@@ -1,4 +1,6 @@
-class SmartFilterManagerUI {
+import { SmartFilterEditor } from './SmartFilterEditor.js';
+
+export class SmartFilterManagerUI {
 
     static initialize(viewer, div) {
         SmartFilterManagerUI._table = null;

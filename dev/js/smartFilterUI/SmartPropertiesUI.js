@@ -1,4 +1,4 @@
-class SmartPropertiesUI {
+export class SmartPropertiesUI {
 
     static initialize(viewer, div) {
         SmartPropertiesUI._table = null;

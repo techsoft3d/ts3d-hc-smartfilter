@@ -1,4 +1,4 @@
-class SmartFilterEditor {
+export class SmartFilterEditor {
     
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -41,9 +41,9 @@ class SmartFilterEditor {
         await SF.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "modelTreeSearchMain" id="' + SmartFilterEditor._maindiv + '_main">';
-        html += '<label style="position:relative;left:5px;">Limit:</label><input onclick=\'SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection">';
-        html += '<button class="modelTreeSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'SmartFilterEditor.selectAll(this)\'>Select All</button>';
-        html += '<button class="modelTreeSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'SmartFilterEditor.search()\'>Search</button>';
+        html += '<label style="position:relative;left:5px;">Limit:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection">';
+        html += '<button class="modelTreeSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
+        html += '<button class="modelTreeSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.search()\'>Search</button>';
         html += '<hr>';
         html += '<div id="' + SmartFilterEditor._maindiv + '_filters">';
         html += await SmartFilterEditor._generateFilters();
@@ -214,12 +214,12 @@ class SmartFilterEditor {
         for (let i = 0; i < SmartFilterEditor._founditems.length; i++) {
             toggle = !toggle;
             if (SmartFilterEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SmartFilterEditor._founditems[i].id)))
-                html += '<div onclick=\'SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItemSelected">';
+                html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItemSelected">';
             else {
                 if (toggle)
-                    html += '<div onclick=\'SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem1">';
+                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem1">';
                 else
-                    html += '<div onclick=\'SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem2">';
+                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem2">';
             }
             html += '<div class="modelTreeSearchItemText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].name) + '</div>';
             html += '<div class="modelTreeSearchItemChainText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].chaintext) + '</div>';
@@ -245,7 +245,7 @@ class SmartFilterEditor {
         else {
 
             let html = '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
-            html += '<select onchange=\'SmartFilterEditor._andorchangedFromUI()\' id="' +  
+            html += '<select onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' id="' +  
             SmartFilterEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
             if (filter.and) {
@@ -264,7 +264,7 @@ class SmartFilterEditor {
 
     static _generateChoiceSelect(filter, filterpos,smartFilter) {
 
-        let html = '<select onchange=\'SmartFilterEditor._andorchangedFromUI()\' style="width:60px;margin-right:3px;" id="' +  
+        let html = '<select onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' style="width:60px;margin-right:3px;" id="' +  
             SmartFilterEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
         let choices = ["has", "exists","!exists", ">=", "<=", "=", "\u2260"];
@@ -293,7 +293,7 @@ class SmartFilterEditor {
     static _generatePropertyTypeSelect(filter, filterpos, smartFilter) {
       
 
-        let html = '<select onchange=\'SmartFilterEditor._clearInputField(' + filterpos + "," + smartFilter.tempId + ');SmartFilterEditor._andorchangedFromUI();\' style="font-size:11px; flex: 1 1 auto;max-width:150px;margin-right:3px;min-width:50px" id="' +  
+        let html = '<select onchange=\'SFUI.SmartFilterEditor._clearInputField(' + filterpos + "," + smartFilter.tempId + ');SFUI.SmartFilterEditor._andorchangedFromUI();\' style="font-size:11px; flex: 1 1 auto;max-width:150px;margin-right:3px;min-width:50px" id="' +  
             SmartFilterEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';       
 
         let sortedStrings = SmartFilterEditor._mtSearch.getAllProperties();
@@ -392,7 +392,7 @@ class SmartFilterEditor {
             if (filter.childFilter) {
                 SmartFilterEditor.tempId++;
                 html += '<div>';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 html+= await this._generateFilters(filter.childFilter,i);
@@ -400,7 +400,7 @@ class SmartFilterEditor {
             }
             else {
                 html += '<div style="height:30px">';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 if (i==1)
@@ -423,10 +423,10 @@ class SmartFilterEditor {
                 html += '</div>';
             }
         }
-        html += '<button class="modelTreeSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
+        html += '<button class="modelTreeSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'SFUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
         if (!smartFilterIn)
         {
-            html += '<button class="modelTreeSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>Add SubFilter</button>';
+            html += '<button class="modelTreeSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'SFUI.SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>Add SubFilter</button>';
         }
         else
         {           

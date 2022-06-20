@@ -3,12 +3,12 @@ var myLayout;
 
 async function msready() {
 
-    SmartFilterEditor.initialize("searchtools", hwv);
-    SmartFilterEditor.display();
+    SFUI.SmartFilterEditor.initialize("searchtools", hwv);
+    SFUI.SmartFilterEditor.display();
 
 
-    SmartFilterManagerUI.initialize(hwv,"smartfilterscontainer");
-    SmartPropertiesUI.initialize(hwv,"smartpropertiescontainer");
+    SFUI.SmartFilterManagerUI.initialize(hwv,"smartfilterscontainer");
+    SFUI.SmartPropertiesUI.initialize(hwv,"smartpropertiescontainer");
 
 }
 
