@@ -1,0 +1,76 @@
+  .modelTreeSearchMain {
+    overflow: hidden;
+    position:absolute;
+    width:100%;
+    height:100%;
+    background-color:white;
+    font-size:12px;
+  }
+
+  .modelTreeSearchItems {
+    overflow: auto;
+    white-space:pre-wrap;
+    font-size:11px;
+    position:relative;
+  }
+  
+  .modelTreeSearchItem1 {
+    background-color:rgb(245,245,245); 
+  }
+  
+  .modelTreeSearchItem2 {
+    background-color:rgb(230,230,230); 
+  }
+  
+  .modelTreeSearchItemSelected {
+    background-color:rgb(255,255,0); 
+  }
+  
+  .modelTreeSearchItemChainText {
+    font-size:9px;
+    margin-left:3px;
+    padding:2px;
+  }
+
+  
+  .modelTreeSearchItemText {
+    margin-bottom:-3px;
+    margin-left:3px;
+    padding:2px;
+  }
+
+  
+  .modelTreeSearchButton {
+    border-width:1px;
+  }
+
+  .cross{
+    width:40px;
+    height:40px;
+    position:relative;
+    border-radius:6px;
+    zoom:0.5;
+}
+
+.cross:before,.cross:after{
+    content:'';
+    position:absolute;
+    width:36px;
+    height:4px;
+    background-color:black;
+    border-radius:2px;
+    top:8px;
+}
+
+.cross:before{
+    -webkit-transform:rotate(45deg);
+    -moz-transform:rotate(45deg);
+    transform:rotate(45deg);
+    left:2px;
+}
+.cross:after{
+    -webkit-transform:rotate(-45deg);
+    -moz-transform:rotate(-45deg);
+    transform:rotate(-45deg);
+    right:2px;
+}
