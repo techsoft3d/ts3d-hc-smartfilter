@@ -580,8 +580,7 @@ export class SmartFilter {
 
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid) {
         if (id != startid) {        
-            if (await this._testNodeAgainstConditions(id,conditions))
-            {
+            if (await this._testNodeAgainstConditions(id,conditions)) {
                 matchingnodes.push(id);
             }           
         }

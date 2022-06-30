@@ -121,16 +121,22 @@ export class SmartFilterEditor {
         let childFilter = null;
         if (createChildFilter) {
             childFilter = new SF.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mtSearch.getStartNode());
-            childFilter.addCondition({ and: true, propertyType:SF.SmartFilterPropertyType.nodeName,propertyName: "", choice: "has", text: "", childFilter:null });
+            childFilter.addCondition(new SF.SmartFilterCondition());
         }
             
         if (smartFilter.getNumConditions() <= 1) {
-            smartFilter.addCondition({ and: true, propertyType:SF.SmartFilterPropertyType.nodeName,propertyName: "", choice: "has", text: "", childFilter:childFilter });
+            let condition = new SF.SmartFilterCondition();
+            condition.setChildFilter(childFilter);
+
+            smartFilter.addCondition(condition);
         }
         else
         {
             let previousCondition = smartFilter.getCondition(smartFilter.getNumConditions() - 1);
-            smartFilter.addCondition({ and: previousCondition.and, propertyType:SF.SmartFilterPropertyType.nodeName, propertyName: "", choice: "has", text: "", childFilter:childFilter });
+            let condition = new SF.SmartFilterCondition();
+            condition.setChildFilter(childFilter);
+            condition.setAndOr(previousCondition.getAndOr());
+            smartFilter.addCondition(condition);
         }
 
         await SmartFilterEditor.updateFilters();
