@@ -28,8 +28,8 @@ export class SmartFilterEditor {
 
         SmartFilterEditor._maindiv = maindiv;
         SmartFilterEditor._viewer = viewer;
-        SmartFilterEditor._mtSearch = new SF.SmartFilter(viewer, startnode);
-        SmartFilterEditor._mtSearch.tempId = 0;
+        SmartFilterEditor._mainFilter = new SF.SmartFilter(viewer, startnode);
+        SmartFilterEditor._mainFilter.tempId = 0;
         
     }
     
@@ -41,8 +41,8 @@ export class SmartFilterEditor {
         html += '<button class="modelTreeSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
         html += '<button class="modelTreeSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.search()\'>Search</button>';
         html += '<hr>';
-        html += '<div id="' + SmartFilterEditor._maindiv + '_filters">';
-        html += await SmartFilterEditor._generateFilters();
+        html += '<div id="' + SmartFilterEditor._maindiv + '_conditions">';
+        html += await SmartFilterEditor._generateConditions();
         html += '</div><hr>';
         html += '<div id="' + SmartFilterEditor._maindiv + '_searchitems" class="modelTreeSearchItems"></div>';
         html += '<div style="position:absolute; right:3px;bottom:20px; font-size:12px;background-color:white" id="' + SmartFilterEditor._maindiv + '_found">Found:</div>';
@@ -55,12 +55,12 @@ export class SmartFilterEditor {
     }
 
     static getFilter() {
-        return SmartFilterEditor._mtSearch;
+        return SmartFilterEditor._mainFilter;
     }
 
-    static refresh() 
+    static adjust() 
     {
-        let newheight = $("#" + SmartFilterEditor._maindiv + "_main").height() - $("#" + SmartFilterEditor._maindiv + "_filters").height() - 40;
+        let newheight = $("#" + SmartFilterEditor._maindiv + "_main").height() - $("#" + SmartFilterEditor._maindiv + "_conditions").height() - 40;
         $("#" + SmartFilterEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
     }
 
@@ -69,21 +69,16 @@ export class SmartFilterEditor {
     }
 
 
-    static async _andorchangedFromUI() {
-        SmartFilterEditor.getFiltersFromUI();
-        await SmartFilterEditor.updateFilters();
-    }
-
     static async search() {
 
-        SmartFilterEditor.getFiltersFromUI();
+        SmartFilterEditor.updateFilterFromUI();
       
-        let nodeids = await SmartFilterEditor._mtSearch.apply();
+        let nodeids = await SmartFilterEditor._mainFilter.apply();
 
-        let startnode = SmartFilterEditor._mtSearch.getStartNode();
+        let startnode = SmartFilterEditor._mainFilter.getStartNode();
         SmartFilterEditor._founditems = [];
         for (let i=0;i<nodeids.length;i++) {
-            let chaintext = SmartFilterEditor._mtSearch.createChainText(nodeids[i], startnode);
+            let chaintext = SmartFilterEditor._mainFilter.createChainText(nodeids[i], startnode);
             let item = {name: SmartFilterEditor._viewer.model.getNodeName(nodeids[i]), id: nodeids[i], chaintext: chaintext};            
             SmartFilterEditor._founditems.push(item);
         }    
@@ -94,12 +89,12 @@ export class SmartFilterEditor {
     static getSmartFilterFromTempId(id) {
 
         if (id == 0) {
-            return SmartFilterEditor._mtSearch;
+            return SmartFilterEditor._mainFilter;
         }
 
-        for (let i=0;i<SmartFilterEditor._mtSearch.getNumConditions();i++)
+        for (let i=0;i<SmartFilterEditor._mainFilter.getNumConditions();i++)
         {
-            let filter = SmartFilterEditor._mtSearch.getCondition(i);
+            let filter = SmartFilterEditor._mainFilter.getCondition(i);
             if (filter.childFilter && filter.childFilter.tempId == id)
             {
                 return filter.childFilter;
@@ -108,36 +103,7 @@ export class SmartFilterEditor {
 
     }
 
-    static async _addFilterFromUI(createChildFilter, id) {
-        let smartFilter;
-        SmartFilterEditor._clearSearchResults();
-        SmartFilterEditor.getFiltersFromUI();
-
-        smartFilter = SmartFilterEditor.getSmartFilterFromTempId(id);
-        let childFilter = null;
-        if (createChildFilter) {
-            childFilter = new SF.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mtSearch.getStartNode());
-            childFilter.addCondition(new SF.SmartFilterCondition());
-        }
-            
-        if (smartFilter.getNumConditions() <= 1) {
-            let condition = new SF.SmartFilterCondition();
-            condition.setChildFilter(childFilter);
-
-            smartFilter.addCondition(condition);
-        }
-        else
-        {
-            let previousCondition = smartFilter.getCondition(smartFilter.getNumConditions() - 1);
-            let condition = new SF.SmartFilterCondition();
-            condition.setChildFilter(childFilter);
-            condition.setAndOr(previousCondition.getAndOr());
-            smartFilter.addCondition(condition);
-        }
-
-        await SmartFilterEditor.updateFilters();
-    }
-
+    
     static isolateAll() {        
                      
         
@@ -161,6 +127,109 @@ export class SmartFilterEditor {
         SmartFilterEditor._generateSearchResults();
     }
 
+    static updateFilterFromUI(smartFilterIn) {
+        let smartFilter;
+        if (!smartFilterIn)
+        {
+            smartFilter = SmartFilterEditor._mainFilter;                 
+        }
+        else
+        {
+            smartFilter = smartFilterIn;
+        }
+
+        for (let i = 0; i < smartFilter.getNumConditions(); i++) {
+            let filter = smartFilter.getCondition(i);
+            if (filter.childFilter) {
+                this.updateFilterFromUI(filter.childFilter);
+            }
+            else {
+                filter.conditionType = SF.SmartFilter.convertStringConditionToEnum($("#" + SmartFilterEditor._maindiv + "_propertyChoiceSelect" + i + "-" + smartFilter.tempId)[0].value);
+                if ($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0] != undefined) {
+                    filter.text = SmartFilterEditor._htmlEncode($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value);
+                }
+                filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
+
+                switch (filter.propertyName) {
+                    case "Node Name":
+                        filter.propertyType = SF.SmartFilterPropertyType.nodeName;
+                        break;
+                    case "Nodeid":
+                        filter.propertyType = SF.SmartFilterPropertyType.nodeId;
+                        break;
+                    case "Node Chain":
+                        filter.propertyType = SF.SmartFilterPropertyType.nodeChain;
+                        break;
+                    case "Node Type":
+                        filter.propertyType = SF.SmartFilterPropertyType.nodeType;
+                        break;
+                    case "Node Color":
+                        filter.propertyType = SF.SmartFilterPropertyType.nodeColor;
+                        break;
+                    case "Rel:ContainedIn":
+                    case "Rel:SpaceBoundary":
+                        filter.propertyType = SF.SmartFilterPropertyType.relationship;
+                        break;
+                    default:
+                        filter.propertyType = SF.SmartFilterPropertyType.property;
+                }
+
+
+                if (i == 1) {
+                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
+                }
+                else if (i > 1) {
+                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
+                }
+            }
+
+        }
+    }
+
+    static async refreshUI() {     
+        $("#" + SmartFilterEditor._maindiv + "_conditions").empty();
+        $("#" + SmartFilterEditor._maindiv + "_conditions").append(await SmartFilterEditor._generateConditions());
+        SmartFilterEditor.adjust();
+
+    }
+    
+    static async _andorchangedFromUI() {
+        SmartFilterEditor.updateFilterFromUI();
+        await SmartFilterEditor.refreshUI();
+    }
+
+
+    static async _addFilterFromUI(createChildFilter, id) {
+        let smartFilter;
+        SmartFilterEditor._clearSearchResults();
+        SmartFilterEditor.updateFilterFromUI();
+
+        smartFilter = SmartFilterEditor.getSmartFilterFromTempId(id);
+        let childFilter = null;
+        if (createChildFilter) {
+            childFilter = new SF.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mainFilter.getStartNode());
+            childFilter.addCondition(new SF.SmartFilterCondition());
+        }
+            
+        if (smartFilter.getNumConditions() <= 1) {
+            let condition = new SF.SmartFilterCondition();
+            condition.setChildFilter(childFilter);
+
+            smartFilter.addCondition(condition);
+        }
+        else
+        {
+            let previousCondition = smartFilter.getCondition(smartFilter.getNumConditions() - 1);
+            let condition = new SF.SmartFilterCondition();
+            condition.setChildFilter(childFilter);
+            condition.setAndOr(previousCondition.getAndOr());
+            smartFilter.addCondition(condition);
+        }
+
+        await SmartFilterEditor.refreshUI();
+    }
+
+
     static _select(id) {
         if (!SmartFilterEditor.ctrlPressed)
             SmartFilterEditor._viewer.selectionManager.selectNode(parseInt(id), Communicator.SelectionMode.Set);
@@ -172,11 +241,11 @@ export class SmartFilterEditor {
 
     static _deleteFilter(i,id) {
         SmartFilterEditor._clearSearchResults();
-        SmartFilterEditor.getFiltersFromUI();
+        SmartFilterEditor.updateFilterFromUI();
         let smartFilter = SmartFilterEditor.getSmartFilterFromTempId(id);
         smartFilter.removeCondition(i);
 
-        SmartFilterEditor.updateFilters();
+        SmartFilterEditor.refreshUI();
 
     }
 
@@ -188,11 +257,11 @@ export class SmartFilterEditor {
             for (let i = 0; i < r.length; i++) {
                 limitselectionlist.push(r[i].getNodeId());
             }
-            SmartFilterEditor._mtSearch.limitToNodes(limitselectionlist);
+            SmartFilterEditor._mainFilter.limitToNodes(limitselectionlist);
         }
         else
         {
-            SmartFilterEditor._mtSearch.limitToNodes([]);
+            SmartFilterEditor._mainFilter.limitToNodes([]);
         }
     }
 
@@ -230,7 +299,7 @@ export class SmartFilterEditor {
         }
         $("#" + SmartFilterEditor._maindiv + "_searchitems").append(html);
 
-        SmartFilterEditor.refresh();
+        SmartFilterEditor.adjust();
     }
 
 
@@ -298,7 +367,7 @@ export class SmartFilterEditor {
         let html = '<select onchange=\'SFUI.SmartFilterEditor._clearInputField(' + filterpos + "," + smartFilter.tempId + ');SFUI.SmartFilterEditor._andorchangedFromUI();\' style="font-size:11px; flex: 1 1 auto;max-width:150px;margin-right:3px;min-width:50px" id="' +  
             SmartFilterEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';       
 
-        let sortedStrings = SmartFilterEditor._mtSearch.getAllProperties();
+        let sortedStrings = SmartFilterEditor._mainFilter.getAllProperties();
             
         sortedStrings.unshift("Rel:SpaceBoundary");
         sortedStrings.unshift("Rel:ContainedIn");
@@ -344,7 +413,7 @@ export class SmartFilterEditor {
             }
         }        
         else {
-            let options = SmartFilterEditor._mtSearch.getAllOptionsForProperty(filter.propertyName);
+            let options = SmartFilterEditor._mainFilter.getAllOptionsForProperty(filter.propertyName);
             for (let i in options) {
                 sortedStrings.push(i);
             }
@@ -361,14 +430,14 @@ export class SmartFilterEditor {
         return html;
     }
 
-    static async _generateFilters(smartFilterIn,index) {                
+    static async _generateConditions(smartFilterIn,index) {                
         let html = "";
         let smartFilter;
         let tempId;
         if (!smartFilterIn)
         {
             SmartFilterEditor.tempId = 0;
-            smartFilter = SmartFilterEditor._mtSearch;                 
+            smartFilter = SmartFilterEditor._mainFilter;                 
         }
         else
         {
@@ -397,7 +466,7 @@ export class SmartFilterEditor {
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
-                html+= await this._generateFilters(filter.childFilter,i);
+                html+= await this._generateConditions(filter.childFilter,i);
                 html += '</div>';
             }
             else {
@@ -437,72 +506,6 @@ export class SmartFilterEditor {
 
         
         return html;
-    }
-
-    static getFiltersFromUI(smartFilterIn) {
-        let smartFilter;
-        if (!smartFilterIn)
-        {
-            smartFilter = SmartFilterEditor._mtSearch;                 
-        }
-        else
-        {
-            smartFilter = smartFilterIn;
-        }
-
-        for (let i = 0; i < smartFilter.getNumConditions(); i++) {
-            let filter = smartFilter.getCondition(i);
-            if (filter.childFilter) {
-                this.getFiltersFromUI(filter.childFilter);
-            }
-            else {
-                filter.conditionType = SF.SmartFilter.convertStringConditionToEnum($("#" + SmartFilterEditor._maindiv + "_propertyChoiceSelect" + i + "-" + smartFilter.tempId)[0].value);
-                if ($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0] != undefined) {
-                    filter.text = SmartFilterEditor._htmlEncode($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value);
-                }
-                filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
-
-                switch (filter.propertyName) {
-                    case "Node Name":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeName;
-                        break;
-                    case "Nodeid":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeId;
-                        break;
-                    case "Node Chain":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeChain;
-                        break;
-                    case "Node Type":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeType;
-                        break;
-                    case "Node Color":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeColor;
-                        break;
-                    case "Rel:ContainedIn":
-                    case "Rel:SpaceBoundary":
-                        filter.propertyType = SF.SmartFilterPropertyType.relationship;
-                        break;
-                    default:
-                        filter.propertyType = SF.SmartFilterPropertyType.property;
-                }
-
-
-                if (i == 1) {
-                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
-                }
-                else if (i > 1) {
-                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
-                }
-            }
-
-        }
-    }
-
-    static async updateFilters() {     
-        $("#" + SmartFilterEditor._maindiv + "_filters").empty();
-        $("#" + SmartFilterEditor._maindiv + "_filters").append(await SmartFilterEditor._generateFilters());
-        SmartFilterEditor.refresh();
-
     }
 
 }

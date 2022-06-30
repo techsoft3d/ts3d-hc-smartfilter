@@ -56,7 +56,7 @@ export class SmartFilterManagerUI {
     }
 
     static async _addCurrentFilter() {
-        SmartFilterEditor.getFiltersFromUI();
+        SmartFilterEditor.updateFilterFromUI();
         let filter = SmartFilterEditor.getFilter();
         let jfilter = filter.toJSON();
 
@@ -188,7 +188,7 @@ export class SmartFilterManagerUI {
 
         let editorfilter = SmartFilterEditor.getFilter();
         editorfilter.fromJSON(filterjson);
-        await SmartFilterEditor.updateFilters();
+        await SmartFilterEditor.refreshUI();
         await SmartFilterEditor.search();
         if (isolate)
         {
@@ -221,7 +221,7 @@ export class SmartFilterManagerUI {
         let data = row.getData();
         let smartFilter = SF.SmartFilterManager.getSmartFilter(data.id);
 
-        SmartFilterEditor.getFiltersFromUI();
+        SmartFilterEditor.updateFilterFromUI();
         let filter = SmartFilterEditor.getFilter();
         let jfilter = filter.toJSON();
 

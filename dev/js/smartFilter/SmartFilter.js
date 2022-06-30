@@ -272,6 +272,64 @@ export class SmartFilter {
         return chaintext;
     }
 
+    async testOneNodeAgainstConditions(id)
+    {
+        return await this._testNodeAgainstConditions(id,this._conditions);
+    }
+
+    async findAllPropertiesOnNode(id, conditionsIn, foundConditionsIn, alreadyDoneHashIn) {
+        let conditions;
+        let foundConditions;
+        let alreadyDoneHash;
+        if (!conditionsIn) {
+            conditions = this._conditions;
+            foundConditions = [];
+            alreadyDoneHash = [];
+        }
+        else
+        {
+            conditions = conditionsIn;
+            foundConditions = foundConditionsIn;
+            alreadyDoneHash = alreadyDoneHashIn;
+        }
+
+        for (let i = 0; i < conditions.length; i++) {
+            if (conditions[i].childFilter) {
+                await this.findAllPropertiesOnNode(id, conditions[i].childFilter._conditions, foundConditions, alreadyDoneHash);
+            }
+            else {
+                if (conditions[i].propertyType == SmartFilterPropertyType.property) {
+                    let conditionsOnNode = SmartFilter._propertyHash[id];
+                    if (conditionsOnNode[conditions[i].propertyName] && !alreadyDoneHash[conditions[i].propertyName]) {
+                        alreadyDoneHash[conditions[i].propertyName] = true;
+                        foundConditions.push({name: conditions[i].propertyName, value: conditionsOnNode[conditions[i].propertyName]});
+                    }
+                }
+            }
+        }
+        return foundConditions;
+
+    }
+
+    generateString()
+    {
+        let text = "";
+        for (let i = 0; i < this._conditions.length; i++) {
+            if (i > 0) {
+                text += " " + (this._conditions[i].and ? "AND" : "OR") + " ";
+            }
+            if (this._conditions[i].childFilter) {
+                text += "(" + this._conditions[i].childFilter.generateString() + ") ";
+            }
+            else
+            {
+                text += this._conditions[i].propertyName + " " + SmartFilter.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
+            }
+        }
+        return text;
+    }
+
+
     async _checkSpaceBoundaryFilter(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
@@ -551,45 +609,7 @@ export class SmartFilter {
     }
 
 
-    async testOneNodeAgainstConditions(id)
-    {
-        return await this._testNodeAgainstConditions(id,this._conditions);
-    }
-
-    async findAllPropertiesOnNode(id, conditionsIn, foundConditionsIn, alreadyDoneHashIn) {
-        let conditions;
-        let foundConditions;
-        let alreadyDoneHash;
-        if (!conditionsIn) {
-            conditions = this._conditions;
-            foundConditions = [];
-            alreadyDoneHash = [];
-        }
-        else
-        {
-            conditions = conditionsIn;
-            foundConditions = foundConditionsIn;
-            alreadyDoneHash = alreadyDoneHashIn;
-        }
-
-        for (let i = 0; i < conditions.length; i++) {
-            if (conditions[i].childFilter) {
-                await this.findAllPropertiesOnNode(id, conditions[i].childFilter._conditions, foundConditions, alreadyDoneHash);
-            }
-            else {
-                if (conditions[i].propertyType == SmartFilterPropertyType.property) {
-                    let conditionsOnNode = SmartFilter._propertyHash[id];
-                    if (conditionsOnNode[conditions[i].propertyName] && !alreadyDoneHash[conditions[i].propertyName]) {
-                        alreadyDoneHash[conditions[i].propertyName] = true;
-                        foundConditions.push({name: conditions[i].propertyName, value: conditionsOnNode[conditions[i].propertyName]});
-                    }
-                }
-            }
-        }
-        return foundConditions;
-
-    }
-
+ 
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid) {
         if (id != startid) {        
             if (await this._testNodeAgainstConditions(id,conditions)) {
@@ -604,22 +624,6 @@ export class SmartFilter {
 
     }
 
-    generateString()
-    {
-        let text = "";
-        for (let i = 0; i < this._conditions.length; i++) {
-            if (i > 0) {
-                text += " " + (this._conditions[i].and ? "AND" : "OR") + " ";
-            }
-            if (this._conditions[i].childFilter) {
-                text += "(" + this._conditions[i].childFilter.generateString() + ") ";
-            }
-            else
-            {
-                text += this._conditions[i].propertyName + " " + SmartFilter.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
-            }
-        }
-        return text;
-    }
+   
 
 }

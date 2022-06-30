@@ -61,8 +61,7 @@ export class SmartFilterManager {
     {
         let properties = [];
         for (let i = 0; i < SmartFilterManager._smartFilters.length; i++) {
-            if (SmartFilterManager._smartFilters[i].isProp)
-            {
+            if (SmartFilterManager._smartFilters[i].isProp) {
                 let smartFilter = SmartFilterManager._smartFilters[i].filter;
                 let res = await smartFilter.testOneNodeAgainstConditions(nodeid);
                 if (res)
@@ -78,7 +77,6 @@ export class SmartFilterManager {
             }
         }
         return properties;
-
     }
 
 }
