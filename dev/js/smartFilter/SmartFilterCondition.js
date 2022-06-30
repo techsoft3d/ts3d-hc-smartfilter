@@ -11,6 +11,27 @@ export class SmartFilterCondition {
         this.propertyName = "";
         this.text =  "";
         this.childFilter = null;
+
+    }
+
+    toJSON() {
+        return {
+            and: this.and,
+            conditionType: this.conditionType,
+            propertyType: this.propertyType,
+            propertyName:  JSON.parse(JSON.stringify(this.propertyName)),
+            text: this.text,
+            childFilter: this.childFilter
+        };
+    }
+
+    fromJSON(def) {
+        this.and = def.and;
+        this.conditionType = def.conditionType;
+        this.propertyType = def.propertyType;
+        this.propertyName = def.propertyName;
+        this.text = def.text;
+        this.childFilter = def.childFilter;
     }
 
     setAndOr(andor) {

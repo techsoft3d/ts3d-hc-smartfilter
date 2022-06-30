@@ -20,6 +20,9 @@ const SmartFilterPropertyType = {
     property:6
 };
 
+import { SmartFilterCondition } from './SmartFilterCondition.js';
+
+
 export {SmartFilterPropertyType};
 
 export class SmartFilter {
@@ -183,8 +186,13 @@ export class SmartFilter {
     }
 
     fromJSON(json) {
+        this._conditions = [];
      
-        this._conditions = json.conditions;
+        for (let i=0;i<json.conditions.length;i++) {
+            let condition =  new SmartFilterCondition();
+            condition.fromJSON(json.conditions[i]);
+            this._conditions.push(condition);
+        }
         for (let i=0;i<this._conditions.length;i++)
         {
             if (this._conditions[i].childFilter)
@@ -201,8 +209,8 @@ export class SmartFilter {
 
         let newconditions = [];
         for (let i=0;i<this._conditions.length;i++) {
-            let fjson = { and: this._conditions[i].and, propertyType: this._conditions[i].propertyType, propertyName: JSON.parse(JSON.stringify(this._conditions[i].propertyName)), 
-                conditionType: this._conditions[i].conditionType, text: JSON.parse(JSON.stringify(this._conditions[i].text))};
+            let fjson =this._conditions[i].toJSON();
+
             if (this._conditions[i].childFilter)
             {
                 fjson.childFilter = this._conditions[i].childFilter.toJSON();
@@ -548,27 +556,31 @@ export class SmartFilter {
         return await this._testNodeAgainstConditions(id,this._conditions);
     }
 
-    async findAllPropertiesOnNode(id, conditionsIn, foundConditionsIn) {
+    async findAllPropertiesOnNode(id, conditionsIn, foundConditionsIn, alreadyDoneHashIn) {
         let conditions;
         let foundConditions;
+        let alreadyDoneHash;
         if (!conditionsIn) {
             conditions = this._conditions;
             foundConditions = [];
+            alreadyDoneHash = [];
         }
         else
         {
             conditions = conditionsIn;
             foundConditions = foundConditionsIn;
+            alreadyDoneHash = alreadyDoneHashIn;
         }
 
         for (let i = 0; i < conditions.length; i++) {
             if (conditions[i].childFilter) {
-                await this.findAllPropertiesOnNode(id, conditions[i].childFilter._conditions, foundConditions);
+                await this.findAllPropertiesOnNode(id, conditions[i].childFilter._conditions, foundConditions, alreadyDoneHash);
             }
             else {
                 if (conditions[i].propertyType == SmartFilterPropertyType.property) {
                     let conditionsOnNode = SmartFilter._propertyHash[id];
-                    if (conditionsOnNode[conditions[i].propertyName]) {
+                    if (conditionsOnNode[conditions[i].propertyName] && !alreadyDoneHash[conditions[i].propertyName]) {
+                        alreadyDoneHash[conditions[i].propertyName] = true;
                         foundConditions.push({name: conditions[i].propertyName, value: conditionsOnNode[conditions[i].propertyName]});
                     }
                 }
