@@ -25,15 +25,11 @@ export class SmartFilterEditor {
             
             SmartFilterEditor.ctrlPressed = e.ctrlKey;
         } );
-        SmartFilterEditor.filterHash  = [];
-
-        SmartFilterEditor._mtSearch = new SF.SmartFilter(viewer, startnode);
-        SmartFilterEditor._mtSearch.tempId = 0;
-        SmartFilterEditor.filterHash[0] = SmartFilterEditor._mtSearch;
 
         SmartFilterEditor._maindiv = maindiv;
         SmartFilterEditor._viewer = viewer;
         SmartFilterEditor._mtSearch = new SF.SmartFilter(viewer, startnode);
+        SmartFilterEditor._mtSearch.tempId = 0;
         
     }
     
