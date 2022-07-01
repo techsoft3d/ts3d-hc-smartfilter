@@ -9,9 +9,9 @@ export class SmartFilterManagerUI {
 
         SF.SmartFilterManager.initialize(viewer);
 
-        $("#" + SmartFilterManagerUI._uidiv).append('<button id="smartFilterManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
-        $("#" + SmartFilterManagerUI._uidiv).append('<button id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:0px">Export</button>');
-        $("#" + SmartFilterManagerUI._uidiv).append('<button id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:0px">Load</button><input style="display:none" type="file" id="inputupload">');
+        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
+        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:0px">Export</button>');
+        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:0px">Load</button><input style="display:none" type="file" id="inputupload">');
 
 
 
@@ -85,9 +85,9 @@ export class SmartFilterManagerUI {
    
         content += '<div style="height:20px">';
     
-        content += '<button id="sfm-select-' + cell.getData().id + '" type="button" title="Press Shift to Isolate" style="position:relative;top:2px;height:18px"><span style="font-size:12px;top:-2px;position:relative;">Select</span></button>';
-        content += '<button id="sfm-update-' + cell.getData().id + '" type="button" style="margin-left:2px; position:relative;top:2px;height:18px"><span style="font-size:12px;top:-2px;position:relative;">Update</span></button>';
-        content += '<button id="sfm-delete-' + cell.getData().id + '" type="button" style="margin-left:2px; position:relative;top:2px;height:18px"><span style="font-size:12px;top:-2px;position:relative;">Del</span></button>';
+        content += '<button class="smartFilterManagerButtons" id="sfm-select-' + cell.getData().id + '" type="button" title="Press Shift to Isolate" ><span style="font-size:12px;top:-2px;position:relative;">Select</span></button>';
+        content += '<button class="smartFilterManagerButtons" id="sfm-update-' + cell.getData().id + '" type="button" ><span style="font-size:12px;top:-2px;position:relative;">Update</span></button>';
+        content += '<button class="smartFilterManagerButtons" id="sfm-delete-' + cell.getData().id + '" type="button" ><span style="font-size:12px;top:-2px;position:relative;">Del</span></button>';
     
         content += '</div>';
         $(cell.getElement()).append(content);

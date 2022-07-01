@@ -5,9 +5,10 @@
     height:100%;
     background-color:white;
     font-size:12px;
+    line-height:1
   }
 
-  .modelTreeSearchItems {
+  .smartFilterSearchItems {
     overflow: auto;
     white-space:pre-wrap;
     font-size:11px;
@@ -22,27 +23,44 @@
     background-color:rgb(230,230,230); 
   }
   
-  .modelTreeSearchItemSelected {
+  .smartFilterSearchItemselected {
     background-color:rgb(255,255,0); 
   }
   
-  .modelTreeSearchItemChainText {
+  .smartFilterSearchItemChainText {
     font-size:9px;
     margin-left:3px;
     padding:2px;
   }
 
   
-  .modelTreeSearchItemText {
+  .smartFilterSearchItemText {
     margin-bottom:-3px;
     margin-left:3px;
     padding:2px;
   }
 
-  
-  .modelTreeSearchButton {
-    border-width:1px;
+  .smartFilterSearchButton {
+    border-width: 1px;
+    font-family: monospace;
+    font-size:11px;
+    margin: 0;
   }
+
+  
+  .smartFilterSearchSelect {
+    font-family: monospace;
+    font-size: 11px;
+  }
+
+  .propertyTypeSelect {
+    font-size:11px; 
+    flex: 1 1 auto;
+    max-width:150px;
+    margin-right:3px;
+    min-width:50px
+  }
+
 
   .cross{
     width:40px;
@@ -73,4 +91,12 @@
     -moz-transform:rotate(-45deg);
     transform:rotate(-45deg);
     right:2px;
+}
+
+.smartFilterManagerButtons {
+  position: relative;
+  top: 2px;
+  height: 18px;
+  line-height: 1;
+  margin-left:2px;
 }
