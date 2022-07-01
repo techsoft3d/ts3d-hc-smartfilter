@@ -2,7 +2,7 @@ import { SmartFilterEditor } from './SmartFilterEditor.js';
 
 export class SmartFilterManagerUI {
 
-    static initialize(viewer, div) {
+    static initialize(viewer, div, showImportExportButtons) {
         SmartFilterManagerUI._table = null;
         SmartFilterManagerUI._viewer = viewer;
         SmartFilterManagerUI._uidiv = div;
@@ -10,8 +10,10 @@ export class SmartFilterManagerUI {
         SF.SmartFilterManager.initialize(viewer);
 
         $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
-        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:0px">Export</button>');
-        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:0px">Load</button><input style="display:none" type="file" id="inputupload">');
+        if (showImportExportButtons) {
+            $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:4px">Export</button>');
+            $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:4px">Load</button><input style="display:none" type="file" id="inputupload">');
+        }
 
 
 

@@ -1,6 +1,6 @@
 export class SmartFilterEditor {
     
-    SmartFilterEditor._chainSkip = 0;
+    static _chainSkip = 0;
 
     static _htmlEncode(html) {
         html = $.trim(html);
