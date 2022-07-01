@@ -2,6 +2,8 @@ import { SmartFilterEditor } from './SmartFilterEditor.js';
 
 export class SmartFilterManagerUI {
 
+    static _updatedCallback = null;
+
     static initialize(viewer, div, showImportExportButtons) {
         SmartFilterManagerUI._table = null;
         SmartFilterManagerUI._viewer = viewer;
@@ -13,32 +15,33 @@ export class SmartFilterManagerUI {
         if (showImportExportButtons) {
             $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:4px">Export</button>');
             $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:4px">Load</button><input style="display:none" type="file" id="inputupload">');
+
+            $("#smartFilterManagerExport").click(function () { SmartFilterManagerUI.exportToFile("smartfilters.json"); });
+
+            $("#smartFilterManagerUpload").click(function(e){
+                e.preventDefault();
+                $("#inputupload").trigger('click');
+             });
+    
+             $("#inputupload").change(function () {
+        
+                let files = $('#inputupload')[0].files;        
+                // Check file selected or not
+                if (files.length > 0) {
+                    SmartFilterManagerUI.load(files[0]);
+                }
+              });
         }
 
-
-
         $("#smartFilterManagerAddCurrentFilter").click(function () { SmartFilterManagerUI._addCurrentFilter(); });
-        $("#smartFilterManagerExport").click(function () { SmartFilterManagerUI.exportToFile("smartfilters.json"); });
-
-        $("#smartFilterManagerUpload").click(function(e){
-            e.preventDefault();
-            $("#inputupload").trigger('click');
-         });
-
-         $("#inputupload").change(function () {
-    
-            let files = $('#inputupload')[0].files;        
-            // Check file selected or not
-            if (files.length > 0) {
-                SmartFilterManagerUI.load(files[0]);
-            }
-          });
-
-
-
+       
         $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" style="overflow: hidden; zoom:0.7;width:100%; height:100%;"></div>');
 
-        SmartFilterManagerUI._refreshUI();
+        SmartFilterManagerUI.refreshUI();
+    }
+
+    static setUpdatedCallback(callback) {
+        SmartFilterManagerUI._updatedCallback = callback;
     }
 
     static async load(file) {
@@ -49,13 +52,14 @@ export class SmartFilterManagerUI {
                 // Render thumbnail.
                 let res = JSON.parse(e.target.result);
                 SF.SmartFilterManager.fromJSON(res);
-                SmartFilterManagerUI._refreshUI();
+                SmartFilterManagerUI.refreshUI();
             };
         })(file);
 
         // Read in the image file as a data URL.
         reader.readAsText(file);
     }
+    
 
     static async _addCurrentFilter() {
         SmartFilterEditor.updateFilterFromUI();
@@ -74,6 +78,9 @@ export class SmartFilterManagerUI {
         prop.description = text;
         await SmartFilterManagerUI._table.addRow(prop);
 
+        if (SmartFilterManagerUI._updatedCallback) {
+            SmartFilterManagerUI._updatedCallback();
+        }
     }
 
     static _renderButtonCell(cell) {
@@ -109,7 +116,7 @@ export class SmartFilterManagerUI {
         });
     }
 
-    static async _refreshUI() {
+    static async refreshUI() {
 
         if (!SmartFilterManagerUI._table) {
             SmartFilterManagerUI._table = new Tabulator("#" + SmartFilterManagerUI._uidiv + "Tabulator", {
@@ -211,11 +218,18 @@ export class SmartFilterManagerUI {
         {
             row.update({description:smartFilter.generateString()});
         }
+        if (SmartFilterManagerUI._updatedCallback) {
+            SmartFilterManagerUI._updatedCallback();
+        }
+
     }
 
     static async _handleSmartFilterIsPropEdit(row) {
         let data = row.getData();
         SF.SmartFilterManager.updateSmartFilterIsProp(data.id,data.prop);
+        if (SmartFilterManagerUI._updatedCallback) {
+            SmartFilterManagerUI._updatedCallback();
+        }
     }
 
     static _handleSmartFilterUpdate(row) {
@@ -237,6 +251,9 @@ export class SmartFilterManagerUI {
             row.update({description:sf.generateString()});
         }
 
+        if (SmartFilterManagerUI._updatedCallback) {
+            SmartFilterManagerUI._updatedCallback();
+        }
     }
 
     static exportToFile(filename) {
