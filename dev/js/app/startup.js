@@ -94,7 +94,7 @@ function createUILayout() {
     myLayout.on('stateChanged', function () {
         if (hwv != null) {
             hwv.resizeCanvas();
-            SmartFilterEditor.adjust();
+            SFUI.SmartFilterEditor.adjust();
         }
     });
     myLayout.init();
@@ -125,8 +125,8 @@ function createUILayout() {
 
 function initializeSearch(){
     if(hwv.selectionManager.getLast())   
-        SmartFilterEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
+        SFUI.SmartFilterEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
     else
-        SmartFilterEditor.initialize("searchtools",hwv);
-    SmartFilterEditor.display();
+        SFUI.SmartFilterEditor.initialize("searchtools",hwv);
+    SFUI.SmartFilterEditor.display();
 }

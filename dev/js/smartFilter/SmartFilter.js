@@ -75,6 +75,28 @@ export class SmartFilter {
         }
     }
 
+    static convertStringPropertyTypeToEnum(c) {
+
+        switch (c) {
+            case "Node Name":
+                return SmartFilterPropertyType.nodeName;
+            case "Nodeid":
+                return SmartFilterPropertyType.nodeId;
+            case "Node Chain":
+                return SmartFilterPropertyType.nodeChain;
+            case "Node Type":
+                return SmartFilterPropertyType.nodeType;
+            case "Node Color":
+                return SmartFilterPropertyType.nodeColor;
+            case "Rel:ContainedIn":
+            case "Rel:SpaceBoundary":
+                return SmartFilterPropertyType.relationship;
+            default:
+                return SmartFilterPropertyType.property;
+        }
+    }
+
+
     static _getModelTreeIdsRecursive(nodeid,proms, ids, viewer) {
 
         proms.push(viewer.model.getNodeProperties(nodeid));
@@ -86,6 +108,10 @@ export class SmartFilter {
     }
 
     static initialize(viewer) {
+        SmartFilter._propertyHash = [];
+        SmartFilter._allPropertiesHash = [];        
+        SmartFilter.containedInSpatialStructureHash = [];
+        SmartFilter.spaceBoundaryHash = [];
 
         let layernames = viewer.model.getLayers();
         let lst = new Promise(function (resolve, reject) {
@@ -251,7 +277,7 @@ export class SmartFilter {
         return matchingnodes;
     }
 
-    createChainText(id, startid) {
+    createChainText(id, startid, chainskip) {
         let current = id;
         let chain = [];
         chain.push(this._viewer.model.getNodeName(id));
@@ -263,7 +289,7 @@ export class SmartFilter {
             current = newone;
         }
         let chaintext = "";
-        for (let j = chain.length - 1; j >= 0; j--) {
+        for (let j = chain.length - 1 - chainskip; j >= 0; j--) {
             if (j > 0)
                 chaintext += chain[j] + "->";
             else

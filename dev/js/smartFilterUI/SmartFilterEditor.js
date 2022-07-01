@@ -20,7 +20,8 @@ export class SmartFilterEditor {
 
     static initialize(maindiv, viewer, startnode) {
         SmartFilterEditor.ctrlPressed = false;
-      
+
+        SmartFilterEditor._chainSkip = 0;
         $(document).on('keyup keydown', function(e){
             
             SmartFilterEditor.ctrlPressed = e.ctrlKey;
@@ -31,6 +32,11 @@ export class SmartFilterEditor {
         SmartFilterEditor._mainFilter = new SF.SmartFilter(viewer, startnode);
         SmartFilterEditor._mainFilter.tempId = 0;
         
+    }
+
+    static setChainSkip(skip) {
+        SmartFilterEditor._chainSkip = skip;
+
     }
     
     static async display() {
@@ -78,7 +84,7 @@ export class SmartFilterEditor {
         let startnode = SmartFilterEditor._mainFilter.getStartNode();
         SmartFilterEditor._founditems = [];
         for (let i=0;i<nodeids.length;i++) {
-            let chaintext = SmartFilterEditor._mainFilter.createChainText(nodeids[i], startnode);
+            let chaintext = SmartFilterEditor._mainFilter.createChainText(nodeids[i], startnode, SmartFilterEditor._chainSkip);
             let item = {name: SmartFilterEditor._viewer.model.getNodeName(nodeids[i]), id: nodeids[i], chaintext: chaintext};            
             SmartFilterEditor._founditems.push(item);
         }    
@@ -103,10 +109,8 @@ export class SmartFilterEditor {
 
     }
 
-    
     static isolateAll() {        
-                     
-        
+                            
         let selections = [];
         for (let i = 0; i < SmartFilterEditor._founditems.length; i++) {
             selections.push(parseInt(SmartFilterEditor._founditems[i].id));
@@ -150,30 +154,7 @@ export class SmartFilterEditor {
                 }
                 filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
 
-                switch (filter.propertyName) {
-                    case "Node Name":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeName;
-                        break;
-                    case "Nodeid":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeId;
-                        break;
-                    case "Node Chain":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeChain;
-                        break;
-                    case "Node Type":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeType;
-                        break;
-                    case "Node Color":
-                        filter.propertyType = SF.SmartFilterPropertyType.nodeColor;
-                        break;
-                    case "Rel:ContainedIn":
-                    case "Rel:SpaceBoundary":
-                        filter.propertyType = SF.SmartFilterPropertyType.relationship;
-                        break;
-                    default:
-                        filter.propertyType = SF.SmartFilterPropertyType.property;
-                }
-
+                filter.propertyType = SF.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
 
                 if (i == 1) {
                     filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
@@ -503,8 +484,6 @@ export class SmartFilterEditor {
         {           
             html += '</div>';    
         }
-
-        
         return html;
     }
 
