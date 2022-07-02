@@ -477,7 +477,7 @@ export class SmartFilter {
                 searchAgainst = this._viewer.model.getNodeName(id);
             }
             else if (condition.propertyType == SmartFilterPropertyType.nodeChain) {
-                searchAgainst = this.createChainText(id, this._viewer.model.getRootNode());
+                searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(),0);
             }
             else if (condition.propertyType == SmartFilterPropertyType.nodeType) {
                 searchAgainst = Communicator.NodeType[this._viewer.model.getNodeType(id)];
