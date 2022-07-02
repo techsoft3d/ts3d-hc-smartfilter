@@ -1,6 +1,7 @@
 export class SmartFilterEditor {
     
     static _chainSkip = 0;
+    static _showLimitOption = true;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -40,12 +41,24 @@ export class SmartFilterEditor {
         SmartFilterEditor._chainSkip = skip;
 
     }
+
+    static setShowLimitOption(limitOption) {
+        SmartFilterEditor._showLimitOption = limitOption;
+
+    }
     
     static async display() {
         await SF.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "modelTreeSearchMain" id="' + SmartFilterEditor._maindiv + '_main">';
-        html += '<label style="position:relative;left:5px;">Limit:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection">';
+        if (SmartFilterEditor._showLimitOption) {
+            html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
+        }
+        else
+        {
+            html += '<div style="position:relative;height:20px;"></div>';
+
+        }
         html += '<button class="smartFilterSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
         html += '<button class="smartFilterSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.search()\'>Search</button>';
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
@@ -53,7 +66,7 @@ export class SmartFilterEditor {
         html += await SmartFilterEditor._generateConditions();
         html += '</div><hr>';
         html += '<div id="' + SmartFilterEditor._maindiv + '_searchitems" class="smartFilterSearchItems"></div>';
-        html += '<div style="position:absolute; right:3px;bottom:20px; font-size:12px;background-color:white" id="' + SmartFilterEditor._maindiv + '_found">Found:</div>';
+        html += '<div style="position:absolute; right:20px;bottom:0px; font-size:12px;background-color:white" id="' + SmartFilterEditor._maindiv + '_found">Found:</div>';
         html += '</div>';
         $("#" + SmartFilterEditor._maindiv).empty();
         $("#" + SmartFilterEditor._maindiv).append(html);
@@ -68,8 +81,14 @@ export class SmartFilterEditor {
 
     static adjust() 
     {
-        let newheight = $("#" + SmartFilterEditor._maindiv + "_main").height() - $("#" + SmartFilterEditor._maindiv + "_conditions").height() - 40;
+
+        let newheight = $("#" + SmartFilterEditor._maindiv).parent().height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
         $("#" + SmartFilterEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
+        
+        let gap  = $("#" + SmartFilterEditor._maindiv).offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top;
+        $("#" + SmartFilterEditor._maindiv + "_found").css({ "bottom": gap + "px" });
+
+
     }
 
     static flush() {
@@ -475,7 +494,7 @@ export class SmartFilterEditor {
                 }
                 html += '</div>';
                 html += '</div>';
-            }
+            }        
         }
         html += '<button class="smartFilterSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'SFUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
         if (!smartFilterIn)
@@ -485,7 +504,7 @@ export class SmartFilterEditor {
         else
         {           
             html += '</div>';    
-        }
+        }       
         return html;
     }
 
