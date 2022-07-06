@@ -112,6 +112,7 @@ export class SmartFilter {
         {
             if (SmartFilter._modelHash[i].id == id)
             {
+                SmartFilter._modelHash[i].nodeid = nodeid;
                 return;
             }
         }
