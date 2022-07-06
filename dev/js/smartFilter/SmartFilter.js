@@ -337,6 +337,10 @@ export class SmartFilter {
 
     async testOneNodeAgainstConditions(id)
     {
+        let conditions = this._conditions;
+        for (let i = 0; i < conditions.length; i++) {
+            conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
+        }
         return await this._testNodeAgainstConditions(id,this._conditions);
     }
 
@@ -389,6 +393,7 @@ export class SmartFilter {
                 text += this._conditions[i].propertyName + " " + SmartFilter.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
             }
         }
+        text = text.replace(/&quot;/g, '"');
         return text;
     }
 

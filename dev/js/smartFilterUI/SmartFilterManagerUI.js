@@ -157,8 +157,6 @@ export class SmartFilterManagerUI {
                 {
                     SmartFilterManagerUI._handleSmartFilterIsPropEdit(cell.getRow());
                 }
-
-    
             });
 
 
@@ -180,7 +178,7 @@ export class SmartFilterManagerUI {
             }
             
             let prop = {};
-
+            text = text.replace(/&quot;/g, '"');
             prop.id = i;
             prop.description = text;
             prop.prop = SF.SmartFilterManager.getIsProp(i);
