@@ -97,7 +97,6 @@ export class SmartFilter {
         }
     }
 
-
     static _getModelTreeIdsRecursive(nodeid,proms, ids, viewer) {
 
         proms.push(viewer.model.getNodeProperties(nodeid));
@@ -147,49 +146,41 @@ export class SmartFilter {
         SmartFilter._containedInSpatialStructureHash = [];
         SmartFilter._spaceBoundaryHash = [];
         let layernames = viewer.model.getLayers();
-       
 
-            if (SmartFilter._modelHash.length == 0) {
-                let proms = [];
+        if (SmartFilter._modelHash.length == 0) {
+            let proms = [];
+            let ids = [];
+
+            SmartFilter._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
+            let res = await Promise.all(proms);
+            SmartFilter._updateHashes(viewer, ids, res, layernames);
+        }
+        else {
+            for (let i = 0; i < SmartFilter._modelHash.length; i++) {
+                let model = SmartFilter._modelHash[i];
                 let ids = [];
-
-                SmartFilter._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
-                let res = await Promise.all(proms);
-                SmartFilter._updateHashes(viewer,ids, res, layernames);
-            }
-            else
-            {
-                for (let i=0;i<SmartFilter._modelHash.length;i++)
-                {
-                    let model = SmartFilter._modelHash[i];
-                    let ids = [];
-                    let res = null;
-                    let offset = viewer.model.getNodeIdOffset(model.nodeid);
-                    if (!model.ids)
-                    {
-                        let proms = [];
-                        SmartFilter._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
-                        res = await Promise.all(proms);  
-                        model.properties = res;                     
-                        model.ids = [];
-                        for (let j=0;j<ids.length;j++)
-                        {
-                            model.ids.push(ids[j] - offset);
-                        }
+                let res = null;
+                let offset = viewer.model.getNodeIdOffset(model.nodeid);
+                if (!model.ids) {
+                    let proms = [];
+                    SmartFilter._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
+                    res = await Promise.all(proms);
+                    model.properties = res;
+                    model.ids = [];
+                    for (let j = 0; j < ids.length; j++) {
+                        model.ids.push(ids[j] - offset);
                     }
-                    else
-                    {
-                        for (let j=0;j<model.ids.length;j++)
-                        {
-                            ids.push(model.ids[j] + offset);
-                        }
-                        res = model.properties;
-
-                    }
-                    SmartFilter._updateHashes(viewer,ids, res, layernames);                           
                 }
+                else {
+                    for (let j = 0; j < model.ids.length; j++) {
+                        ids.push(model.ids[j] + offset);
+                    }
+                    res = model.properties;
 
-            }            
+                }
+                SmartFilter._updateHashes(viewer, ids, res, layernames);
+            }
+        }
     }
 
     constructor(viewer, startnode) {
@@ -212,7 +203,6 @@ export class SmartFilter {
         return this._name;
     }
     
-
     getNumConditions() {
         return this._conditions.length;
     }
@@ -401,7 +391,6 @@ export class SmartFilter {
         return text;
     }
 
-
     async _checkSpaceBoundaryFilter(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
@@ -442,7 +431,6 @@ export class SmartFilter {
             SmartFilter._containedInSpatialStructureHash[id] = elements;
         }
 
-
         if (elements.length > 0) {
             let offset = this._viewer.model.getNodeIdOffset(id);
             for (let i = 0; i < elements.length; i++) {
@@ -452,7 +440,6 @@ export class SmartFilter {
             }
         }
         return false;
-
     }
 
     async _checkFilter(id, condition) {
@@ -679,8 +666,6 @@ export class SmartFilter {
         }
         return false;
     }
-
-
  
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid) {
         if (id != startid) {        
@@ -693,9 +678,5 @@ export class SmartFilter {
             await this._gatherMatchingNodesRecursive(conditions, children[i], matchingnodes, startid);
 
         }
-
     }
-
-   
-
 }
