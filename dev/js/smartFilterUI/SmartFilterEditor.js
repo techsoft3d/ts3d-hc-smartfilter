@@ -478,11 +478,11 @@ export class SmartFilterEditor {
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 if (i==1)
                 {
-                    html += '<div style="display:flex;position:relative;top:-11px;left:64px;margin-right: 1em;">';
+                    html += '<div style="display:flex;position:relative;top:-11px;left:64px;margin-right: 1em;width:calc(100%  - 66px)">';
                 }
                 else
                 {
-                    html += '<div style="display:flex;position:relative;top:-10px;left:64px;margin-right: 1em;">';
+                    html += '<div style="display:flex;position:relative;top:-10px;left:64px;margin-right: 1em;width:calc(100%  - 66px)">';
                 }
                 html += SmartFilterEditor._generatePropertyTypeSelect(filter, i, smartFilter);
                 html += SmartFilterEditor._generateChoiceSelect(filter, i, smartFilter);
