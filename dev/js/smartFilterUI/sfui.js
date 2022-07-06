@@ -5,5 +5,5 @@ export { SmartPropertiesUI } from './SmartPropertiesUI.js';
 
 
 export function getVersion() {
-    return "1.0.2";
+    return "1.0.3";
 }

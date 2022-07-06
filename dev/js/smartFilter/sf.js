@@ -6,5 +6,5 @@ export { SmartFilterPropertyType } from './SmartFilter.js';
 
 
 export function getVersion() {
-    return "1.0.2";
+    return "1.0.3";
 }

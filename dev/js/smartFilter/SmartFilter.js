@@ -30,8 +30,9 @@ export class SmartFilter {
     static _propertyHash = [];
     static _allPropertiesHash = [];        
 
-    static containedInSpatialStructureHash = [];
-    static spaceBoundaryHash = [];
+    static _containedInSpatialStructureHash = [];
+    static _spaceBoundaryHash = [];
+    static _modelHash = [];
 
 
 
@@ -107,43 +108,88 @@ export class SmartFilter {
         }
     }
 
-    static initialize(viewer) {
+    static addModel(id,nodeid) {
+        for (let i=0;i<SmartFilter._modelHash.length;i++)
+        {
+            if (SmartFilter._modelHash[i].id == id)
+            {
+                return;
+            }
+        }
+        SmartFilter._modelHash.push({id:id, nodeid: nodeid, ids: null, properties:null});
+    }
+
+    static _updateHashes(viewer, ids,res,layernames)
+    {
+        for (let i = 0; i < res.length; i++) {
+            SmartFilter._propertyHash[ids[i]] = res[i];
+            let layerid = viewer.model.getNodeLayerId(ids[i]);
+            if (layerid != null && layernames.size > 1) {
+                if (SmartFilter._propertyHash[ids[i]] == null)
+                    SmartFilter._propertyHash[ids[i]] = [];
+                SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+            }
+            for (let j in res[i]) {
+                SmartFilter._allPropertiesHash[j] = [];
+            }
+        }
+
+        for (let i in SmartFilter._propertyHash) {
+            for (let j in SmartFilter._propertyHash[i]) {
+                SmartFilter._allPropertiesHash[j][SmartFilter._propertyHash[i][j]] = true;
+            }
+        }
+    }
+
+    static async initialize(viewer) {
         SmartFilter._propertyHash = [];
-        SmartFilter._allPropertiesHash = [];        
-        SmartFilter.containedInSpatialStructureHash = [];
-        SmartFilter.spaceBoundaryHash = [];
-
+        SmartFilter._allPropertiesHash = [];
+        SmartFilter._containedInSpatialStructureHash = [];
+        SmartFilter._spaceBoundaryHash = [];
         let layernames = viewer.model.getLayers();
-        let lst = new Promise(function (resolve, reject) {
-            let proms = [];
-            let ids = [];
-            SmartFilter._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
-
        
-        Promise.all(proms).then(function (res) {
-            for (let i = 0; i < res.length; i++) {
-                SmartFilter._propertyHash[ids[i]] = res[i];
-                let layerid = viewer.model.getNodeLayerId(ids[i]);  
-                if (layerid != null && layernames.size > 1)
-                {
-                    if (SmartFilter._propertyHash[ids[i]] == null)
-                        SmartFilter._propertyHash[ids[i]] = [];
-                    SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
-                }
-                for (let j in res[i]) {
-                    SmartFilter._allPropertiesHash[j] = [];
-                }
-            }
 
-            for (let i in SmartFilter._propertyHash) {
-                for (let j in SmartFilter._propertyHash[i]) {
-                    SmartFilter._allPropertiesHash[j][SmartFilter._propertyHash[i][j]] = true;
-                }
+            if (SmartFilter._modelHash.length == 0) {
+                let proms = [];
+                let ids = [];
+
+                SmartFilter._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
+                let res = await Promise.all(proms);
+                SmartFilter._updateHashes(viewer,ids, res, layernames);
             }
-            resolve();
-            });
-        });
-        return lst;
+            else
+            {
+                for (let i=0;i<SmartFilter._modelHash.length;i++)
+                {
+                    let model = SmartFilter._modelHash[i];
+                    let ids = [];
+                    let res = null;
+                    let offset = viewer.model.getNodeIdOffset(model.nodeid);
+                    if (!model.ids)
+                    {
+                        let proms = [];
+                        SmartFilter._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
+                        res = await Promise.all(proms);  
+                        model.properties = res;                     
+                        model.ids = [];
+                        for (let j=0;j<ids.length;j++)
+                        {
+                            model.ids.push(ids[j] - offset);
+                        }
+                    }
+                    else
+                    {
+                        for (let j=0;j<model.ids.length;j++)
+                        {
+                            ids.push(model.ids[j] + offset);
+                        }
+                        res = model.properties;
+
+                    }
+                    SmartFilter._updateHashes(viewer,ids, res, layernames);                           
+                }
+
+            }            
     }
 
     constructor(viewer, startnode) {
@@ -360,14 +406,14 @@ export class SmartFilter {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SmartFilter.spaceBoundaryHash[id])
+        if (SmartFilter._spaceBoundaryHash[id])
         {
-            elements = SmartFilter.spaceBoundaryHash[id];
+            elements = SmartFilter._spaceBoundaryHash[id];
         }
         else
         {
             elements = hwv.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.SpaceBoundary);
-            SmartFilter.spaceBoundaryHash[id] = elements;
+            SmartFilter._spaceBoundaryHash[id] = elements;
         }
 
         if (elements.length > 0) {
@@ -386,14 +432,14 @@ export class SmartFilter {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SmartFilter.containedInSpatialStructureHash[id])
+        if (SmartFilter._containedInSpatialStructureHash[id])
         {
-            elements = SmartFilter.containedInSpatialStructureHash[id];
+            elements = SmartFilter._containedInSpatialStructureHash[id];
         }
         else
         {
             elements = hwv.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
-            SmartFilter.containedInSpatialStructureHash[id] = elements;
+            SmartFilter._containedInSpatialStructureHash[id] = elements;
         }
 
 
