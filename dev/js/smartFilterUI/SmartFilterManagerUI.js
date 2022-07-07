@@ -4,7 +4,7 @@ export class SmartFilterManagerUI {
 
     static _updatedCallback = null;
 
-    static initialize(viewer, div, showImportExportButtons) {
+    static initialize(div,viewer, showImportExportButtons) {
         SmartFilterManagerUI._table = null;
         SmartFilterManagerUI._viewer = viewer;
         SmartFilterManagerUI._uidiv = div;

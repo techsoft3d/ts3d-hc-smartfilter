@@ -1,4 +1,4 @@
-.modelTreeSearchMain {
+.smartFilterMain {
   overflow: hidden;
   position:absolute;
   width:100%;
@@ -15,11 +15,11 @@
   position:relative;
 }
 
-.modelTreeSearchItem1 {
+.smartFilterSearchItem1 {
   background-color:rgb(245,245,245); 
 }
 
-.modelTreeSearchItem2 {
+.smartFilterSearchItem2 {
   background-color:rgb(230,230,230); 
 }
 

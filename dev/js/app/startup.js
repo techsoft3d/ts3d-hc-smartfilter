@@ -7,8 +7,8 @@ async function msready() {
     SFUI.SmartFilterEditor.display();
 
 
-    SFUI.SmartFilterManagerUI.initialize(hwv,"smartfilterscontainer", true);
-    SFUI.SmartPropertiesUI.initialize(hwv,"smartpropertiescontainer");
+    SFUI.SmartFilterManagerUI.initialize("smartfilterscontainer",hwv, true);
+    SFUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
 
 }
 

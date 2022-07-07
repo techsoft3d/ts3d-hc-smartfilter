@@ -1,6 +1,6 @@
 export class SmartPropertiesUI {
 
-    static initialize(viewer, div) {
+    static initialize(div, viewer) {
         SmartPropertiesUI._table = null;
         SmartPropertiesUI._viewer = viewer;
         SmartPropertiesUI._uidiv = div;

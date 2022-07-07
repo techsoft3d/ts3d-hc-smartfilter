@@ -50,7 +50,7 @@ export class SmartFilterEditor {
     static async display() {
         await SF.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
-        html += '<div class = "modelTreeSearchMain" id="' + SmartFilterEditor._maindiv + '_main">';
+        html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
         if (SmartFilterEditor._showLimitOption) {
             html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
         }
@@ -113,7 +113,7 @@ export class SmartFilterEditor {
     }
 
 
-    static getSmartFilterFromTempId(id) {
+    static _getSmartFilterFromTempId(id) {
 
         if (id == 0) {
             return SmartFilterEditor._mainFilter;
@@ -206,7 +206,7 @@ export class SmartFilterEditor {
         SmartFilterEditor._clearSearchResults();
         SmartFilterEditor.updateFilterFromUI();
 
-        smartFilter = SmartFilterEditor.getSmartFilterFromTempId(id);
+        smartFilter = SmartFilterEditor._getSmartFilterFromTempId(id);
         let childFilter = null;
         if (createChildFilter) {
             childFilter = new SF.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mainFilter.getStartNode());
@@ -244,7 +244,7 @@ export class SmartFilterEditor {
     static _deleteFilter(i,id) {
         SmartFilterEditor._clearSearchResults();
         SmartFilterEditor.updateFilterFromUI();
-        let smartFilter = SmartFilterEditor.getSmartFilterFromTempId(id);
+        let smartFilter = SmartFilterEditor._getSmartFilterFromTempId(id);
         smartFilter.removeCondition(i);
 
         SmartFilterEditor.refreshUI();
@@ -290,9 +290,9 @@ export class SmartFilterEditor {
                 html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItemselected">';
             else {
                 if (toggle)
-                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem1">';
+                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem1">';
                 else
-                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="modelTreeSearchItem2">';
+                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem2">';
             }
             html += '<div class="smartFilterSearchItemText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].name) + '</div>';
             html += '<div class="smartFilterSearchItemChainText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].chaintext) + '</div>';
