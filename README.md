@@ -171,18 +171,18 @@ The SmartFilter Manager UI can turn a smartfilter into a smart property which me
 
 
 ## Performance and handling of Federated Models
-In order to ensure fast client-side search performance, the SmartFilter library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into)
+In order to ensure fast client-side search performance, the SmartFilter library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
 
 ```
   SF.SmartFilter.addModel("arboleda",nodeid);
 ```
 
-If this function is called at least once, if a new model is added to the viewer the acceleration structure only has to be generated for the newly added model and not the already existing models which should significantly improve performance.
-
+When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.
 
 
 ## TODO:
 * Document SmartFilter and SmartFilterManager classes
+* Investigate Server-Side Search Evaluation
 
 
 ## Disclaimer
