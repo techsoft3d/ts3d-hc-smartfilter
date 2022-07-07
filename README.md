@@ -25,6 +25,14 @@ If you are using the UI library you also need to add the provided css file:
 ```
 
 
+## Demo
+
+Here is how to start the demo with the provided sample model locally when using the Visual Studio Code Live Server plugin:
+
+<http://127.0.0.1:5500/dev/viewer.html?scs=models/arboleda.scs>
+
+The demo is using HC2022 SP1 U2
+
 ## Search Editor UI 
 ### Initialization
 
@@ -181,8 +189,10 @@ If this function is called at least once, if a new model is added to the viewer 
 **This library is not an officially supported part of HOOPS Communicator and provided as-is.**
 
 ## Acknowledgments
-
+### Demo:
 * [GoldenLayout](https://golden-layout.com/)
+
+### SmartFilter UI:
 * [Tabulator](http://tabulator.info/)
 
 
