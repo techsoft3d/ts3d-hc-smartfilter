@@ -4,7 +4,7 @@
 ## Advanced Search for HOOPS Communicator
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
-For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 90 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
+For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 
 
 
@@ -14,7 +14,7 @@ Add dist/smartFilter.min.js to your project for the core search functionality wi
     <script src="./js/smartFilter.min.js"></script>
 ```
 
-Add dist/smartFilterUI.min.js for the optional UI component. 
+Add dist/smartFilterUI.min.js for the optional UI functionality. 
 ```
     <script src="./js/smartFilterUI.min.js"></script>
 ```
@@ -41,7 +41,7 @@ Before the search window is initially displayed all model properties are extract
 ```
 Call this function when the size of the surrounding div changes. 
 
-The editor is somewhat reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through a separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
+The editor is somewhat reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
 
 ### Usage
 
@@ -49,9 +49,10 @@ The editor is somewhat reactive and will adjust to various sizes though the pare
 
 **Searching with "HAS"**
 
-When searching for text with “has” the default is a substring search so a search for “screw” will find “front screw” as well as “back screw”. If you need a precise search surround the search string in double quotes. If you want to find all nodes that “do not” have the search string put a “-“ in front of the search term. You can also combine multiple text searches by putting a “,” between them.
+When searching for text with “has” the default is a substring search so a search for “screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
 
 **Example "HAS" Searches:**  
+
 *Type has wall,-curtainwall*  
 This will find all walls except for curtain walls.
 
@@ -60,7 +61,6 @@ This will find all elements where the type name has either wall or door in it
 
 *Type has "IFCWALL"  
 This will find all elements where the type name is exactly “IFCWALL”
-
 
 **Nodeid Property**  
 You can search for specific nodeids (separated by comma) with this property
@@ -74,7 +74,7 @@ Performs the search on the HOOPS Communicator internal type of the node (the val
 
 
 **Node Color**  
-Performs the search on the color of a node. You can specify your own color as 3 RGB integers (e.g. “255 0 0”) or if you select a node before adding the search item the color of that node will be a preset option.
+Performs the search on the color of a node. You can specify your own color as 3 RGB integers (e.g. “255 0 0”) or if you select a node before adding the search item the color of that node will be a preset option. It's important to keep in mind that in HOOPS Communicator colors only exist on body (leaf) nodes in the product tree.
 
 **Rel: Space Boundary**  
 If this option is selected the search will be performed on the relating SpaceBoundary elements of the nodes with the specified text.
@@ -88,13 +88,13 @@ If this option is selected the search will be performed on the elements "contain
 ```
  SFUI.SmartFilterEditor.setChainSkip(1);
 ```
-When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. THis is useful if you loaded your model into a node other than the root node.
+When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
  SFUI.SmartFilterEditor.setShowLimitOption(true);
 ```
-You can control if the Limit checkbox should be visible in the UI.
+Controls if the Limit checkbox should be visible in the UI.
 
 
 
@@ -108,20 +108,18 @@ You can control if the Limit checkbox should be visible in the UI.
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
 
 
-
-
 ### Usage
 
-This class essentially keeps a list of filters that can be applied to the model. The user can add a new filter by pressing the add button which adds the current editor search to the filter list.
+This class keeps track of a list of search filters that can be applied to a model. The user can add a new filter by pressing the add button which adds the current editor search to the filter list.
 
-After the search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window. The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final colum in the list indicates if the filter should become a smart property. See below for more information on this functionality.
+After the search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window. The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final column in the list indicates if the filter should become a smart property. See below for more information on this functionality.
   
 With the optional Load/Export buttons the user can load and save the current list of smartfilters to a file.
 
 
 ### Advanced Usage:
 
-You can provide a callback function that gets triggered on any change of the list of smartfilters. You can then retrieve the smartfilterlist from the SmartFilterManager object and push it to your server as in the example below:
+A callback function can be provided that gets triggered on any change of the list of smartfilters. In the callback the list of smartfilters can then be retrieved from the SmartFilterManager object and further processed (pushed to a server, etc.). See example below:
 ```
     SFUI.SmartFilterManagerUI.setUpdatedCallback(smartFiltersUpdated);        
     async function smartFiltersUpdated() {
@@ -138,7 +136,7 @@ You can provide a callback function that gets triggered on any change of the lis
 }
 ```
 
-After a retrieving an existing list of smartfilters you can add it to the smartfiltermanager after initialization as in the code below:
+The JSON object representing a list of smartfilters can be added to the SmartFilter manager with the code below:
 
 ```
     SF.SmartFilterManager.fromJSON(data.filtersarray);
@@ -161,17 +159,17 @@ Initializes the SmartProperties UI and displays it. The first parameter is the i
 
 ### Usage
 
-Via the SmartFilterManager each smartfilter can be turned into a smart property which means that it will be evaluated whenever the user clicks on that object. It basically becomes a user defined property. 
+The SmartFilter Manager UI can turn a smartfilter into a smart property which means that it will be evaluated whenever the user selects an object in the webviewer. It basically becomes a dynamic user defined property. 
 
 
 ## Performance and handling of Federated Models
-In order to ensure fast client-side search performance, the SmartFilter generates an initial acceleration structure for the loaded model. This can take a few seconds for large models. This structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. its unique name) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node you loaded the model into)
+In order to ensure fast client-side search performance, the SmartFilter library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into)
 
 ```
   SF.SmartFilter.addModel("arboleda",nodeid);
 ```
 
-Now, if a new model is added to the viewer the acceleration structure only has to be generated for the newly added model and not the already existing models which should significantly improve performance.
+If this function is called at least once, if a new model is added to the viewer the acceleration structure only has to be generated for the newly added model and not the already existing models which should significantly improve performance.
 
 
 
