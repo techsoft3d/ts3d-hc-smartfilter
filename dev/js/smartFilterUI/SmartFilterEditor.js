@@ -52,7 +52,7 @@ export class SmartFilterEditor {
         let html = "";
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
         if (SmartFilterEditor._showLimitOption) {
-            html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
+            html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
         }
         else
         {

@@ -54,7 +54,9 @@ The editor is somewhat reactive and will adjust to various sizes though the pare
 
 ## Usage
 
- The functionality of this class should be largely self-explanatory. You can combine multiple conditions with either an “and” or “or” operator (but not mixed). However you can also add a single level of subfilters with a separate set of conditions for more flexibility. In addition the user can first perform a search and then click on the “Sel:” checkbox which will limit all future searches to the selected entities.
+ The functionality of this class should be largely self-explanatory. The user can combine multiple conditions with either an “and” or “or” operator (but not mixed). However the user can also add a single level of subfilters with a separate set of conditions for more flexibility. 
+ 
+ In addition the user can limit the scope of future searches by activating the “Limit to Selection:” checkbox which will limit all future searches to the currently selected nodes and their children.
 
 ### "equals" Comparison
 
@@ -129,11 +131,11 @@ Initializes the Manager UI and displays it. The first parameter is the id of the
 
 ### Usage
 
-This class keeps track of a list of search filters that can be applied to a model. The user can add a new filter by pressing the add button which adds the current editor search to the filter list.
+This class keeps track of a list of search filters that can be applied to a model. The user can add a new filter by pressing the add button which adds the current editor search to the smartfilter list.
 
-After the search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window. The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final column in the list indicates if the filter should become a smart property. See below for more information on this functionality.
+After a search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window (hold down shift to isolate the nodes instead). The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final column in the list indicates if the filter should become a smart property. See below for more information on this functionality.
   
-With the optional Load/Export buttons the user can load and save the current list of smartfilters to a file.
+With the optional Load/Export buttons the user can load and save the current list of smartfilters to a JSON file.
 
 
 ### Advanced Usage:
