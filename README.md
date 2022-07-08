@@ -1,6 +1,7 @@
 # SmartFilters
 
 
+![alt text](https://github.com/techsoft3d/SmartFilters/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
