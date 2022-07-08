@@ -60,7 +60,7 @@ The editor is somewhat reactive and will adjust to various sizes though the pare
 
 ### "equals" Comparison
 
-When searching for text with “equals” the default is a non case-sensitive substring search so a search for “Screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
+When searching for text with “equals” the default is a non case-sensitive substring search so a search for “Screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them. In this case you can put a + in front of the search term to require that the search term is present.
 
 **Example "equals" Searches:**  
 
@@ -78,7 +78,7 @@ This will find all elements where the name of the type is exactly “IFCWALL”
 
 ### Other Comparisons
 
-You can also search for the existence (or absence) of a specific property. In addition if the property has a numeric value you can also perform number comparisons. In the current implementation the unit value is ignored and an equal unit is assumed.
+You can also search for the existence (or absence) of a specific property. In addition if the property has a numeric value you can also perform number comparisons. In the current implementation the unit value is ignored and it is assumed that all nodes share the same unit for this property.
 
 ### Properties
 
