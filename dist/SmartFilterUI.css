@@ -53,6 +53,15 @@
   font-size: 11px;
 }
 
+
+
+.smartFilterAndOrSelect {
+  font-size:11px;
+  width:60px;
+  margin-right:3px;
+  font-family: monospace;
+}
+
 .propertyTypeSelect {
   font-size:11px; 
   flex: 1 1 auto;

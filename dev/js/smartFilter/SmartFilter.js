@@ -1,5 +1,5 @@
 const SmartFilterConditionType = {
-    has:0,
+    equals:0,
     exists:1,
     notExists:2,
     greaterOrEqual:3,
@@ -39,8 +39,8 @@ export class SmartFilter {
     static convertEnumConditionToString(c) {
     
         switch (c) {
-            case SmartFilterConditionType.has:
-                return "has";
+            case SmartFilterConditionType.equals:
+                return "equals";
             case SmartFilterConditionType.exists:
                 return "exists";
             case SmartFilterConditionType.notExists:
@@ -59,8 +59,8 @@ export class SmartFilter {
     static convertStringConditionToEnum(c) {
     
         switch (c) {
-            case "has":
-                return SmartFilterConditionType.has;
+            case "equals":
+                return SmartFilterConditionType.equals;
             case "exists":
                 return SmartFilterConditionType.exists;
             case "!exists":
@@ -449,7 +449,7 @@ export class SmartFilter {
     }
 
     async _checkFilter(id, condition) {
-        if (condition.conditionType != SmartFilterConditionType.has) {
+        if (condition.conditionType != SmartFilterConditionType.equals) {
             if (condition.conditionType == SmartFilterConditionType.exists) {
                 if (SmartFilter._propertyHash[id] && SmartFilter._propertyHash[id][condition.propertyName] != undefined)
                     return true;

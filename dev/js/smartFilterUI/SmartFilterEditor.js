@@ -337,10 +337,10 @@ export class SmartFilterEditor {
 
     static _generateChoiceSelect(filter, filterpos,smartFilter) {
 
-        let html = '<select onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' style="width:60px;margin-right:3px;" id="' +  
+        let html = '<select onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' class="smartFilterAndOrSelect" id="' +  
             SmartFilterEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
-        let choices = ["has", "exists","!exists", ">=", "<=", "=", "\u2260"];
+        let choices = ["equals", "exists","!exists", ">=", "<=", "=", "\u2260"];
 
         for (let i = 0; i < choices.length; i++) {
             if (choices[i] == SF.SmartFilter.convertEnumConditionToString(filter.conditionType)) {
@@ -476,13 +476,17 @@ export class SmartFilterEditor {
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
+                let offset = 66;
+                if (smartFilterIn) {
+                    offset*=2;
+                }                
                 if (i==1)
                 {
-                    html += '<div style="display:flex;position:relative;top:-11px;left:64px;margin-right: 1em;width:calc(100%  - 66px)">';
+                    html += '<div style="display:flex;position:relative;top:-11px;left:64px;margin-right: 1em;width:calc(100%  - ' + offset + 'px)">';
                 }
                 else
                 {
-                    html += '<div style="display:flex;position:relative;top:-10px;left:64px;margin-right: 1em;width:calc(100%  - 66px)">';
+                    html += '<div style="display:flex;position:relative;top:-10px;left:64px;margin-right: 1em;width:calc(100%  - ' + offset + 'px)">';
                 }
                 html += SmartFilterEditor._generatePropertyTypeSelect(filter, i, smartFilter);
                 html += SmartFilterEditor._generateChoiceSelect(filter, i, smartFilter);

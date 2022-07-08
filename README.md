@@ -55,19 +55,19 @@ The editor is somewhat reactive and will adjust to various sizes though the pare
 
  The functionality of this class should be largely self-explanatory. You can combine multiple search filters with either an “and” or “or” (but not mixed). However you can also add a single level of subfilters for more flexibility. In addition the user can first perform a search and then click on the “Sel:” checkbox which will limit all future searches to the selected entities.
 
-**Searching with "HAS"**
+**Searching with "equals"**
 
-When searching for text with “has” the default is a substring search so a search for “screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
+When searching for text with “equals” the default is a substring search so a search for “screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
 
-**Example "HAS" Searches:**  
+**Example "equals" Searches:**  
 
-*Type has wall,-curtainwall*  
+*Type equals wall,-curtainwall*  
 This will find all walls except for curtain walls.
 
-*Type has wall,door*  
+*Type equals wall,door*  
 This will find all elements where the type name has either wall or door in it
 
-*Type has "IFCWALL"  
+*Type equals "IFCWALL"  
 This will find all elements where the type name is exactly “IFCWALL”
 
 **Nodeid Property**  
