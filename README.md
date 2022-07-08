@@ -35,7 +35,7 @@ Here is how to start the demo with the provided sample model locally when using 
 The demo is using HC2022 SP1 U2
 
 ## Search Editor UI 
-### Initialization
+## Initialization
 
 ```
 SFUI.SmartFilterEditor.initialize("searcheditor", hwv);
@@ -52,43 +52,53 @@ Call this function when the size of the surrounding div changes.
 
 The editor is somewhat reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
 
-### Usage
+## Usage
 
- The functionality of this class should be largely self-explanatory. You can combine multiple search filters with either an “and” or “or” (but not mixed). However you can also add a single level of subfilters for more flexibility. In addition the user can first perform a search and then click on the “Sel:” checkbox which will limit all future searches to the selected entities.
+ The functionality of this class should be largely self-explanatory. You can combine multiple conditions with either an “and” or “or” operator (but not mixed). However you can also add a single level of subfilters with a separate set of conditions for more flexibility. In addition the user can first perform a search and then click on the “Sel:” checkbox which will limit all future searches to the selected entities.
 
-**Searching with "equals"**
+### "equals" Comparison
 
-When searching for text with “equals” the default is a substring search so a search for “screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
+When searching for text with “equals” the default is a non case-sensitive substring search so a search for “Screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them.
 
 **Example "equals" Searches:**  
 
-*Type equals wall,-curtainwall*  
-This will find all walls except for curtain walls.
-
 *Type equals wall,door*  
-This will find all elements where the type name has either wall or door in it
+This will find all elements where the name of the type contains either wall or door.
 
-*Type equals "IFCWALL"  
-This will find all elements where the type name is exactly “IFCWALL”
+*Type equals wall,-curtainwall*  
+This will find all elements where the name of the type contains wall but not curtainwall.
+
+*Node Name equals +IFC,wall,door*  
+This will find all elements where the name contains IFC and either wall or door.
+
+*Type equals "IFCWALL"*  
+This will find all elements where the name of the type is exactly “IFCWALL”
+
+### Other Comparisons
+
+You can also search for the existence (or absence) of a specific property. In addition if the property has a numeric value you can also perform number comparisons. In the current implementation the unit value is ignored and an equal unit is assumed.
+
+### Properties
 
 **Nodeid Property**  
 You can search for specific nodeids (separated by comma) with this property
 
-**Node Chain**  
+**Node Chain Property**  
 “Node Chain” performs the text search on the complete path to a node. Its an easy way to filter the search by a certain floor in a building for example.
 
-
-**Node Type**  
+**Node Type Property**  
 Performs the search on the HOOPS Communicator internal type of the node (the value returned by model.getNodeTyp())
 
-
-**Node Color**  
+**Node Color Property**  
 Performs the search on the color of a node. You can specify your own color as 3 RGB integers (e.g. “255 0 0”) or if you select a node before adding the search item the color of that node will be a preset option. It's important to keep in mind that in HOOPS Communicator colors only exist on body (leaf) nodes in the product tree.
 
-**Rel: Space Boundary**  
-If this option is selected the search will be performed on the relating SpaceBoundary elements of the nodes with the specified text.
+**Rel: Space Boundary Property**  
+If this option is selected the search will be performed on the relating SpaceBoundary elements of the nodes with the specified text. 
 
-**Rel: Contained**  
+*Rel:SpaceBoundary equals kitchen*  
+This will find all elements that are related to all IFCSPACE's which contain kitchen in their name.
+
+**Rel: Contained Property**  
 If this option is selected the search will be performed on the elements "contained in" the nodes with the specified text.
 
 ### Advanced Usage:
