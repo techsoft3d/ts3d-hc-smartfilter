@@ -303,10 +303,10 @@ export class SmartFilter {
         }
         let matchingnodes = [];
         if (limitlist.length == 0)
-            if (this._startnode == hwv.model.getRootNode())
+            if (this._startnode == this._viewer.model.getRootNode())
                 await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._startnode);
             else
-                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, hwv.model.getNodeParent(this._startnode));
+                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._viewer.model.getNodeParent(this._startnode));
         else
             for (let i = 0; i < limitlist.length; i++) {
                 await this._gatherMatchingNodesRecursive(conditions, limitlist[i], matchingnodes, this._viewer.model.getNodeParent(limitlist[i]));
@@ -407,7 +407,7 @@ export class SmartFilter {
         }
         else
         {
-            elements = hwv.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.SpaceBoundary);
+            elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.SpaceBoundary);
             SmartFilter._spaceBoundaryHash[id] = elements;
         }
 
