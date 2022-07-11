@@ -78,21 +78,21 @@ This will find all elements where the name of the type is exactly “IFCWALL”
 
 ### Other Comparisons
 
-You can also search for the existence (or absence) of a specific property. In addition if the property has a numeric value you can also perform number comparisons. In the current implementation the unit value is ignored and it is assumed that all nodes share the same unit for this property.
+You can also search for the existence (or absence) of a specific property. In addition if the property has a numeric value you can also perform number comparisons. In the current implementation units are ignored and it is assumed that all nodes share the same unit for this property.
 
 ### Properties
 
 **Nodeid Property**  
-You can search for specific nodeids (separated by comma) with this property
+Performs the search on specific nodeids (separated by comma).
 
 **Node Chain Property**  
 “Node Chain” performs the text search on the complete path to a node. Its an easy way to filter the search by a certain floor in a building for example.
 
 **Node Type Property**  
-Performs the search on the HOOPS Communicator internal type of the node (the value returned by model.getNodeTyp())
+Performs the search on the HOOPS Communicator internal type of the node (the value returned by model.getNodeType())
 
 **Node Color Property**  
-Performs the search on the color of a node. You can specify your own color as 3 RGB integers (e.g. “255 0 0”) or if you select a node before adding the search item the color of that node will be a preset option. It's important to keep in mind that in HOOPS Communicator colors only exist on body (leaf) nodes in the product tree.
+Performs the search on the color of a node specified as 3 RGB integers (e.g. “255 0 0”). If selecting a node the color of that node will be a preset option. It's important to keep in mind that in HOOPS Communicator colors only exist on body (leaf) nodes in the product tree.
 
 **Rel: Space Boundary Property**  
 If this option is selected the search will be performed on the relating SpaceBoundary elements of the nodes with the specified text. 
