@@ -113,6 +113,9 @@ export class SmartFilterManagerUI {
             event.stopPropagation();
             SF.SmartFilterManager.removeSmartFilter(rowdata.id);
             cell.getRow().delete();
+            if (SmartFilterManagerUI._updatedCallback) {
+                SmartFilterManagerUI._updatedCallback();
+            }
         });
     }
 
