@@ -248,7 +248,6 @@ export class SmartFilterManagerUI {
     }
 
     static _handleSmartFilterUpdate(row) {
-
         let data = row.getData();
         let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
 
@@ -258,12 +257,12 @@ export class SmartFilterManagerUI {
 
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
-        sf.setName(smartFilter.getName());
-        hcSmartFilter.SmartFilterManager.updateSmartFilter(data.id,sf);
 
-        if (sf.getName() == "")
+        smartFilter._conditions = sf._conditions;
+
+        if (smartFilter.getName() == "")
         {
-            row.update({description:sf.generateString()});
+            row.update({description:smartFilter.generateString()});
         }
 
         if (SmartFilterManagerUI._updatedCallback) {

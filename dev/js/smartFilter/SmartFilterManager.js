@@ -14,7 +14,6 @@ export class SmartFilterManager {
     static addSmartFilter(smartFilter,isProp) {
         let filter = {filter:smartFilter, isProp:isProp};
         SmartFilterManager._smartFilters.push({filter:smartFilter, isProp:isProp});
-        return filter;
     }
 
     static getSmartFilters() {
@@ -59,8 +58,12 @@ export class SmartFilterManager {
         SmartFilterManager._smartFilters[pos].filter = smartFilter;
     }
 
-    static updateSmartFilterIsProp(pos,isProp) {
-        SmartFilterManager._smartFilters[pos].isProp = isProp;
+    static updateSmartFilterIsProp(id,isProp) {
+        for (let i=0;i<SmartFilterManager._smartFilters.length;i++) {
+            if (SmartFilterManager._smartFilters[i].filter._id == id) {
+                SmartFilterManager._smartFilters[i].isProp = isProp;
+            }
+        }
     }
 
     static toJSON() {

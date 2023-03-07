@@ -224,6 +224,7 @@ export class SmartFilterEditor {
             
         if (smartFilter.getNumConditions() <= 1) {
             let condition = new hcSmartFilter.SmartFilterCondition();
+            condition.propertyName = "Node Name";
             condition.setChildFilter(childFilter);
 
             smartFilter.addCondition(condition);
