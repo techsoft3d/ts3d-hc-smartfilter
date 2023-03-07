@@ -97,6 +97,9 @@ export class SmartFilter {
             case "Rel:ContainedIn":
             case "Rel:SpaceBoundary":
                 return SmartFilterPropertyType.relationship;
+            case "Smart Filter":
+                 return SmartFilterPropertyType.smartFilter;
+    
             default:
                 return SmartFilterPropertyType.property;
         }
@@ -245,12 +248,8 @@ export class SmartFilter {
         if (hasType) {
             propsnames.unshift("TYPE");
         }
-
-        let smartFilters = SmartFilterManager.getSmartFilters();
-        for (let i=0;i<smartFilters.length;i++) {
-            propsnames.unshift("SmartFilter:" + smartFilters[i].filter.getName());
-        }
-
+    
+        propsnames.unshift("Smart Filter");
         propsnames.unshift("Rel:SpaceBoundary");
         propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
@@ -320,6 +319,16 @@ export class SmartFilter {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
+            if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
+                if (!conditions[i].smartFilterID) {
+                    let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
+                    conditions[i].smartFilterID = f.id;
+                    conditions[i].smartFilter = f.filter;
+                }
+                else {
+                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                }
+            }
         }
         let matchingnodes = [];
         if (limitlist.length == 0)
@@ -667,7 +676,11 @@ export class SmartFilter {
                 }
             }
             else if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
-                res  = await this._testNodeAgainstConditions(id,SmartFilterManager.getSmartFilter(0)._conditions, isor);
+
+                if (!conditions[i].smartFilter) {
+                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                }
+                res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions, isor);
             }
             else {
                 if (conditions[i].childFilter)

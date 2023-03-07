@@ -74,7 +74,7 @@ export class SmartFilterManagerUI {
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
         sf.setName("");
-        hcSmartFilter.SmartFilterManager.addSmartFilter(sf, false);
+        hcSmartFilter.SmartFilterManager.addSmartFilter(null,sf, false);
 
         let text = filter.generateString();            
 

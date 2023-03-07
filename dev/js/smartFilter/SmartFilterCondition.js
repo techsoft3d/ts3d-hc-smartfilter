@@ -11,6 +11,7 @@ export class SmartFilterCondition {
         this.propertyName = "";
         this.text =  "";
         this.childFilter = null;
+        this.smartFilterID = null;
 
     }
 
@@ -21,7 +22,8 @@ export class SmartFilterCondition {
             propertyType: this.propertyType,
             propertyName:  JSON.parse(JSON.stringify(this.propertyName)),
             text: this.text,
-            childFilter: this.childFilter
+            childFilter: this.childFilter,
+            smartFilterID: this.smartFilterID
         };
     }
 
@@ -32,6 +34,16 @@ export class SmartFilterCondition {
         this.propertyName = def.propertyName;
         this.text = def.text;
         this.childFilter = def.childFilter;
+        this.smartFilterID = def.smartFilterID;
+
+    }
+
+    setSmartFilterID(id) {
+        this.smartFitlerID = id;
+    }
+
+    getSmartFilterID() {
+        return this.smartFilterID;
     }
 
     setAndOr(andor) {

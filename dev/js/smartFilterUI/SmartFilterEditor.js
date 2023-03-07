@@ -174,12 +174,19 @@ export class SmartFilterEditor {
             }
             else {
                 filter.conditionType = hcSmartFilter.SmartFilter.convertStringConditionToEnum($("#" + SmartFilterEditor._maindiv + "_propertyChoiceSelect" + i + "-" + smartFilter.tempId)[0].value);
+                filter.propertyType = hcSmartFilter.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
+
                 if ($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0] != undefined) {
-                    filter.text = SmartFilterEditor._htmlEncode($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value);
+                    if (!filter.propertyType == hcSmartFilter.SmartFilterPropertyType.smartFilter) {
+                        filter.text = SmartFilterEditor._htmlEncode($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value);
+                    }
+                    else {
+                        filter.text = $("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value;
+
+                    }
                 }
                 filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
 
-                filter.propertyType = hcSmartFilter.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
             }
             if (i == 1) {
                 filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
@@ -390,7 +397,8 @@ export class SmartFilterEditor {
     static async _generateInput(filter,filterpos,smartFilter) {
       
 
-        let html = '<input list="datalist' + filterpos + "-" + smartFilter.tempId +'" +  style="flex:1 1 auto; font-size:11px;min-width:100px" id="' + SmartFilterEditor._maindiv + '_modeltreesearchtext' + filterpos + "-" + smartFilter.tempId + '" value="' + filter.text + '">\n';
+        let html = '<input list="datalist' + filterpos + "-" + smartFilter.tempId +'" +  style="flex:1 1 auto; font-size:11px;min-width:100px" id="' + SmartFilterEditor._maindiv + 
+            '_modeltreesearchtext' + filterpos + "-" + smartFilter.tempId + '" value="' + filter.text + '">\n';
         html += '<datalist id="datalist' + filterpos + "-" + smartFilter.tempId +'">\n';
         let sortedStrings = [];
         if (filter.propertyName == "Node Type") {
@@ -408,6 +416,12 @@ export class SmartFilterEditor {
                     nodeid = children[0];
                 let colors = await SmartFilterEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
                 sortedStrings.push(colors[0].r + " " + colors[0].g + " " + colors[0].b);
+            }
+        }        
+        else if (filter.propertyName == "Smart Filter") {
+            let smartFilters = hcSmartFilter.SmartFilterManager.getSmartFilters();
+            for (let i=0;i<smartFilters.length;i++) {
+                sortedStrings.push(smartFilters[i].filter.getName());
             }
         }        
         else {
