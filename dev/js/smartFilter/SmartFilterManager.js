@@ -15,6 +15,10 @@ export class SmartFilterManager {
         SmartFilterManager._smartFilters.push({filter:smartFilter, isProp:isProp});
     }
 
+    static getSmartFilters() {
+        return SmartFilterManager._smartFilters;
+
+    }
     static getSmartFilterNum() {
         return SmartFilterManager._smartFilters.length;
     }

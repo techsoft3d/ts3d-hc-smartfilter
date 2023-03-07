@@ -373,13 +373,7 @@ export class SmartFilterEditor {
 
         let sortedStrings = SmartFilterEditor._mainFilter.getAllProperties();
             
-        sortedStrings.unshift("Rel:SpaceBoundary");
-        sortedStrings.unshift("Rel:ContainedIn");
-        sortedStrings.unshift("Node Color");
-        sortedStrings.unshift("Node Type");
-        sortedStrings.unshift("Node Chain");
-        sortedStrings.unshift("Nodeid");
-        sortedStrings.unshift("Node Name");
+    
 
         let prefix = "";
 
