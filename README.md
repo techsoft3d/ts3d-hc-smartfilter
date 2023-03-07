@@ -1,5 +1,10 @@
 # SmartFilters
 
+## Version Update (0.5.0) 
+* modules renamed to hcSmartFilter and hcSmartFilterUI
+* Abiltity to hide top row UI buttons
+* Update to HOOPS Communicator 2023 U1
+
 
 ![alt text](https://github.com/techsoft3d/SmartFilters/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
@@ -32,25 +37,24 @@ Here is how to start the demo with the provided sample model locally when using 
 
 <http://127.0.0.1:5500/dev/viewer.html?scs=models/arboleda.scs>
 
-The demo is using HC2022 SP1 U2
 
 ## Search Editor UI 
 ## Initialization
 
 ```
-SFUI.SmartFilterEditor.initialize("searcheditor", hwv);
-SFUI.SmartFilterEditor.display();
+hcSmartFilterUI.SmartFilterEditor.initialize("searcheditor", hwv);
+hcSmartFilterUI.SmartFilterEditor.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
 Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models.
 
 ```
- SFUI.SmartFilterEditor.adjust();
+ hcSmartFilterUI.SmartFilterEditor.adjust();
 ```
 Call this function when the size of the surrounding div changes. 
 
-The editor is somewhat reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
+The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
 
 ## Usage
 
@@ -107,13 +111,13 @@ If this option is selected the search will be performed on the elements "contain
 
 
 ```
- SFUI.SmartFilterEditor.setChainSkip(1);
+ hcSmartFilterUI.SmartFilterEditor.setChainSkip(1);
 ```
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
- SFUI.SmartFilterEditor.setShowLimitOption(true);
+ hcSmartFilterUI.SmartFilterEditor.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
 
@@ -123,7 +127,7 @@ Controls if the Limit checkbox should be visible in the UI.
 ### Initialization
 
 ```
-    SFUI.SmartFilterManagerUI.initialize("smartfiltermanagercontainer",hwv, true);
+    hcSmartFilterUI.SmartFilterManagerUI.initialize("smartfiltermanagercontainer",hwv, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
@@ -142,9 +146,9 @@ With the optional Load/Export buttons the user can load and save the current lis
 
 A callback function can be provided that gets triggered on any change of the list of smartfilters. In the callback the list of smartfilters can then be retrieved from the SmartFilterManager object and further processed (pushed to a server, etc.). See example below:
 ```
-    SFUI.SmartFilterManagerUI.setUpdatedCallback(smartFiltersUpdated);        
+    hcSmartFilterUI.SmartFilterManagerUI.setUpdatedCallback(smartFiltersUpdated);        
     async function smartFiltersUpdated() {
-        let text = JSON.stringify({filtersarray:SF.SmartFilterManager.toJSON()});
+        let text = JSON.stringify({filtersarray:hcSmartFilter.SmartFilterManager.toJSON()});
 
         var res = await fetch(serveraddress + '/api/smartFilters', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
@@ -160,8 +164,8 @@ A callback function can be provided that gets triggered on any change of the lis
 The JSON object representing a list of smartfilters can be added to the SmartFilter manager with the code below:
 
 ```
-    SF.SmartFilterManager.fromJSON(data.filtersarray);
-    SFUI.SmartFilterManagerUI.refreshUI();
+    hcSmartFilter.SmartFilterManager.fromJSON(data.filtersarray);
+    hcSmartFilterUI.SmartFilterManagerUI.refreshUI();
 ```
 
 
@@ -171,7 +175,7 @@ The JSON object representing a list of smartfilters can be added to the SmartFil
 
 
 ```
-  SFUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
+  hcSmartFilterUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
 ```
 
 
@@ -187,7 +191,7 @@ The SmartFilter Manager UI can turn a smartfilter into a smart property which me
 In order to ensure fast client-side search performance, the SmartFilter library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
 
 ```
-  SF.SmartFilter.addModel("arboleda",nodeid);
+  hcSmartFilter.SmartFilter.addModel("arboleda",nodeid);
 ```
 
 When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.

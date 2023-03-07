@@ -3,12 +3,12 @@ var myLayout;
 
 async function msready() {
 
-    SFUI.SmartFilterEditor.initialize("searchtools", hwv);
-    SFUI.SmartFilterEditor.display();
+    hcSmartFilterUI.SmartFilterEditor.initialize("searchtools", hwv);
+    hcSmartFilterUI.SmartFilterEditor.display();
 
 
-    SFUI.SmartFilterManagerUI.initialize("smartfilterscontainer",hwv, true);
-    SFUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
+    hcSmartFilterUI.SmartFilterManagerUI.initialize("smartfilterscontainer",hwv, true);
+    hcSmartFilterUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
 
 }
 
@@ -94,7 +94,7 @@ function createUILayout() {
     myLayout.on('stateChanged', function () {
         if (hwv != null) {
             hwv.resizeCanvas();
-            SFUI.SmartFilterEditor.adjust();
+            hcSmartFilterUI.SmartFilterEditor.adjust();
         }
     });
     myLayout.init();
@@ -125,8 +125,8 @@ function createUILayout() {
 
 function initializeSearch(){
     if(hwv.selectionManager.getLast())   
-        SFUI.SmartFilterEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
+        hcSmartFilterUI.SmartFilterEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
     else
-        SFUI.SmartFilterEditor.initialize("searchtools",hwv);
-    SFUI.SmartFilterEditor.display();
+        hcSmartFilterUI.SmartFilterEditor.initialize("searchtools",hwv);
+    hcSmartFilterUI.SmartFilterEditor.display();
 }

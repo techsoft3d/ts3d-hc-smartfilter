@@ -4,37 +4,42 @@ export class SmartFilterManagerUI {
 
     static _updatedCallback = null;
 
-    static initialize(div,viewer, showImportExportButtons) {
+    static _showButtonRow = true;
+
+    static initialize(div, viewer, showImportExportButtons) {
         SmartFilterManagerUI._table = null;
         SmartFilterManagerUI._viewer = viewer;
         SmartFilterManagerUI._uidiv = div;
 
-        SF.SmartFilterManager.initialize(viewer);
+        hcSmartFilter.SmartFilterManager.initialize(viewer);
 
-        $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
-        if (showImportExportButtons) {
-            $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:4px">Export</button>');
-            $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:4px">Load</button><input style="display:none" type="file" id="inputupload">');
+        if (SmartFilterManagerUI._showButtonRow) {
 
-            $("#smartFilterManagerExport").click(function () { SmartFilterManagerUI.exportToFile("smartfilters.json"); });
+            $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
+            if (showImportExportButtons) {
+                $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerExport" type="button" style="position:absolute;right:0px;top:2px">Export</button>');
+                $("#" + SmartFilterManagerUI._uidiv).append('<button class="smartFilterSearchButton" id="smartFilterManagerUpload" type="button" style="position:absolute;right:58px;top:2px">Load</button><input style="display:none" type="file" id="inputupload">');
 
-            $("#smartFilterManagerUpload").click(function(e){
-                e.preventDefault();
-                $("#inputupload").trigger('click');
-             });
-    
-             $("#inputupload").change(function () {
-        
-                let files = $('#inputupload')[0].files;        
-                // Check file selected or not
-                if (files.length > 0) {
-                    SmartFilterManagerUI.load(files[0]);
-                }
-              });
+                $("#smartFilterManagerExport").click(function () { SmartFilterManagerUI.exportToFile("smartfilters.json"); });
+
+                $("#smartFilterManagerUpload").click(function (e) {
+                    e.preventDefault();
+                    $("#inputupload").trigger('click');
+                });
+
+                $("#inputupload").change(function () {
+
+                    let files = $('#inputupload')[0].files;
+                    // Check file selected or not
+                    if (files.length > 0) {
+                        SmartFilterManagerUI.load(files[0]);
+                    }
+                });
+            }
+
+            $("#smartFilterManagerAddCurrentFilter").click(function () { SmartFilterManagerUI._addCurrentFilter(); });
         }
 
-        $("#smartFilterManagerAddCurrentFilter").click(function () { SmartFilterManagerUI._addCurrentFilter(); });
-       
         $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" style="overflow: hidden; zoom:0.7;width:100%; height:100%;"></div>');
 
         SmartFilterManagerUI.refreshUI();
@@ -51,7 +56,7 @@ export class SmartFilterManagerUI {
             return async function (e) {
                 // Render thumbnail.
                 let res = JSON.parse(e.target.result);
-                SF.SmartFilterManager.fromJSON(res);
+                hcSmartFilter.SmartFilterManager.fromJSON(res);
                 SmartFilterManagerUI.refreshUI();
             };
         })(file);
@@ -66,15 +71,15 @@ export class SmartFilterManagerUI {
         let filter = SmartFilterEditor.getFilter();
         let jfilter = filter.toJSON();
 
-        let sf = new SF.SmartFilter(SmartFilterManagerUI._viewer);
+        let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
         sf.setName("");
-        SF.SmartFilterManager.addSmartFilter(sf, false);
+        hcSmartFilter.SmartFilterManager.addSmartFilter(sf, false);
 
         let text = filter.generateString();            
 
         let prop = {};
-        prop.id = SF.SmartFilterManager.getSmartFilterNum() - 1;
+        prop.id = hcSmartFilter.SmartFilterManager.getSmartFilterNum() - 1;
         prop.description = text;
         await SmartFilterManagerUI._table.addRow(prop);
 
@@ -111,7 +116,7 @@ export class SmartFilterManagerUI {
 
         $("#sfm-delete-" + cell.getData().id).on("click", function (event) {             
             event.stopPropagation();
-            SF.SmartFilterManager.removeSmartFilter(rowdata.id);
+            hcSmartFilter.SmartFilterManager.removeSmartFilter(rowdata.id);
             cell.getRow().delete();
             if (SmartFilterManagerUI._updatedCallback) {
                 SmartFilterManagerUI._updatedCallback();
@@ -167,8 +172,8 @@ export class SmartFilterManagerUI {
         else
             await SmartFilterManagerUI._table.clearData();
 
-        for (let i=0;i<SF.SmartFilterManager.getSmartFilterNum();i++) {
-            let filter = SF.SmartFilterManager.getSmartFilter(i);
+        for (let i=0;i<hcSmartFilter.SmartFilterManager.getSmartFilterNum();i++) {
+            let filter = hcSmartFilter.SmartFilterManager.getSmartFilter(i);
             
             let text;
             if (filter.getName() == "")
@@ -184,7 +189,7 @@ export class SmartFilterManagerUI {
             text = text.replace(/&quot;/g, '"');
             prop.id = i;
             prop.description = text;
-            prop.prop = SF.SmartFilterManager.getIsProp(i);
+            prop.prop = hcSmartFilter.SmartFilterManager.getIsProp(i);
             await SmartFilterManagerUI._table.addRow(prop);
         }     
     }
@@ -192,7 +197,7 @@ export class SmartFilterManagerUI {
 
     static async _handleTableSelection(data, isolate) {
 
-        let smartFilter = SF.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
 
         let filterjson = smartFilter.toJSON();
 
@@ -213,7 +218,7 @@ export class SmartFilterManagerUI {
     static async _handleSmartFilterNameEdit(row) {
 
         let data = row.getData();
-        let smartFilter = SF.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
         smartFilter.setName(data.description);
         if (data.description == "")
         {
@@ -227,7 +232,7 @@ export class SmartFilterManagerUI {
 
     static async _handleSmartFilterIsPropEdit(row) {
         let data = row.getData();
-        SF.SmartFilterManager.updateSmartFilterIsProp(data.id,data.prop);
+        hcSmartFilter.SmartFilterManager.updateSmartFilterIsProp(data.id,data.prop);
         if (SmartFilterManagerUI._updatedCallback) {
             SmartFilterManagerUI._updatedCallback();
         }
@@ -236,16 +241,16 @@ export class SmartFilterManagerUI {
     static _handleSmartFilterUpdate(row) {
 
         let data = row.getData();
-        let smartFilter = SF.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
 
         SmartFilterEditor.updateFilterFromUI();
         let filter = SmartFilterEditor.getFilter();
         let jfilter = filter.toJSON();
 
-        let sf = new SF.SmartFilter(SmartFilterManagerUI._viewer);
+        let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
         sf.setName(smartFilter.getName());
-        SF.SmartFilterManager.updateSmartFilter(data.id,sf);
+        hcSmartFilter.SmartFilterManager.updateSmartFilter(data.id,sf);
 
         if (sf.getName() == "")
         {
@@ -266,7 +271,7 @@ export class SmartFilterManagerUI {
             return textFile;
           }
 
-        let text = JSON.stringify(SF.SmartFilterManager.toJSON());
+        let text = JSON.stringify(hcSmartFilter.SmartFilterManager.toJSON());
 
         let link = document.createElement('a');
         link.setAttribute('download', filename);

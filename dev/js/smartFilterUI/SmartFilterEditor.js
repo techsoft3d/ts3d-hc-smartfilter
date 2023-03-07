@@ -2,6 +2,7 @@ export class SmartFilterEditor {
     
     static _chainSkip = 0;
     static _showLimitOption = true;
+    static _showFirstRow = true;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -32,7 +33,7 @@ export class SmartFilterEditor {
 
         SmartFilterEditor._maindiv = maindiv;
         SmartFilterEditor._viewer = viewer;
-        SmartFilterEditor._mainFilter = new SF.SmartFilter(viewer, startnode);
+        SmartFilterEditor._mainFilter = new hcSmartFilter.SmartFilter(viewer, startnode);
         SmartFilterEditor._mainFilter.tempId = 0;
         
     }
@@ -42,25 +43,28 @@ export class SmartFilterEditor {
 
     }
 
-    static setShowLimitOption(limitOption) {
-        SmartFilterEditor._showLimitOption = limitOption;
+    static showFirstRow(showFirstRow) {
+        SmartFilterEditor._showFirstRow = showFirstRow;
 
     }
+
     
     static async display() {
-        await SF.SmartFilter.initialize(SmartFilterEditor._viewer);
+        await hcSmartFilter.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
-        if (SmartFilterEditor._showLimitOption) {
-            html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'SFUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
-        }
-        else
-        {
-            html += '<div style="position:relative;height:20px;"></div>';
+        if (SmartFilterEditor._showFirstRow) {
+            if (SmartFilterEditor._showLimitOption) {
+                html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
+            }
+            else {
+                html += '<div style="position:relative;height:20px;"></div>';
 
+            }
+
+            html += '<button class="smartFilterSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
+            html += '<button class="smartFilterSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.search()\'>Search</button>';
         }
-        html += '<button class="smartFilterSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
-        html += '<button class="smartFilterSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'SFUI.SmartFilterEditor.search()\'>Search</button>';
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
         html += '<div id="' + SmartFilterEditor._maindiv + '_conditions">';
         html += await SmartFilterEditor._generateConditions();
@@ -169,13 +173,13 @@ export class SmartFilterEditor {
                 this.updateFilterFromUI(filter.childFilter);
             }
             else {
-                filter.conditionType = SF.SmartFilter.convertStringConditionToEnum($("#" + SmartFilterEditor._maindiv + "_propertyChoiceSelect" + i + "-" + smartFilter.tempId)[0].value);
+                filter.conditionType = hcSmartFilter.SmartFilter.convertStringConditionToEnum($("#" + SmartFilterEditor._maindiv + "_propertyChoiceSelect" + i + "-" + smartFilter.tempId)[0].value);
                 if ($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0] != undefined) {
                     filter.text = SmartFilterEditor._htmlEncode($("#" + SmartFilterEditor._maindiv + "_modeltreesearchtext" + i + "-" + smartFilter.tempId)[0].value);
                 }
                 filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
 
-                filter.propertyType = SF.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
+                filter.propertyType = hcSmartFilter.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
 
                 if (i == 1) {
                     filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
@@ -209,12 +213,12 @@ export class SmartFilterEditor {
         smartFilter = SmartFilterEditor._getSmartFilterFromTempId(id);
         let childFilter = null;
         if (createChildFilter) {
-            childFilter = new SF.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mainFilter.getStartNode());
-            childFilter.addCondition(new SF.SmartFilterCondition());
+            childFilter = new hcSmartFilter.SmartFilter(SmartFilterEditor._viewer, SmartFilterEditor._mainFilter.getStartNode());
+            childFilter.addCondition(new hcSmartFilter.SmartFilterCondition());
         }
             
         if (smartFilter.getNumConditions() <= 1) {
-            let condition = new SF.SmartFilterCondition();
+            let condition = new hcSmartFilter.SmartFilterCondition();
             condition.setChildFilter(childFilter);
 
             smartFilter.addCondition(condition);
@@ -222,7 +226,7 @@ export class SmartFilterEditor {
         else
         {
             let previousCondition = smartFilter.getCondition(smartFilter.getNumConditions() - 1);
-            let condition = new SF.SmartFilterCondition();
+            let condition = new hcSmartFilter.SmartFilterCondition();
             condition.setChildFilter(childFilter);
             condition.setAndOr(previousCondition.getAndOr());
             smartFilter.addCondition(condition);
@@ -287,12 +291,12 @@ export class SmartFilterEditor {
         for (let i = 0; i < SmartFilterEditor._founditems.length; i++) {
             toggle = !toggle;
             if (SmartFilterEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SmartFilterEditor._founditems[i].id)))
-                html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItemselected">';
+                html += '<div onclick=\'hcSmartFilterUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItemselected">';
             else {
                 if (toggle)
-                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem1">';
+                    html += '<div onclick=\'hcSmartFilterUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem1">';
                 else
-                    html += '<div onclick=\'SFUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem2">';
+                    html += '<div onclick=\'hcSmartFilterUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItem2">';
             }
             html += '<div class="smartFilterSearchItemText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].name) + '</div>';
             html += '<div class="smartFilterSearchItemChainText">' + SmartFilterEditor._htmlEncode(SmartFilterEditor._founditems[i].chaintext) + '</div>';
@@ -318,7 +322,7 @@ export class SmartFilterEditor {
         else {
 
             let html = '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
-            html += '<select class="smartFilterSearchSelect" onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' id="' +  
+            html += '<select class="smartFilterSearchSelect" onchange=\'hcSmartFilterUI.SmartFilterEditor._andorchangedFromUI()\' id="' +  
             SmartFilterEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
             if (filter.and) {
@@ -337,13 +341,13 @@ export class SmartFilterEditor {
 
     static _generateChoiceSelect(filter, filterpos,smartFilter) {
 
-        let html = '<select onchange=\'SFUI.SmartFilterEditor._andorchangedFromUI()\' class="smartFilterAndOrSelect" id="' +  
+        let html = '<select onchange=\'hcSmartFilterUI.SmartFilterEditor._andorchangedFromUI()\' class="smartFilterAndOrSelect" id="' +  
             SmartFilterEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
         let choices = ["equals", "exists","!exists", ">=", "<=", "=", "\u2260"];
 
         for (let i = 0; i < choices.length; i++) {
-            if (choices[i] == SF.SmartFilter.convertEnumConditionToString(filter.conditionType)) {
+            if (choices[i] == hcSmartFilter.SmartFilter.convertEnumConditionToString(filter.conditionType)) {
                 html += '<option selected value="' + choices[i] + '">' + choices[i] + '</option>\n';
             }
             else {
@@ -366,7 +370,7 @@ export class SmartFilterEditor {
     static _generatePropertyTypeSelect(filter, filterpos, smartFilter) {
       
 
-        let html = '<select onchange=\'SFUI.SmartFilterEditor._clearInputField(' + filterpos + "," + smartFilter.tempId + ');SFUI.SmartFilterEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
+        let html = '<select onchange=\'hcSmartFilterUI.SmartFilterEditor._clearInputField(' + filterpos + "," + smartFilter.tempId + ');hcSmartFilterUI.SmartFilterEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
             SmartFilterEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';       
 
         let sortedStrings = SmartFilterEditor._mainFilter.getAllProperties();
@@ -465,7 +469,7 @@ export class SmartFilterEditor {
             if (filter.childFilter) {
                 SmartFilterEditor.tempId++;
                 html += '<div>';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSmartFilterUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 html+= await this._generateConditions(filter.childFilter,i);
@@ -473,7 +477,7 @@ export class SmartFilterEditor {
             }
             else {
                 html += '<div style="height:30px;margin-top:-3px">';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'SFUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSmartFilterUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
                 html += '<div class="cross"></div></div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 let offset = 66;
@@ -490,7 +494,7 @@ export class SmartFilterEditor {
                 }
                 html += SmartFilterEditor._generatePropertyTypeSelect(filter, i, smartFilter);
                 html += SmartFilterEditor._generateChoiceSelect(filter, i, smartFilter);
-                if (SF.SmartFilter.convertEnumConditionToString(filter.conditionType) != "exists" && SF.SmartFilter.convertEnumConditionToString(filter.conditionType) != "!exists") {
+                if (hcSmartFilter.SmartFilter.convertEnumConditionToString(filter.conditionType) != "exists" && hcSmartFilter.SmartFilter.convertEnumConditionToString(filter.conditionType) != "!exists") {
                     html += await SmartFilterEditor._generateInput(filter, i, smartFilter);
                 }
                 else {
@@ -500,10 +504,10 @@ export class SmartFilterEditor {
                 html += '</div>';
             }        
         }
-        html += '<button class="smartFilterSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'SFUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
+        html += '<button class="smartFilterSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
         if (!smartFilterIn)
         {
-            html += '<button class="smartFilterSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'SFUI.SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>Add SubFilter</button>';
+            html += '<button class="smartFilterSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>Add SubFilter</button>';
         }
         else
         {           

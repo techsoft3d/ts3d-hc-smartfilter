@@ -57,7 +57,7 @@ export class SmartPropertiesUI {
         if (selarray.length > 0) {
             let nodeid = selarray[0].getNodeId();
 
-            let foundProperties = await SF.SmartFilterManager.evaluateProperties(nodeid);
+            let foundProperties = await hcSmartFilter.SmartFilterManager.evaluateProperties(nodeid);
             let ii=0;
             for (let i = 0; i < foundProperties.length; i++) {
                 let propsOnNode = foundProperties[i].properties;
