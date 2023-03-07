@@ -19,7 +19,9 @@ export class SmartFilterManager {
         else {
             filterid = SmartFilterManager._generateGUID();
         }
+        let filter = {filter:smartFilter, isProp:isProp, id:filterid};
         SmartFilterManager._smartFilters.push({filter:smartFilter, isProp:isProp, id:filterid});
+        return filter;
     }
 
     static getSmartFilters() {
@@ -46,6 +48,10 @@ export class SmartFilterManager {
 
     static getSmartFilter(pos) {
         return SmartFilterManager._smartFilters[pos].filter;                
+    }
+
+    static getSmartFilterID(pos) {
+        return SmartFilterManager._smartFilters[pos].id;                
     }
 
     static getIsProp(pos) {

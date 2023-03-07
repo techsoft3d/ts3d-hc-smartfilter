@@ -434,9 +434,9 @@ export class SmartFilterEditor {
 
         for (let i = 0; i < sortedStrings.length; i++) {
             if (filter.propertyName == sortedStrings[i])
-                html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
+                html += '<option value="' + sortedStrings[i] + '" selected></option>\n';
             else
-                html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+                html += '<option value="' + sortedStrings[i] + '"></option>\n';
         }
         html += '</datalist>\n';
         return html;

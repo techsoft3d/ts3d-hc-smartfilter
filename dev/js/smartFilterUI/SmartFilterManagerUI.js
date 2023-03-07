@@ -74,12 +74,12 @@ export class SmartFilterManagerUI {
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
         sf.setName("");
-        hcSmartFilter.SmartFilterManager.addSmartFilter(null,sf, false);
+        let sfitem = hcSmartFilter.SmartFilterManager.addSmartFilter(null,sf, false);
 
         let text = filter.generateString();            
 
         let prop = {};
-        prop.id = hcSmartFilter.SmartFilterManager.getSmartFilterNum() - 1;
+        prop.id = sfitem.id;
         prop.description = text;
         await SmartFilterManagerUI._table.addRow(prop);
 
@@ -187,7 +187,7 @@ export class SmartFilterManagerUI {
             
             let prop = {};
             text = text.replace(/&quot;/g, '"');
-            prop.id = i;
+            prop.id =  hcSmartFilter.SmartFilterManager.getSmartFilterID(i);;
             prop.description = text;
             prop.prop = hcSmartFilter.SmartFilterManager.getIsProp(i);
             await SmartFilterManagerUI._table.addRow(prop);
@@ -197,7 +197,7 @@ export class SmartFilterManagerUI {
 
     static async _handleTableSelection(data, isolate) {
 
-        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
 
         let filterjson = smartFilter.toJSON();
 
@@ -218,7 +218,7 @@ export class SmartFilterManagerUI {
     static async _handleSmartFilterNameEdit(row) {
 
         let data = row.getData();
-        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
         smartFilter.setName(data.description);
         if (data.description == "")
         {
@@ -241,7 +241,7 @@ export class SmartFilterManagerUI {
     static _handleSmartFilterUpdate(row) {
 
         let data = row.getData();
-        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilter(data.id);
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
 
         SmartFilterEditor.updateFilterFromUI();
         let filter = SmartFilterEditor.getFilter();
