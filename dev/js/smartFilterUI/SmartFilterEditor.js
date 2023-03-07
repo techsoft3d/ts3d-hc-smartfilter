@@ -180,15 +180,13 @@ export class SmartFilterEditor {
                 filter.propertyName = $("#" + SmartFilterEditor._maindiv + "_propertyTypeSelect" + i + "-" + smartFilter.tempId)[0].value;
 
                 filter.propertyType = hcSmartFilter.SmartFilter.convertStringPropertyTypeToEnum(filter.propertyName);
-
-                if (i == 1) {
-                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
-                }
-                else if (i > 1) {
-                    filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
-                }
             }
-
+            if (i == 1) {
+                filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + i + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
+            }
+            else if (i > 1) {
+                filter.and = ($("#" + SmartFilterEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + smartFilter.tempId)[0].value == "and") ? true : false;
+            }    
         }
     }
 
