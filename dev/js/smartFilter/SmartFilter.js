@@ -17,10 +17,12 @@ const SmartFilterPropertyType = {
     nodeType:3,
     nodeColor:4,
     relationship:5,
-    property:6
+    property:6,
+    smartFilter:7
 };
 
 import { SmartFilterCondition } from './SmartFilterCondition.js';
+import { SmartFilterManager } from './SmartFilterManager.js';
 
 
 export {SmartFilterPropertyType};
@@ -78,6 +80,9 @@ export class SmartFilter {
 
     static convertStringPropertyTypeToEnum(c) {
 
+        if (c.indexOf("SmartFilter") > -1) {
+            return SmartFilterPropertyType.smartFilter;
+        }
         switch (c) {
             case "Node Name":
                 return SmartFilterPropertyType.nodeName;
@@ -92,6 +97,9 @@ export class SmartFilter {
             case "Rel:ContainedIn":
             case "Rel:SpaceBoundary":
                 return SmartFilterPropertyType.relationship;
+            case "Smart Filter":
+                 return SmartFilterPropertyType.smartFilter;
+    
             default:
                 return SmartFilterPropertyType.property;
         }
@@ -240,6 +248,17 @@ export class SmartFilter {
         if (hasType) {
             propsnames.unshift("TYPE");
         }
+    
+        propsnames.unshift("Smart Filter");
+        propsnames.unshift("Rel:SpaceBoundary");
+        propsnames.unshift("Rel:ContainedIn");
+        propsnames.unshift("Node Color");
+        propsnames.unshift("Node Type");
+        propsnames.unshift("Node Chain");
+        propsnames.unshift("Nodeid");
+        propsnames.unshift("Node Name");
+
+
         return propsnames;
     }
 
@@ -300,6 +319,16 @@ export class SmartFilter {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
+            if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
+                if (!conditions[i].smartFilterID) {
+                    let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
+                    conditions[i].smartFilterID = f.id;
+                    conditions[i].smartFilter = f.filter;
+                }
+                else {
+                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                }
+            }
         }
         let matchingnodes = [];
         if (limitlist.length == 0)
@@ -645,6 +674,13 @@ export class SmartFilter {
                 else if (conditions[i].propertyName == "Rel:ContainedIn") {
                     res = await this._checkContainedInFilter(id, conditions[i]);
                 }
+            }
+            else if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
+
+                if (!conditions[i].smartFilter) {
+                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                }
+                res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions, isor);
             }
             else {
                 if (conditions[i].childFilter)
