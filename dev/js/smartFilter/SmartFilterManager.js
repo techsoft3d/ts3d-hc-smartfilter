@@ -11,16 +11,9 @@ export class SmartFilterManager {
         SmartFilterManager._smartFilters = [];
     }
 
-    static addSmartFilter(id,smartFilter,isProp) {
-        let filterid = "";
-        if (id)  {
-             filterid = id;
-        }
-        else {
-            filterid = SmartFilterManager._generateGUID();
-        }
-        let filter = {filter:smartFilter, isProp:isProp, id:filterid};
-        SmartFilterManager._smartFilters.push({filter:smartFilter, isProp:isProp, id:filterid});
+    static addSmartFilter(smartFilter,isProp) {
+        let filter = {filter:smartFilter, isProp:isProp};
+        SmartFilterManager._smartFilters.push({filter:smartFilter, isProp:isProp});
         return filter;
     }
 
@@ -38,7 +31,7 @@ export class SmartFilterManager {
 
     static getSmartFilterByID(id) {
         for (let i=0;i<SmartFilterManager._smartFilters.length;i++) {
-            if (SmartFilterManager._smartFilters[i].id == id)
+            if (SmartFilterManager._smartFilters[i].filter._id == id)
                 return SmartFilterManager._smartFilters[i].filter;
         }
     }
@@ -51,7 +44,7 @@ export class SmartFilterManager {
     }
 
     static getSmartFilterID(pos) {
-        return SmartFilterManager._smartFilters[pos].id;                
+        return SmartFilterManager._smartFilters[pos].filter._id;                
     }
 
     static getIsProp(pos) {
@@ -73,7 +66,7 @@ export class SmartFilterManager {
     static toJSON() {
         let json = [];
         for (let i = 0; i < SmartFilterManager._smartFilters.length; i++) {
-            json.push({filter:SmartFilterManager._smartFilters[i].filter.toJSON(), isProp:SmartFilterManager._smartFilters[i].isProp, id:SmartFilterManager._smartFilters[i].id});
+            json.push({filter:SmartFilterManager._smartFilters[i].filter.toJSON(), isProp:SmartFilterManager._smartFilters[i].isProp});
         }
         return json;
     }
@@ -83,7 +76,7 @@ export class SmartFilterManager {
         for (let i = 0; i < json.length; i++) {
             let sf = new SmartFilter(SmartFilterManager._viewer);
             sf.fromJSON(json[i].filter);
-            SmartFilterManager.addSmartFilter(json[i].id, sf,json[i].isProp);
+            SmartFilterManager.addSmartFilter(sf,json[i].isProp);
         }
         return json;
     }
@@ -109,12 +102,4 @@ export class SmartFilterManager {
         }
         return properties;
     }
-
-    static _generateGUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
-    }
-
 }

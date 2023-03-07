@@ -65,6 +65,12 @@ export class SmartFilterManagerUI {
         reader.readAsText(file);
     }
     
+    static _generateGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 
     static async _addCurrentFilter() {
         SmartFilterEditor.updateFilterFromUI();
@@ -72,14 +78,17 @@ export class SmartFilterManagerUI {
         let jfilter = filter.toJSON();
 
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
+
         sf.fromJSON(jfilter);
+        
+        sf._id =  SmartFilterManagerUI._generateGUID();
         sf.setName("");
-        let sfitem = hcSmartFilter.SmartFilterManager.addSmartFilter(null,sf, false);
+        hcSmartFilter.SmartFilterManager.addSmartFilter(sf, false);
 
         let text = filter.generateString();            
 
         let prop = {};
-        prop.id = sfitem.id;
+        prop.id = sf._id;
         prop.description = text;
         await SmartFilterManagerUI._table.addRow(prop);
 

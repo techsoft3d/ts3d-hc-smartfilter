@@ -197,6 +197,9 @@ export class SmartFilter {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._id = this._generateGUID();
+
+
             
         if (startnode)
             this._startnode = startnode;
@@ -285,6 +288,9 @@ export class SmartFilter {
             }
         }
         this._name = json.name;
+        if (json.id) {
+            this._id = json.id;
+        }
     }
 
     toJSON() {
@@ -299,7 +305,7 @@ export class SmartFilter {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name};        
+        return {conditions:newconditions, name:this._name, id:this._id};        
     }
 
     limitToNodes(nodeids) {
@@ -721,4 +727,12 @@ export class SmartFilter {
 
         }
     }
+
+    _generateGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
 }
