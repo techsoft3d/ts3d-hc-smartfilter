@@ -86,7 +86,7 @@ export class SmartFilterEditor {
     static adjust() 
     {
 
-        let newheight = $("#" + SmartFilterEditor._maindiv).parent().height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
+        let newheight = $("#" + SmartFilterEditor._maindiv).height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
         $("#" + SmartFilterEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
         
         let gap  = $("#" + SmartFilterEditor._maindiv).offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top;
