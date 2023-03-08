@@ -1,5 +1,5 @@
 const SmartFilterConditionType = {
-    equals:0,
+    contains:0,
     exists:1,
     notExists:2,
     greaterOrEqual:3,
@@ -41,8 +41,8 @@ export class SmartFilter {
     static convertEnumConditionToString(c) {
     
         switch (c) {
-            case SmartFilterConditionType.equals:
-                return "equals";
+            case SmartFilterConditionType.contains:
+                return "contains";
             case SmartFilterConditionType.exists:
                 return "exists";
             case SmartFilterConditionType.notExists:
@@ -61,8 +61,8 @@ export class SmartFilter {
     static convertStringConditionToEnum(c) {
     
         switch (c) {
-            case "equals":
-                return SmartFilterConditionType.equals;
+            case "contains":
+                return SmartFilterConditionType.contains;
             case "exists":
                 return SmartFilterConditionType.exists;
             case "!exists":
@@ -475,7 +475,7 @@ export class SmartFilter {
         }
         else
         {
-            elements = hwv.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+            elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
             SmartFilter._containedInSpatialStructureHash[id] = elements;
         }
 
@@ -491,7 +491,7 @@ export class SmartFilter {
     }
 
     async _checkFilter(id, condition) {
-        if (condition.conditionType != SmartFilterConditionType.equals) {
+        if (condition.conditionType != SmartFilterConditionType.contains) {
             if (condition.conditionType == SmartFilterConditionType.exists) {
                 if (SmartFilter._propertyHash[id] && SmartFilter._propertyHash[id][condition.propertyName] != undefined)
                     return true;

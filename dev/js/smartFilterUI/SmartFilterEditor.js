@@ -350,7 +350,7 @@ export class SmartFilterEditor {
         let html = '<select onchange=\'hcSmartFilterUI.SmartFilterEditor._andorchangedFromUI()\' class="smartFilterAndOrSelect" id="' +  
             SmartFilterEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + smartFilter.tempId + '" value="">\n';
 
-        let choices = ["equals", "exists","!exists", ">=", "<=", "=", "\u2260"];
+        let choices = ["contains", "exists","!exists", ">=", "<=", "=", "\u2260"];
 
         for (let i = 0; i < choices.length; i++) {
             if (choices[i] == hcSmartFilter.SmartFilter.convertEnumConditionToString(filter.conditionType)) {

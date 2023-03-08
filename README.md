@@ -1,18 +1,18 @@
 # SmartFilters
 
+## Version Update (0.5.2)
+* Ability to choose an existing smartfilter as a filter condition
+
 ## Version Update (0.5.0) 
 * modules renamed to hcSmartFilter and hcSmartFilterUI
 * Abiltity to hide top row UI buttons
 * Update to HOOPS Communicator 2023 U1
-
 
 ![alt text](https://github.com/techsoft3d/SmartFilters/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
-
-
 
 ## Install
 Add dist/smartFilter.min.js to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
@@ -29,7 +29,6 @@ If you are using the UI library you also need to add the provided css file:
 ```
     <link rel="stylesheet" href="./css/smartFilterUI.css">
 ```
-
 
 ## Demo
 
@@ -62,22 +61,22 @@ The editor is reactive and will adjust to various sizes though the parent div sh
  
  In addition the user can limit the scope of future searches by activating the “Limit to Selection:” checkbox which will limit all future searches to the currently selected nodes and their children.
 
-### "equals" Comparison
+### "contains" Comparison
 
-When searching for text with “equals” the default is a non case-sensitive substring search so a search for “Screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them. In this case you can put a + in front of the search term to require that the search term is present.
+When searching for text with “contains” the default is a non case-sensitive substring search so a search for “Screw” will find “front screw” as well as “back screw”. If you need a precise search, surround the search string in double quotes. To find all nodes that do not have the search string put a “-“ in front of the search term. It is also possible to combine multiple text searches by putting a “,” between them. In this case you can put a + in front of the search term to require that the search term is present.
 
-**Example "equals" Searches:**  
+**Example "contains" Searches:**  
 
-*Type equals wall,door*  
+*Type contains wall,door*  
 This will find all elements where the name of the type contains either wall or door.
 
-*Type equals wall,-curtainwall*  
+*Type contains wall,-curtainwall*  
 This will find all elements where the name of the type contains wall but not curtainwall.
 
-*Node Name equals +IFC,wall,door*  
+*Node Name contains +IFC,wall,door*  
 This will find all elements where the name contains IFC and either wall or door.
 
-*Type equals "IFCWALL"*  
+*Type contains "IFCWALL"*  
 This will find all elements where the name of the type is exactly “IFCWALL”
 
 ### Other Comparisons
@@ -101,14 +100,17 @@ Performs the search on the color of a node specified as 3 RGB integers (e.g. “
 **Rel: Space Boundary Property**  
 If this option is selected the search will be performed on the relating SpaceBoundary elements of the nodes with the specified text. 
 
-*Rel:SpaceBoundary equals kitchen*  
+*Rel:SpaceBoundary contains kitchen*  
 This will find all elements that are related to all IFCSPACE's which contain kitchen in their name.
 
 **Rel: Contained Property**  
 If this option is selected the search will be performed on the elements "contained in" the nodes with the specified text.
 
-### Advanced Usage:
+**Smart Filter**  
+If this option is selected the search will be performed on the specified Smart Filter.
 
+
+### Advanced Usage:
 
 ```
  hcSmartFilterUI.SmartFilterEditor.setChainSkip(1);
@@ -120,8 +122,6 @@ When displaying the search results you can optionally skip over the first "n" le
  hcSmartFilterUI.SmartFilterEditor.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
-
-
 
 ## SmartfilterManager UI
 ### Initialization
@@ -211,5 +211,3 @@ When calling this function whenever a new model is added to the webviewer the ac
 
 ### SmartFilter UI:
 * [Tabulator](http://tabulator.info/)
-
-
