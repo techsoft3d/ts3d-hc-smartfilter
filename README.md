@@ -15,20 +15,27 @@ This library provides adanced search capabilities for HOOPS Communicator. It is 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 
 ## Install
-Add dist/smartFilter.min.js to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
+Add `dist/smartFilter.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
 ```
     <script src="./js/smartFilter.min.js"></script>
 ```
 
-Add dist/smartFilterUI.min.js for the optional UI functionality. 
+Add `dist/smartFilterUI.min.js` for the optional UI functionality. 
 ```
     <script src="./js/smartFilterUI.min.js"></script>
 ```
 
-If you are using the UI library you also need to add the provided css file:
+If you are using the UI library you also need to add `dist/smartFilterUI.css` to your project:
 ```
     <link rel="stylesheet" href="./css/smartFilterUI.css">
 ```
+
+In addition the UI also requires [Tabulator](https://tabulator.info/). Make sure to include the css and js files for Tabulator in your project. 
+```
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.0.7/js/tabulator.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.0.7/css/tabulator.min.css" rel="stylesheet">
+```
+
 
 ## Demo
 
