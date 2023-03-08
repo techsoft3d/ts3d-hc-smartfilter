@@ -132,6 +132,13 @@ export class SmartFilterManagerUI {
         });
     }
 
+
+    static formatTooltip(e,cell) {
+        let id = cell.getData().id
+        let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(id);
+        return smartFilter.generateString();        
+
+    }
     static async refreshUI() {
 
         if (!SmartFilterManagerUI._table) {
@@ -141,7 +148,7 @@ export class SmartFilterManagerUI {
                 layout: "fitColumns",
                 columns: [                                   
                     {
-                        title: "Description", field: "description", formatter:"textarea", editor:"textarea"
+                        title: "Description", field: "description", formatter:"textarea", editor:"textarea",tooltip: SmartFilterManagerUI.formatTooltip
                     },
                     {
                         title: "", width: 160, field: "buttons", formatter: function (cell, formatterParams, onRendered) {
