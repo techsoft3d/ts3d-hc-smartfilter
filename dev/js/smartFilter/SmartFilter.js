@@ -1,5 +1,5 @@
 const SmartFilterConditionType = {
-    equals:0,
+    contains:0,
     exists:1,
     notExists:2,
     greaterOrEqual:3,
@@ -41,8 +41,8 @@ export class SmartFilter {
     static convertEnumConditionToString(c) {
     
         switch (c) {
-            case SmartFilterConditionType.equals:
-                return "equals";
+            case SmartFilterConditionType.contains:
+                return "contains";
             case SmartFilterConditionType.exists:
                 return "exists";
             case SmartFilterConditionType.notExists:
@@ -61,8 +61,8 @@ export class SmartFilter {
     static convertStringConditionToEnum(c) {
     
         switch (c) {
-            case "equals":
-                return SmartFilterConditionType.equals;
+            case "contains":
+                return SmartFilterConditionType.contains;
             case "exists":
                 return SmartFilterConditionType.exists;
             case "!exists":
@@ -197,6 +197,9 @@ export class SmartFilter {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._id = this._generateGUID();
+
+
             
         if (startnode)
             this._startnode = startnode;
@@ -204,8 +207,15 @@ export class SmartFilter {
             this._startnode =  this._viewer.model.getRootNode();
     }
 
+    updateConditions(conditions) {
+        this._conditions = conditions;
+    }
+
     setName(name) {
         this._name = name;
+        if (this._name == "") {
+            this._name = this.generateString();
+        }
     }
 
     getName() {
@@ -285,6 +295,9 @@ export class SmartFilter {
             }
         }
         this._name = json.name;
+        if (json.id) {
+            this._id = json.id;
+        }
     }
 
     toJSON() {
@@ -299,7 +312,7 @@ export class SmartFilter {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name};        
+        return {conditions:newconditions, name:this._name, id:this._id};        
     }
 
     limitToNodes(nodeids) {
@@ -319,16 +332,6 @@ export class SmartFilter {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
-            if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
-                if (!conditions[i].smartFilterID) {
-                    let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
-                    conditions[i].smartFilterID = f.id;
-                    conditions[i].smartFilter = f.filter;
-                }
-                else {
-                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
-                }
-            }
         }
         let matchingnodes = [];
         if (limitlist.length == 0)
@@ -412,7 +415,7 @@ export class SmartFilter {
         let text = "";
         for (let i = 0; i < this._conditions.length; i++) {
             if (i > 0) {
-                text += " " + (this._conditions[i].and ? "AND" : "OR") + " ";
+                text += " " + (this._conditions[i].and ? "and" : "or") + " ";
             }
             if (this._conditions[i].childFilter) {
                 text += "(" + this._conditions[i].childFilter.generateString() + ") ";
@@ -462,7 +465,7 @@ export class SmartFilter {
         }
         else
         {
-            elements = hwv.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+            elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
             SmartFilter._containedInSpatialStructureHash[id] = elements;
         }
 
@@ -478,7 +481,7 @@ export class SmartFilter {
     }
 
     async _checkFilter(id, condition) {
-        if (condition.conditionType != SmartFilterConditionType.equals) {
+        if (condition.conditionType != SmartFilterConditionType.contains) {
             if (condition.conditionType == SmartFilterConditionType.exists) {
                 if (SmartFilter._propertyHash[id] && SmartFilter._propertyHash[id][condition.propertyName] != undefined)
                     return true;
@@ -678,7 +681,14 @@ export class SmartFilter {
             else if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
 
                 if (!conditions[i].smartFilter) {
-                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                    if (!conditions[i].smartFilterID) {
+                        let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
+                        conditions[i].smartFilterID = f.id;
+                        conditions[i].smartFilter = f.filter;
+                    }
+                    else {
+                        conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                    }
                 }
                 res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions, isor);
             }
@@ -721,4 +731,12 @@ export class SmartFilter {
 
         }
     }
+
+    _generateGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
+
 }

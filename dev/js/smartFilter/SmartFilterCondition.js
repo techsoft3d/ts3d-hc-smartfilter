@@ -6,7 +6,7 @@ export class SmartFilterCondition {
 
     constructor() {
         this.and = true;
-        this.conditionType = SmartFilterConditionType.equals;
+        this.conditionType = SmartFilterConditionType.contains;
         this.propertyType = SmartFilterPropertyType.nodeName;
         this.propertyName = "";
         this.text =  "";

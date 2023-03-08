@@ -57,7 +57,7 @@
   
   .smartFilterAndOrSelect {
     font-size:11px;
-    width:60px;
+    width:75px;
     margin-right:3px;
     font-family: monospace;
   }
@@ -108,4 +108,20 @@
   height: 18px;
   line-height: 1;
   margin-left:2px;
+}
+
+
+.smartFilterManagerTabulator {
+  overflow:hidden;
+  zoom:0.8;
+  width:100%;
+  height:100%;
+}
+
+
+.smartPropertiesTabulator {
+  overflow:hidden;
+  zoom:0.8;
+  width:100%;
+  height:100%;
 }

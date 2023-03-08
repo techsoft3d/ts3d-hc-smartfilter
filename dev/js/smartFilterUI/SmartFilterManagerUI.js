@@ -40,7 +40,7 @@ export class SmartFilterManagerUI {
             $("#smartFilterManagerAddCurrentFilter").click(function () { SmartFilterManagerUI._addCurrentFilter(); });
         }
 
-        $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" style="overflow: hidden; zoom:0.7;width:100%; height:100%;"></div>');
+        $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" class = "smartFilterManagerTabulator"></div>');
 
         SmartFilterManagerUI.refreshUI();
     }
@@ -65,6 +65,12 @@ export class SmartFilterManagerUI {
         reader.readAsText(file);
     }
     
+    static _generateGUID() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    }
 
     static async _addCurrentFilter() {
         SmartFilterEditor.updateFilterFromUI();
@@ -72,15 +78,17 @@ export class SmartFilterManagerUI {
         let jfilter = filter.toJSON();
 
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
-        sf.fromJSON(jfilter);
-        sf.setName("");
-        let sfitem = hcSmartFilter.SmartFilterManager.addSmartFilter(null,sf, false);
 
-        let text = filter.generateString();            
+        sf.fromJSON(jfilter);
+        
+        sf._id =  SmartFilterManagerUI._generateGUID();
+        sf.setName("");
+        hcSmartFilter.SmartFilterManager.addSmartFilter(sf, false);
+        
 
         let prop = {};
-        prop.id = sfitem.id;
-        prop.description = text;
+        prop.id = sf._id;
+        prop.description = sf.getName();
         await SmartFilterManagerUI._table.addRow(prop);
 
         if (SmartFilterManagerUI._updatedCallback) {
@@ -222,7 +230,7 @@ export class SmartFilterManagerUI {
         smartFilter.setName(data.description);
         if (data.description == "")
         {
-            row.update({description:smartFilter.generateString()});
+            row.update({description:smartFilter.getName()});
         }
         if (SmartFilterManagerUI._updatedCallback) {
             SmartFilterManagerUI._updatedCallback();
@@ -239,7 +247,6 @@ export class SmartFilterManagerUI {
     }
 
     static _handleSmartFilterUpdate(row) {
-
         let data = row.getData();
         let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
 
@@ -249,14 +256,11 @@ export class SmartFilterManagerUI {
 
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
-        sf.setName(smartFilter.getName());
-        hcSmartFilter.SmartFilterManager.updateSmartFilter(data.id,sf);
-
-        if (sf.getName() == "")
-        {
-            row.update({description:sf.generateString()});
-        }
-
+        smartFilter.updateConditions(sf._conditions);
+        smartFilter.setName("");
+       
+        row.update({description:smartFilter.getName()});
+        
         if (SmartFilterManagerUI._updatedCallback) {
             SmartFilterManagerUI._updatedCallback();
         }
