@@ -84,12 +84,11 @@ export class SmartFilterManagerUI {
         sf._id =  SmartFilterManagerUI._generateGUID();
         sf.setName("");
         hcSmartFilter.SmartFilterManager.addSmartFilter(sf, false);
-
-        let text = filter.generateString();            
+        
 
         let prop = {};
         prop.id = sf._id;
-        prop.description = text;
+        prop.description = sf.getName();
         await SmartFilterManagerUI._table.addRow(prop);
 
         if (SmartFilterManagerUI._updatedCallback) {
@@ -231,7 +230,7 @@ export class SmartFilterManagerUI {
         smartFilter.setName(data.description);
         if (data.description == "")
         {
-            row.update({description:smartFilter.generateString()});
+            row.update({description:smartFilter.getName()});
         }
         if (SmartFilterManagerUI._updatedCallback) {
             SmartFilterManagerUI._updatedCallback();
@@ -257,14 +256,11 @@ export class SmartFilterManagerUI {
 
         let sf = new hcSmartFilter.SmartFilter(SmartFilterManagerUI._viewer);
         sf.fromJSON(jfilter);
-
-        smartFilter._conditions = sf._conditions;
-
-        if (smartFilter.getName() == "")
-        {
-            row.update({description:smartFilter.generateString()});
-        }
-
+        smartFilter.updateConditions(sf._conditions);
+        smartFilter.setName("");
+       
+        row.update({description:smartFilter.getName()});
+        
         if (SmartFilterManagerUI._updatedCallback) {
             SmartFilterManagerUI._updatedCallback();
         }

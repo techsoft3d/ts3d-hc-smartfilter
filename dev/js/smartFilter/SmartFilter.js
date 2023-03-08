@@ -207,8 +207,15 @@ export class SmartFilter {
             this._startnode =  this._viewer.model.getRootNode();
     }
 
+    updateConditions(conditions) {
+        this._conditions = conditions;
+    }
+
     setName(name) {
         this._name = name;
+        if (this._name == "") {
+            this._name = this.generateString();
+        }
     }
 
     getName() {
