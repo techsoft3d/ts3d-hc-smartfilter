@@ -40,7 +40,7 @@ export class SmartFilterManagerUI {
             $("#smartFilterManagerAddCurrentFilter").click(function () { SmartFilterManagerUI._addCurrentFilter(); });
         }
 
-        $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" style="overflow: hidden; zoom:0.7;width:100%; height:100%;"></div>');
+        $("#" + this._uidiv).append('<div id="' + SmartFilterManagerUI._uidiv + 'Tabulator" class = "smartFilterManagerTabulator"></div>');
 
         SmartFilterManagerUI.refreshUI();
     }

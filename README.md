@@ -1,6 +1,6 @@
 # SmartFilters
 
-## Version Update (0.5.2)
+## Version Update (0.5.3)
 * Ability to choose an existing smartfilter as a filter condition
 
 ## Version Update (0.5.0) 

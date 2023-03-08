@@ -11,7 +11,7 @@ export class SmartPropertiesUI {
             },
         });
 
-        $("#" + this._uidiv).append('<div id="' + SmartPropertiesUI._uidiv + 'Tabulator" style="overflow: hidden; zoom:0.7;width:100%; height:100%;"></div>');
+        $("#" + this._uidiv).append('<div id="' + SmartPropertiesUI._uidiv + 'Tabulator" class="smartPropertiesTabulator"></div>');
         SmartPropertiesUI._refreshUI();
     }
 

@@ -332,16 +332,6 @@ export class SmartFilter {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
-            if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
-                if (!conditions[i].smartFilterID) {
-                    let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
-                    conditions[i].smartFilterID = f.id;
-                    conditions[i].smartFilter = f.filter;
-                }
-                else {
-                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
-                }
-            }
         }
         let matchingnodes = [];
         if (limitlist.length == 0)
@@ -425,7 +415,7 @@ export class SmartFilter {
         let text = "";
         for (let i = 0; i < this._conditions.length; i++) {
             if (i > 0) {
-                text += " " + (this._conditions[i].and ? "AND" : "OR") + " ";
+                text += " " + (this._conditions[i].and ? "and" : "or") + " ";
             }
             if (this._conditions[i].childFilter) {
                 text += "(" + this._conditions[i].childFilter.generateString() + ") ";
@@ -691,7 +681,14 @@ export class SmartFilter {
             else if (conditions[i].propertyType == SmartFilterPropertyType.smartFilter) {
 
                 if (!conditions[i].smartFilter) {
-                    conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                    if (!conditions[i].smartFilterID) {
+                        let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
+                        conditions[i].smartFilterID = f.id;
+                        conditions[i].smartFilter = f.filter;
+                    }
+                    else {
+                        conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
+                    }
                 }
                 res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions, isor);
             }
