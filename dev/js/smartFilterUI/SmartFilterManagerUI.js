@@ -1,3 +1,5 @@
+import { dummy } from './tabulator_esm.min.js';
+
 import { SmartFilterEditor } from './SmartFilterEditor.js';
 
 export class SmartFilterManagerUI {

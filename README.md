@@ -1,5 +1,8 @@
 # SmartFilters
 
+## Version Update (0.6.0)
+* Tabulator now included in UI library
+
 ## Version Update (0.5.3)
 * Ability to choose an existing smartfilter as a filter condition
 
@@ -29,13 +32,6 @@ If you are using the UI library you also need to add `dist/smartFilterUI.css` to
 ```
     <link rel="stylesheet" href="./css/smartFilterUI.css">
 ```
-
-In addition the UI also requires [Tabulator](https://tabulator.info/). Make sure to include the css and js files for Tabulator in your project. 
-```
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.4.4/js/tabulator.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.4.4/css/tabulator.min.css" rel="stylesheet">
-```
-
 
 ## Demo
 
