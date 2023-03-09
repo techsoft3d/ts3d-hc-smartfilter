@@ -47,6 +47,15 @@
     margin: 0;
   }
 
+  .smartFilterSearchButtonImportant {
+    border-width: 1px;
+    font-family: monospace;
+    font-size:11px;
+    background:blue;
+    color:white;
+    margin: 0;
+  }
+
   
   .smartFilterSearchSelect {
     font-family: monospace;
