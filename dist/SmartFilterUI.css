@@ -76,7 +76,9 @@
     height:40px;
     position:relative;
     border-radius:6px;
-    zoom:0.5;
+    transform:scale(0.5);
+    left:-12px;
+    top:-12px;
 }
 
 .cross:before,.cross:after{
