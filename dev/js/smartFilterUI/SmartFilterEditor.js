@@ -72,7 +72,7 @@ export class SmartFilterEditor {
             }
 
             html += '<button class="smartFilterSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.selectAll(this)\'>Select All</button>';
-            html += '<button class="smartFilterSearchButton" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.search()\'>Search</button>';
+            html += '<button class="smartFilterSearchButtonImportant" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.search()\'>Search</button>';
         }
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
         html += '<div id="' + SmartFilterEditor._maindiv + '_conditions">';

@@ -1,129 +1,140 @@
-  .smartFilterMain {
-    overflow: hidden;
-    position:absolute;
-    width:100%;
-    height:100%;
-    background-color:white;
-    font-size:12px;
-    line-height:1
-  }
+.smartFilterMain {
+  overflow: hidden;
+  position:absolute;
+  width:100%;
+  height:100%;
+  background-color:white;
+  font-size:12px;
+  line-height:1
+}
 
-  .smartFilterSearchItems {
-    overflow: auto;
-    white-space:pre-wrap;
-    font-size:11px;
-    position:relative;
-  }
-  
-  .smartFilterSearchItem1 {
-    background-color:rgb(245,245,245); 
-  }
-  
-  .smartFilterSearchItem2 {
-    background-color:rgb(230,230,230); 
-  }
-  
-  .smartFilterSearchItemselected {
-    background-color:rgb(255,255,0); 
-  }
-  
-  .smartFilterSearchItemChainText {
-    font-size:9px;
-    margin-left:3px;
-    padding:2px;
-  }
+.smartFilterSearchItems {
+  overflow: auto;
+  white-space:pre-wrap;
+  font-size:11px;
+  position:relative;
+}
 
-  
-  .smartFilterSearchItemText {
-    margin-bottom:-3px;
-    margin-left:3px;
-    padding:2px;
-  }
+.smartFilterSearchItem1 {
+  background-color:rgb(245,245,245); 
+}
 
-  .smartFilterSearchButton {
-    border-width: 1px;
-    font-family: monospace;
-    font-size:11px;
-    margin: 0;
-  }
+.smartFilterSearchItem2 {
+  background-color:rgb(230,230,230); 
+}
 
-  
-  .smartFilterSearchSelect {
-    font-family: monospace;
-    font-size: 11px;
-  }
+.smartFilterSearchItemselected {
+  background-color:rgb(255,255,0); 
+}
+
+.smartFilterSearchItemChainText {
+  font-size:9px;
+  margin-left:3px;
+  padding:2px;
+}
 
 
-  
-  .smartFilterAndOrSelect {
-    font-size:11px;
-    width:75px;
-    margin-right:3px;
-    font-family: monospace;
-  }
+.smartFilterSearchItemText {
+  margin-bottom:-3px;
+  margin-left:3px;
+  padding:2px;
+}
 
-  .propertyTypeSelect {
-    font-size:11px; 
-    flex: 1 1 auto;
-    max-width:150px;
-    margin-right:3px;
-    min-width:50px
-  }
+.smartFilterSearchButton {
+  border-width: 1px;
+  font-family: monospace;
+  font-size:11px;
+  margin: 0;
+}
+
+.smartFilterSearchButtonImportant {
+  border-width: 1px;
+  font-family: monospace;
+  font-size:11px;
+  background:blue;
+  color:white;
+  margin: 0;
+}
 
 
-  .cross{
-    width:40px;
-    height:40px;
-    position:relative;
-    border-radius:6px;
-    zoom:0.5;
+.smartFilterSearchSelect {
+  font-family: monospace;
+  font-size: 11px;
+}
+
+
+
+.smartFilterAndOrSelect {
+  font-size:11px;
+  width:75px;
+  margin-right:3px;
+  font-family: monospace;
+}
+
+.propertyTypeSelect {
+  font-size:11px; 
+  flex: 1 1 auto;
+  max-width:150px;
+  margin-right:3px;
+  min-width:50px
+}
+
+
+.cross{
+  width:40px;
+  height:40px;
+  position:relative;
+  border-radius:6px;
+  transform:scale(0.5);
+  left:-12px;
+  top:-12px;
 }
 
 .cross:before,.cross:after{
-    content:'';
-    position:absolute;
-    width:36px;
-    height:4px;
-    background-color:black;
-    border-radius:2px;
-    top:8px;
+  content:'';
+  position:absolute;
+  width:36px;
+  height:4px;
+  background-color:black;
+  border-radius:2px;
+  top:8px;
 }
 
 .cross:before{
-    -webkit-transform:rotate(45deg);
-    -moz-transform:rotate(45deg);
-    transform:rotate(45deg);
-    left:2px;
+  -webkit-transform:rotate(45deg);
+  -moz-transform:rotate(45deg);
+  transform:rotate(45deg);
+  left:2px;
 }
 .cross:after{
-    -webkit-transform:rotate(-45deg);
-    -moz-transform:rotate(-45deg);
-    transform:rotate(-45deg);
-    right:2px;
+  -webkit-transform:rotate(-45deg);
+  -moz-transform:rotate(-45deg);
+  transform:rotate(-45deg);
+  right:2px;
 }
 
 .smartFilterManagerButtons {
-  position: relative;
-  top: 2px;
-  height: 18px;
-  line-height: 1;
-  margin-left:2px;
+position: relative;
+top: 2px;
+height: 18px;
+line-height: 1;
+margin-left:2px;
 }
 
 
 .smartFilterManagerTabulator {
-  overflow:hidden;
-  zoom:0.8;
-  width:100%;
-  height:100%;
+overflow:hidden;
+zoom:0.8;
+width:100%;
+height:100%;
 }
 
 
 .smartPropertiesTabulator {
-  overflow:hidden;
-  zoom:0.8;
-  width:100%;
-  height:100%;
+overflow:hidden;
+zoom:0.8;
+width:100%;
+height:100%;
 }
 
 
