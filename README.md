@@ -1,5 +1,8 @@
 # SmartFilters
 
+## Version Update (0.6.0)
+* Tabulator now included in UI library
+
 ## Version Update (0.5.3)
 * Ability to choose an existing smartfilter as a filter condition
 
@@ -30,13 +33,6 @@ If you are using the UI library you also need to add `dist/smartFilterUI.css` to
     <link rel="stylesheet" href="./css/smartFilterUI.css">
 ```
 
-In addition the UI also requires [Tabulator](https://tabulator.info/). Make sure to include the css and js files for Tabulator in your project. 
-```
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.0.7/js/tabulator.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/tabulator/5.0.7/css/tabulator.min.css" rel="stylesheet">
-```
-
-
 ## Demo
 
 Here is how to start the demo with the provided sample model locally when using the Visual Studio Code Live Server plugin:
@@ -54,11 +50,6 @@ hcSmartFilterUI.SmartFilterEditor.display();
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
 Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models.
-
-```
- hcSmartFilterUI.SmartFilterEditor.adjust();
-```
-Call this function when the size of the surrounding div changes. 
 
 The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
 

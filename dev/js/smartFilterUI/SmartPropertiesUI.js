@@ -1,3 +1,7 @@
+import { dummy } from './tabulator_esm.min.js';
+
+
+
 export class SmartPropertiesUI {
 
     static initialize(div, viewer) {

@@ -35,6 +35,12 @@ export class SmartFilterEditor {
         SmartFilterEditor._viewer = viewer;
         SmartFilterEditor._mainFilter = new hcSmartFilter.SmartFilter(viewer, startnode);
         SmartFilterEditor._mainFilter.tempId = 0;
+
+        new ResizeObserver(function () {
+            SmartFilterEditor.adjust()
+           
+        }).observe($("#" + SmartFilterEditor._maindiv)[0]);
+
         
     }
 
@@ -50,6 +56,9 @@ export class SmartFilterEditor {
 
     
     static async display() {
+
+
+        
         await hcSmartFilter.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
@@ -86,7 +95,7 @@ export class SmartFilterEditor {
     static adjust() 
     {
 
-        let newheight = $("#" + SmartFilterEditor._maindiv).parent().height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
+        let newheight = $("#" + SmartFilterEditor._maindiv).height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
         $("#" + SmartFilterEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
         
         let gap  = $("#" + SmartFilterEditor._maindiv).offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top;

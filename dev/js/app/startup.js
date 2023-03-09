@@ -94,7 +94,6 @@ function createUILayout() {
     myLayout.on('stateChanged', function () {
         if (hwv != null) {
             hwv.resizeCanvas();
-            hcSmartFilterUI.SmartFilterEditor.adjust();
         }
     });
     myLayout.init();
