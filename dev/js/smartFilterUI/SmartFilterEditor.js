@@ -35,6 +35,12 @@ export class SmartFilterEditor {
         SmartFilterEditor._viewer = viewer;
         SmartFilterEditor._mainFilter = new hcSmartFilter.SmartFilter(viewer, startnode);
         SmartFilterEditor._mainFilter.tempId = 0;
+
+        new ResizeObserver(function () {
+            SmartFilterEditor.adjust()
+           
+        }).observe($("#" + SmartFilterEditor._maindiv)[0]);
+
         
     }
 
@@ -50,6 +56,9 @@ export class SmartFilterEditor {
 
     
     static async display() {
+
+
+        
         await hcSmartFilter.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';

@@ -51,11 +51,6 @@ Initializes the Editor UI and displays it. The first parameter is the id of the 
 
 Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models.
 
-```
- hcSmartFilterUI.SmartFilterEditor.adjust();
-```
-Call this function when the size of the surrounding div changes. 
-
 The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
 
 ## Usage
