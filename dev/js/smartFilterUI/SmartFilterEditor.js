@@ -64,7 +64,7 @@ export class SmartFilterEditor {
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
         if (SmartFilterEditor._showFirstRow) {
             if (SmartFilterEditor._showLimitOption) {
-                html += '<div style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
+                html += '<div id="' + SmartFilterEditor._maindiv + '_firstrow" style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
             }
             else {
                 html += '<div style="position:relative;height:20px;"></div>';
@@ -98,8 +98,12 @@ export class SmartFilterEditor {
         let newheight = $("#" + SmartFilterEditor._maindiv).height() - ($("#" + SmartFilterEditor._maindiv + "_searchitems").offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top);
         $("#" + SmartFilterEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
         
-        let gap  = $("#" + SmartFilterEditor._maindiv).offset().top - $("#" + SmartFilterEditor._maindiv).parent().offset().top;
-        $("#" + SmartFilterEditor._maindiv + "_found").css({ "bottom": gap + "px" });
+
+        let gap  = newheight + $("#" + SmartFilterEditor._maindiv + "_conditions").height() + 3;
+        if (SmartFilterEditor._showFirstRow) {
+            gap += $("#" + SmartFilterEditor._maindiv + "_firstrow").height();
+        }
+        $("#" + SmartFilterEditor._maindiv + "_found").css({ "top": gap + "px" });
 
 
     }
