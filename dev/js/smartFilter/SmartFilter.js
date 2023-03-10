@@ -237,6 +237,13 @@ export class SmartFilter {
 
     removeCondition(conditionpos) {
         this._conditions.splice(conditionpos, 1);
+        if (this._conditions[0].childFilter) {
+            let cf = this._conditions[0].childFilter;
+            this._conditions.splice(0, 1);
+            for (let i=0;i<cf._conditions.length;i++) {                
+                this._conditions.unshift(cf._conditions[i]);
+            }
+        }
     }
 
     getAllProperties() {
