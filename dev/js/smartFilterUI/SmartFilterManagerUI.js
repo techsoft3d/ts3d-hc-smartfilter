@@ -98,43 +98,6 @@ export class SmartFilterManagerUI {
         }
     }
 
-    static _renderButtonCell(cell) {
-        let _this = this;
-        
-        let content = "";
-        let editable = cell.getValue();
-
-        let rowdata = cell.getRow().getData();
-
-   
-        content += '<div style="height:20px">';
-    
-        content += '<button class="smartFilterManagerButtons" id="sfm-select-' + cell.getData().id + '" type="button" title="Press Shift to Isolate" ><span style="font-size:12px;top:-2px;position:relative;">Select</span></button>';
-        content += '<button class="smartFilterManagerButtons" id="sfm-update-' + cell.getData().id + '" type="button" ><span style="font-size:12px;top:-2px;position:relative;">Update</span></button>';
-        content += '<button class="smartFilterManagerButtons" id="sfm-delete-' + cell.getData().id + '" type="button" ><span style="font-size:12px;top:-2px;position:relative;">Del</span></button>';
-    
-        content += '</div>';
-        $(cell.getElement()).append(content);
-        $("#sfm-select-" + cell.getData().id).on("click", function (event) {             
-            event.stopPropagation();
-            SmartFilterManagerUI._handleTableSelection(rowdata, event.shiftKey);
-        });
-        $("#sfm-update-" + cell.getData().id).on("click", function (event) {             
-            event.stopPropagation();
-            SmartFilterManagerUI._handleSmartFilterUpdate(cell.getRow());
-        });
-
-        $("#sfm-delete-" + cell.getData().id).on("click", function (event) {             
-            event.stopPropagation();
-            hcSmartFilter.SmartFilterManager.removeSmartFilter(rowdata.id);
-            cell.getRow().delete();
-            if (SmartFilterManagerUI._updatedCallback) {
-                SmartFilterManagerUI._updatedCallback();
-            }
-        });
-    }
-
-
     static formatTooltip(e,cell) {
         let id = cell.getData().id
         let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(id);
@@ -144,21 +107,57 @@ export class SmartFilterManagerUI {
     static async refreshUI() {
 
         if (!SmartFilterManagerUI._table) {
+
+            let rowMenu = [
+                {
+                    label: "<i class='fas fa-user'></i> Show",
+                    action: async function (e, row) {
+                        let rowdata = row.getData();
+                        SmartFilterManagerUI._handleTableSelection(row.getData(), false, false);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Select",
+                    action: async function (e, row) {
+                        let rowdata = row.getData();
+                        SmartFilterManagerUI._handleTableSelection(row.getData(), true, false);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Isolate",
+                    action: async function (e, row) {
+                        let rowdata = row.getData();
+                        SmartFilterManagerUI._handleTableSelection(row.getData(), true,true);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Update",
+                    action: async function (e, row) {
+                        SmartFilterManagerUI._handleSmartFilterUpdate(row);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Delete",
+                    action: async function (e, row) {
+                        hcSmartFilter.SmartFilterManager.removeSmartFilter(row.getData().id);
+                        row.delete();
+                        if (SmartFilterManagerUI._updatedCallback) {
+                            SmartFilterManagerUI._updatedCallback();
+                        }
+                    }
+                },
+            ];
+
+
             SmartFilterManagerUI._table = new Tabulator("#" + SmartFilterManagerUI._uidiv + "Tabulator", {
                 data: [],                             
                 selectable:0,
                 layout: "fitColumns",
+                rowContextMenu: rowMenu,
                 columns: [                                   
                     {
                         title: "Description", field: "description", formatter:"textarea", editor:"textarea",tooltip: SmartFilterManagerUI.formatTooltip
-                    },
-                    {
-                        title: "", width: 160, field: "buttons", formatter: function (cell, formatterParams, onRendered) {
-                            onRendered(function () {
-                                SmartFilterManagerUI._renderButtonCell(cell);
-                            });
-                        },
-                    },            
+                    },  
                     {
                         title: "ID", field: "id", width: 20, visible: false
                     },
@@ -212,7 +211,7 @@ export class SmartFilterManagerUI {
     }
 
 
-    static async _handleTableSelection(data, isolate) {
+    static async _handleTableSelection(data, select, isolate) {
 
         let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
 
@@ -222,13 +221,13 @@ export class SmartFilterManagerUI {
         editorfilter.fromJSON(filterjson);
         await SmartFilterEditor.refreshUI();
         await SmartFilterEditor.search();
-        if (isolate)
-        {
-            await SmartFilterEditor.isolateAll();
-        }
-        else
-        {
-            await SmartFilterEditor.selectAll();
+        if (select) {
+            if (isolate) {
+                SmartFilterEditor.isolateAll();
+            }
+            else {
+                SmartFilterEditor.selectAll();
+            }
         }
     }
 
