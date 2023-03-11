@@ -20,6 +20,12 @@ This library provides adanced search capabilities for HOOPS Communicator. It is 
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 
+## Future Plans
+* various performance improvements
+* server-side Search Evaluation
+* More UI Customization Options
+* Improved Documentation
+
 ## Install
 Add `dist/smartFilter.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
 ```
@@ -196,12 +202,6 @@ In order to ensure fast client-side search performance, the SmartFilter library 
 ```
 
 When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.
-
-
-## TODO:
-* Document SmartFilter and SmartFilterManager classes
-* Investigate Server-Side Search Evaluation
-
 
 ## Disclaimer
 **This library is not an officially supported part of HOOPS Communicator and provided as-is.**
