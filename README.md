@@ -1,5 +1,8 @@
 # SmartFilters
 
+## Version Update (0.6.1)
+* Ability to save/restore optimized property JSON
+
 ## Version Update (0.6.0)
 * Tabulator now included in UI library
 

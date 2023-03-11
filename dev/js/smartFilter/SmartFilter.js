@@ -115,7 +115,7 @@ export class SmartFilter {
         }
     }
 
-    static addModel(id,nodeid) {
+    static addModel(id,nodeid,savedHash) {
         for (let i=0;i<SmartFilter._modelHash.length;i++)
         {
             if (SmartFilter._modelHash[i].id == id)
@@ -124,7 +124,7 @@ export class SmartFilter {
                 return;
             }
         }
-        SmartFilter._modelHash.push({id:id, nodeid: nodeid, ids: null, properties:null});
+        SmartFilter._modelHash.push({id:id, nodeid: nodeid,savedHash:savedHash, ids: null, properties:null});
     }
 
     static _updateHashes(viewer, ids,res,layernames)
@@ -149,6 +149,62 @@ export class SmartFilter {
         }
     }
 
+    static parseSavedPropertyHash(savedPropertyHash) {
+
+        let allprops = savedPropertyHash.allprops;
+        let nodeprops = savedPropertyHash.nodeprops;
+
+        let rprops = [];
+        let ids = [];
+
+        for (let i=0;i<nodeprops.length;i++) {
+            let nprop = nodeprops[i];
+            ids.push(nprop.i);
+            let rprop = {};
+            let pa = nprop.p;
+            for (let j=0;j<pa.length;j+=2) {
+                rprop[allprops[pa[j]].name] = allprops[pa[j]].values[pa[j+1]];
+            }
+            rprops.push(rprop);
+        }
+        return {ids:ids, props:rprops};
+    }
+
+    static exportPropertyHash() {
+        let allpropsarray = [];
+        let nodeproparray = [];
+
+        let tempHash = [];
+
+        for (let i in SmartFilter._allPropertiesHash) {
+            let ppp = {name:i , values: Object.keys(SmartFilter._allPropertiesHash[i])};
+
+            let thash1 = [];
+            for (let j=0;j<ppp.values.length;j++) {
+                thash1[ppp.values[j]] = j;
+            }
+            ppp.ehash= thash1;            
+            allpropsarray.push(ppp);
+            tempHash[i] = allpropsarray.length -1;
+        }
+
+        for (let i in SmartFilter._propertyHash) {
+            let props = [];
+            for (let j in SmartFilter._propertyHash[i]) {
+                let prop = allpropsarray[tempHash[j]];
+                props.push(tempHash[j], prop.ehash[SmartFilter._propertyHash[i][j]]);
+              }
+          
+            nodeproparray.push({i: i, p: props});
+        }
+
+        for (let i= 0;i<allpropsarray.length;i++) {
+            allpropsarray[i].ehash = undefined;
+        }
+            
+        return {allprops: allpropsarray, nodeprops: nodeproparray};
+    }
+
     static async initialize(viewer) {
         SmartFilter._propertyHash = [];
         SmartFilter._allPropertiesHash = [];
@@ -163,6 +219,7 @@ export class SmartFilter {
             SmartFilter._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
             let res = await Promise.all(proms);
             SmartFilter._updateHashes(viewer, ids, res, layernames);
+
         }
         else {
             for (let i = 0; i < SmartFilter._modelHash.length; i++) {
@@ -172,8 +229,15 @@ export class SmartFilter {
                 let offset = viewer.model.getNodeIdOffset(model.nodeid);
                 if (!model.ids) {
                     let proms = [];
-                    SmartFilter._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
-                    res = await Promise.all(proms);
+                    if (!model.savedHash) {
+                        SmartFilter._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
+                        res = await Promise.all(proms);
+                    }
+                    else {
+                        let temp = SmartFilter.parseSavedPropertyHash(model.savedHash);
+                        res = temp.props;
+                        ids = temp.ids;
+                    }
                     model.properties = res;
                     model.ids = [];
                     for (let j = 0; j < ids.length; j++) {
@@ -237,6 +301,13 @@ export class SmartFilter {
 
     removeCondition(conditionpos) {
         this._conditions.splice(conditionpos, 1);
+        if (this._conditions.length && this._conditions[0].childFilter) {
+            let cf = this._conditions[0].childFilter;
+            this._conditions.splice(0, 1);
+            for (let i=0;i<cf._conditions.length;i++) {                
+                this._conditions.unshift(cf._conditions[i]);
+            }
+        }
     }
 
     getAllProperties() {
@@ -683,7 +754,7 @@ export class SmartFilter {
                 if (!conditions[i].smartFilter) {
                     if (!conditions[i].smartFilterID) {
                         let f=  SmartFilterManager.getSmartFilterByName(conditions[i].text);
-                        conditions[i].smartFilterID = f.id;
+                        conditions[i].smartFilterID = f.filter._id;
                         conditions[i].smartFilter = f.filter;
                     }
                     else {
