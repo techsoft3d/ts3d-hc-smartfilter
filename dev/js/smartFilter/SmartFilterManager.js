@@ -50,8 +50,12 @@ export class SmartFilterManager {
         return SmartFilterManager._smartFilters[pos].isProp;                
     }
 
-    static removeSmartFilter(pos) {
-        return SmartFilterManager._smartFilters.splice(pos, 1);                
+    static removeSmartFilter(id) {
+        for (let i=0;i<SmartFilterManager._smartFilters.length;i++) {
+            if (SmartFilterManager._smartFilters[i].filter._id == id) {
+                return SmartFilterManager._smartFilters.splice(i, 1);
+            }
+        }
     }
 
     static updateSmartFilter(pos, smartFilter) {

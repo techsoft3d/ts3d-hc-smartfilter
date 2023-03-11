@@ -3,6 +3,12 @@ var myLayout;
 
 async function msready() {
 
+
+    // let res = await fetch('models2/savedhash.json');
+    // let json = await res.json();
+    // hcSmartFilter.SmartFilter.addModel("hospital",hwv.model.getRootNode(),json);
+
+
     hcSmartFilterUI.SmartFilterEditor.initialize("searchtools", hwv);
     hcSmartFilterUI.SmartFilterEditor.display();
 

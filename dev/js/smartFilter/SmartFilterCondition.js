@@ -1,5 +1,7 @@
 import { SmartFilterConditionType } from './SmartFilter.js';
 import { SmartFilterPropertyType } from './SmartFilter.js';
+import { SmartFilterManager } from './SmartFilterManager.js';
+
 
 export class SmartFilterCondition {
 
@@ -16,11 +18,21 @@ export class SmartFilterCondition {
     }
 
     toJSON() {
+
+        if (this.propertyType == SmartFilterPropertyType.smartFilter &&
+            !this.smartFitlerID) {
+
+            let f = SmartFilterManager.getSmartFilterByName(this.text);
+            if (f) {
+                this.smartFilterID =  f.filter._id;
+            }
+        }
+
         return {
             and: this.and,
             conditionType: this.conditionType,
             propertyType: this.propertyType,
-            propertyName:  JSON.parse(JSON.stringify(this.propertyName)),
+            propertyName: JSON.parse(JSON.stringify(this.propertyName)),
             text: this.text,
             childFilter: this.childFilter,
             smartFilterID: this.smartFilterID
