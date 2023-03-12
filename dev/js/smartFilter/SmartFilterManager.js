@@ -94,6 +94,25 @@ export class SmartFilterManager {
         for (let i = 0; i < SmartFilterManager._smartFilters.length; i++) {
             if (SmartFilterManager._smartFilters[i].isProp) {
                 let smartFilter = SmartFilterManager._smartFilters[i].filter;
+
+                let stop = false;
+                if (!smartFilter._keepSearchingChildren) {
+                    let tnodeid = nodeid;
+                    while (1) {
+                        tnodeid = SmartFilterManager._viewer.model.getNodeParent(tnodeid);
+                        if (tnodeid == SmartFilterManager._viewer.model.getRootNode()) {
+                            break;
+                        }
+                        let res = await smartFilter.testOneNodeAgainstConditions(tnodeid);
+                        if (res) {
+                            stop = true;
+                            break;
+                        }                        
+                    }
+                }
+                if (stop) {
+                    continue;
+                }
                 let res = await smartFilter.testOneNodeAgainstConditions(nodeid);
                 if (res)
                 {

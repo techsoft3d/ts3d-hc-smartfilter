@@ -18,7 +18,8 @@ const SmartFilterPropertyType = {
     nodeColor:4,
     relationship:5,
     property:6,
-    smartFilter:7
+    smartFilter:7,
+    nodeParent:8,
 };
 
 import { SmartFilterCondition } from './SmartFilterCondition.js';
@@ -99,7 +100,9 @@ export class SmartFilter {
                 return SmartFilterPropertyType.relationship;
             case "Smart Filter":
                  return SmartFilterPropertyType.smartFilter;
-    
+            case "Node Parent":
+                      return SmartFilterPropertyType.nodeParent;
+        
             default:
                 return SmartFilterPropertyType.property;
         }
@@ -261,6 +264,7 @@ export class SmartFilter {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._keepSearchingChildren = false;
         this._id = this._generateGUID();
 
 
@@ -269,6 +273,14 @@ export class SmartFilter {
             this._startnode = startnode;
         else
             this._startnode =  this._viewer.model.getRootNode();
+    }
+
+    setKeepSearchingChildren(keepSearchingChildren) {
+        this._keepSearchingChildren = keepSearchingChildren;
+    }
+
+    getKeepSearchingChildren() {
+        return this._keepSearchingChildren;
     }
 
     updateConditions(conditions) {
@@ -336,6 +348,7 @@ export class SmartFilter {
         propsnames.unshift("Node Color");
         propsnames.unshift("Node Type");
         propsnames.unshift("Node Chain");
+        propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
 
@@ -366,6 +379,12 @@ export class SmartFilter {
             }
         }
         this._name = json.name;
+        if (json.keepSearchingChildren == undefined) {
+            this._keepSearchingChildren = false;
+        }
+        else {
+            this._keepSearchingChildren = json.keepSearchingChildren;
+        }
         if (json.id) {
             this._id = json.id;
         }
@@ -383,7 +402,7 @@ export class SmartFilter {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name, id:this._id};        
+        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren};        
     }
 
     limitToNodes(nodeids) {
@@ -398,7 +417,7 @@ export class SmartFilter {
     }
 
     async apply() {
-        let t1 = new Date();
+  //      let t1 = new Date();
         let conditions = this._conditions;
         let limitlist = this._limitselectionlist;
 
@@ -406,7 +425,6 @@ export class SmartFilter {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
         }
         let matchingnodes = [];
-        this._nodeChainText = "";
         if (limitlist.length == 0) {
             if (this._startnode == this._viewer.model.getRootNode())
                 await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._startnode,"");
@@ -418,15 +436,14 @@ export class SmartFilter {
                 await this._gatherMatchingNodesRecursive(conditions, limitlist[i], matchingnodes, this._viewer.model.getNodeParent(limitlist[i]),"");
             }
         }
-        let t2 = new Date();
-        console.log("SmartFilter: " + (t2 - t1) + "ms");
+//        let t2 = new Date();
+//        console.log("SmartFilter: " + (t2 - t1) + "ms");
         return matchingnodes;
     }
 
     createChainText(id, startid, chainskip) {
         let current = id;
         let chain = [];
-        chain.push(this._viewer.model.getNodeName(id));
         while (1) {
             let newone = this._viewer.model.getNodeParent(current);
             if (newone == null || newone == startid)
@@ -633,6 +650,9 @@ export class SmartFilter {
 
                 }
             }
+            else if (condition.propertyType == SmartFilterPropertyType.nodeParent) {
+                searchAgainst = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(id));                
+            }
             else if (condition.propertyType == SmartFilterPropertyType.nodeType) {
                 searchAgainst = Communicator.NodeType[this._viewer.model.getNodeType(id)];
             }
@@ -802,19 +822,21 @@ export class SmartFilter {
         return false;
     }
  
-    async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid,chaintext) {
+    async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
         let nl = this._viewer.model.getNodeName(id);
-        if (id != startid) {        
-            if (await this._testNodeAgainstConditions(id,conditions,chaintext + nl)) {
+        if (id != startid) {
+            if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);
-            }           
+                if (!this._keepSearchingChildren) {
+                    return;
+                }
+            }
         }
         let children = this._viewer.model.getNodeChildren(id);
         for (let i = 0; i < children.length; i++) {
             await this._gatherMatchingNodesRecursive(conditions, children[i], matchingnodes, startid, chaintext + nl);
 
         }
-        this._nodeChainText.slice(0, -nl.length);
     }
 
     _generateGUID() {

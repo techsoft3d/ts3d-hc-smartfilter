@@ -1,5 +1,8 @@
 # SmartFilters
 
+## Version Update (0.6.2)
+* Node Parent search added
+
 ## Version Update (0.6.1)
 * Ability to save/restore optimized property JSON
 
@@ -97,6 +100,9 @@ Performs the search on specific nodeids (separated by comma).
 
 **Node Chain Property**  
 “Node Chain” performs the text search on the complete path to a node. Its an easy way to filter the search by a certain floor in a building for example.
+
+**Node Parent Property**  
+“Node Parent” performs the text search on the name of the parent node
 
 **Node Type Property**  
 Performs the search on the HOOPS Communicator internal type of the node (the value returned by model.getNodeType())

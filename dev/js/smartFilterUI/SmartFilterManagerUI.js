@@ -131,6 +131,9 @@ export class SmartFilterManagerUI {
                     }
                 },
                 {
+                    separator:true,
+                },
+                {
                     label: "<i class='fas fa-user'></i> Update",
                     action: async function (e, row) {
                         SmartFilterManagerUI._handleSmartFilterUpdate(row);
