@@ -104,27 +104,31 @@ export class SmartFilterManagerUI {
         return smartFilter.generateString();        
 
     }
+
+    static editCheck(cell){
+        return SmartFilterManagerUI._editable;
+    }
     static async refreshUI() {
 
         if (!SmartFilterManagerUI._table) {
 
             let rowMenu = [
                 {
-                    label: "<i class='fas fa-user'></i> Show",
+                    label: "<i class='fas fa-user'></i> Search",
                     action: async function (e, row) {
                         let rowdata = row.getData();
                         SmartFilterManagerUI._handleTableSelection(row.getData(), false, false);
                     }
                 },
                 {
-                    label: "<i class='fas fa-user'></i> Select",
+                    label: "<i class='fas fa-user'></i> Search & Select",
                     action: async function (e, row) {
                         let rowdata = row.getData();
                         SmartFilterManagerUI._handleTableSelection(row.getData(), true, false);
                     }
                 },
                 {
-                    label: "<i class='fas fa-user'></i> Isolate",
+                    label: "<i class='fas fa-user'></i> Search & Isolate",
                     action: async function (e, row) {
                         let rowdata = row.getData();
                         SmartFilterManagerUI._handleTableSelection(row.getData(), true,true);
@@ -132,6 +136,12 @@ export class SmartFilterManagerUI {
                 },
                 {
                     separator:true,
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Edit Description",
+                    action: async function (e, row) {
+                        SmartFilterManagerUI._editable = true;
+                    }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Update",
@@ -151,6 +161,14 @@ export class SmartFilterManagerUI {
                 },
             ];
 
+            var editCheck = function(cell){
+                //cell - the cell component for the editable cell
+            
+                //get row data
+                var data = cell.getRow().getData();
+            
+                return data.age > 18; // only allow the name cell to be edited if the age is over 18
+            }
 
             SmartFilterManagerUI._table = new Tabulator("#" + SmartFilterManagerUI._uidiv + "Tabulator", {
                 data: [],                             
@@ -159,7 +177,7 @@ export class SmartFilterManagerUI {
                 rowContextMenu: rowMenu,
                 columns: [                                   
                     {
-                        title: "Description", field: "description", formatter:"textarea", editor:"textarea",tooltip: SmartFilterManagerUI.formatTooltip
+                        title: "Description", field: "description", formatter:"textarea", editor:"input",editable: SmartFilterManagerUI.editCheck,tooltip:SmartFilterManagerUI.formatTooltip
                     },  
                     {
                         title: "ID", field: "id", width: 20, visible: false
@@ -174,11 +192,25 @@ export class SmartFilterManagerUI {
                 ],
             });
 
+            SmartFilterManagerUI._table.on("rowClick", async function (e, row) {
+                let data = row.getData();
+                let smartFilter = hcSmartFilter.SmartFilterManager.getSmartFilterByID(data.id);
+                let filterjson = smartFilter.toJSON();
+        
+                let editorfilter = SmartFilterEditor.getFilter();
+                editorfilter.fromJSON(filterjson);
+                await SmartFilterEditor.refreshUI();                
+            });
+
+            SmartFilterManagerUI._table.on("rowDblClick", function(e, row){
+                SmartFilterManagerUI._editable = true;                
+            });
         
 
             SmartFilterManagerUI._table.on("cellEdited", function (cell) {
                 if (cell.getField() == "description") {
                     SmartFilterManagerUI._handleSmartFilterNameEdit(cell.getRow());
+                    SmartFilterManagerUI._editable = false;
                 }
                 else
                 {
