@@ -18,7 +18,8 @@ const SmartFilterPropertyType = {
     nodeColor:4,
     relationship:5,
     property:6,
-    smartFilter:7
+    smartFilter:7,
+    nodeParent:8,
 };
 
 import { SmartFilterCondition } from './SmartFilterCondition.js';
@@ -99,7 +100,9 @@ export class SmartFilter {
                 return SmartFilterPropertyType.relationship;
             case "Smart Filter":
                  return SmartFilterPropertyType.smartFilter;
-    
+            case "Node Parent":
+                      return SmartFilterPropertyType.nodeParent;
+        
             default:
                 return SmartFilterPropertyType.property;
         }
@@ -261,6 +264,7 @@ export class SmartFilter {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._keepSearchingChildren = false;
         this._id = this._generateGUID();
 
 
@@ -269,6 +273,14 @@ export class SmartFilter {
             this._startnode = startnode;
         else
             this._startnode =  this._viewer.model.getRootNode();
+    }
+
+    setKeepSearchingChildren(keepSearchingChildren) {
+        this._keepSearchingChildren = keepSearchingChildren;
+    }
+
+    getKeepSearchingChildren() {
+        return this._keepSearchingChildren;
     }
 
     updateConditions(conditions) {
@@ -336,6 +348,7 @@ export class SmartFilter {
         propsnames.unshift("Node Color");
         propsnames.unshift("Node Type");
         propsnames.unshift("Node Chain");
+        propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
 
@@ -366,6 +379,12 @@ export class SmartFilter {
             }
         }
         this._name = json.name;
+        if (json.keepSearchingChildren == undefined) {
+            this._keepSearchingChildren = false;
+        }
+        else {
+            this._keepSearchingChildren = json.keepSearchingChildren;
+        }
         if (json.id) {
             this._id = json.id;
         }
@@ -383,7 +402,7 @@ export class SmartFilter {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name, id:this._id};        
+        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren};        
     }
 
     limitToNodes(nodeids) {
@@ -398,6 +417,7 @@ export class SmartFilter {
     }
 
     async apply() {
+  //      let t1 = new Date();
         let conditions = this._conditions;
         let limitlist = this._limitselectionlist;
 
@@ -405,22 +425,25 @@ export class SmartFilter {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
         }
         let matchingnodes = [];
-        if (limitlist.length == 0)
+        if (limitlist.length == 0) {
             if (this._startnode == this._viewer.model.getRootNode())
-                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._startnode);
+                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._startnode,"");
             else
-                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._viewer.model.getNodeParent(this._startnode));
-        else
+                await this._gatherMatchingNodesRecursive(conditions, this._startnode, matchingnodes, this._viewer.model.getNodeParent(this._startnode),"");
+        }
+        else {
             for (let i = 0; i < limitlist.length; i++) {
-                await this._gatherMatchingNodesRecursive(conditions, limitlist[i], matchingnodes, this._viewer.model.getNodeParent(limitlist[i]));
+                await this._gatherMatchingNodesRecursive(conditions, limitlist[i], matchingnodes, this._viewer.model.getNodeParent(limitlist[i]),"");
             }
+        }
+//        let t2 = new Date();
+//        console.log("SmartFilter: " + (t2 - t1) + "ms");
         return matchingnodes;
     }
 
     createChainText(id, startid, chainskip) {
         let current = id;
         let chain = [];
-        chain.push(this._viewer.model.getNodeName(id));
         while (1) {
             let newone = this._viewer.model.getNodeParent(current);
             if (newone == null || newone == startid)
@@ -444,7 +467,7 @@ export class SmartFilter {
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
         }
-        return await this._testNodeAgainstConditions(id,this._conditions);
+        return await this._testNodeAgainstConditions(id,this._conditions,"");
     }
 
     async findAllPropertiesOnNode(id, conditionsIn, foundConditionsIn, alreadyDoneHashIn) {
@@ -551,7 +574,7 @@ export class SmartFilter {
         return false;
     }
 
-    async _checkFilter(id, condition) {
+    async _checkFilter(id, condition, chaintext) {
         if (condition.conditionType != SmartFilterConditionType.contains) {
             if (condition.conditionType == SmartFilterConditionType.exists) {
                 if (SmartFilter._propertyHash[id] && SmartFilter._propertyHash[id][condition.propertyName] != undefined)
@@ -619,7 +642,16 @@ export class SmartFilter {
                 searchAgainst = this._viewer.model.getNodeName(id);
             }
             else if (condition.propertyType == SmartFilterPropertyType.nodeChain) {
-                searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(),0);
+                if (chaintext) {
+                    searchAgainst = chaintext;
+                }
+                else {
+                    searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(),0);
+
+                }
+            }
+            else if (condition.propertyType == SmartFilterPropertyType.nodeParent) {
+                searchAgainst = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(id));                
             }
             else if (condition.propertyType == SmartFilterPropertyType.nodeType) {
                 searchAgainst = Communicator.NodeType[this._viewer.model.getNodeType(id)];
@@ -731,7 +763,7 @@ export class SmartFilter {
         }
     }
 
-    async _testNodeAgainstConditions(id,conditions) {
+    async _testNodeAgainstConditions(id,conditions,chaintext) {
 
         let foundtotal = 0;
         let isor = false;
@@ -761,16 +793,16 @@ export class SmartFilter {
                         conditions[i].smartFilter = SmartFilterManager.getSmartFilterByID(conditions[i].smartFilterID);
                     }
                 }
-                res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions, isor);
+                res  = await this._testNodeAgainstConditions(id,conditions[i].smartFilter._conditions,chaintext);
             }
             else {
                 if (conditions[i].childFilter)
                 {
-                    res  = await this._testNodeAgainstConditions(id,conditions[i].childFilter._conditions, isor);
+                    res  = await this._testNodeAgainstConditions(id,conditions[i].childFilter._conditions,chaintext);
                 }    
                 else
                 {
-                    res = await this._checkFilter(id, conditions[i]);
+                    res = await this._checkFilter(id, conditions[i], chaintext);
                 }
             }
             if (res == false) {
@@ -790,15 +822,19 @@ export class SmartFilter {
         return false;
     }
  
-    async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid) {
-        if (id != startid) {        
-            if (await this._testNodeAgainstConditions(id,conditions)) {
+    async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
+        let nl = this._viewer.model.getNodeName(id);
+        if (id != startid) {
+            if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);
-            }           
+                if (!this._keepSearchingChildren) {
+                    return;
+                }
+            }
         }
         let children = this._viewer.model.getNodeChildren(id);
         for (let i = 0; i < children.length; i++) {
-            await this._gatherMatchingNodesRecursive(conditions, children[i], matchingnodes, startid);
+            await this._gatherMatchingNodesRecursive(conditions, children[i], matchingnodes, startid, chaintext + nl);
 
         }
     }

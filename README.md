@@ -1,5 +1,8 @@
 # SmartFilters
 
+## Version Update (0.6.2)
+* Node Parent search added
+
 ## Version Update (0.6.1)
 * Ability to save/restore optimized property JSON
 
@@ -19,6 +22,12 @@
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
+
+## Future Plans
+* various performance improvements
+* server-side Search Evaluation
+* More UI Customization Options
+* Improved Documentation
 
 ## Install
 Add `dist/smartFilter.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
@@ -91,6 +100,9 @@ Performs the search on specific nodeids (separated by comma).
 
 **Node Chain Property**  
 “Node Chain” performs the text search on the complete path to a node. Its an easy way to filter the search by a certain floor in a building for example.
+
+**Node Parent Property**  
+“Node Parent” performs the text search on the name of the parent node
 
 **Node Type Property**  
 Performs the search on the HOOPS Communicator internal type of the node (the value returned by model.getNodeType())
@@ -196,12 +208,6 @@ In order to ensure fast client-side search performance, the SmartFilter library 
 ```
 
 When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.
-
-
-## TODO:
-* Document SmartFilter and SmartFilterManager classes
-* Investigate Server-Side Search Evaluation
-
 
 ## Disclaimer
 **This library is not an officially supported part of HOOPS Communicator and provided as-is.**
