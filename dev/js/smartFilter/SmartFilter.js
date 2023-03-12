@@ -173,7 +173,33 @@ export class SmartFilter {
         return {ids:ids, props:rprops};
     }
 
-    static exportPropertyHash() {
+
+    static gatherRelatedDataHashesRecursive(viewer,nodeid, la) {
+
+        let bimid = viewer.model.getBimIdFromNode(nodeid);
+
+        let elements = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
+
+        let lao = {i:nodeid};
+        let elements2 = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+        if (elements.length || elements2.length) {
+            if (elements) {
+                lao.e = elements;
+            }
+            if (elements2) {
+                lao.f = elements;
+            }
+            la.push(lao);
+        }
+
+        let children = viewer.model.getNodeChildren(nodeid);
+        for (let i = 0; i < children.length; i++) {
+            SmartFilter.gatherRelatedDataHashesRecursive(viewer, children[i], la);
+        }
+    }
+
+
+    static exportPropertyHash(viewer) {
         let allpropsarray = [];
         let nodeproparray = [];
 
@@ -204,7 +230,11 @@ export class SmartFilter {
         for (let i= 0;i<allpropsarray.length;i++) {
             allpropsarray[i].ehash = undefined;
         }
-            
+
+
+        // let relhash = [];
+        // SmartFilter.gatherRelatedDataHashesRecursive(viewer, viewer.model.getRootNode(), relhash);
+       
         return {allprops: allpropsarray, nodeprops: nodeproparray};
     }
 
