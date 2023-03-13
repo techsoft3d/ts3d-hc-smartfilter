@@ -1,7 +1,8 @@
 # SmartFilters
 
-## Version Update (0.6.2)
-* Node Parent search added
+## Version Update (0.7.2)
+* Ability to pass property file during initialization
+* Server-Side generation of property file
 
 ## Version Update (0.6.1)
 * Ability to save/restore optimized property JSON

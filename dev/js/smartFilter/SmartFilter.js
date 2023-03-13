@@ -156,6 +156,7 @@ export class SmartFilter {
 
         let allprops = savedPropertyHash.allprops;
         let nodeprops = savedPropertyHash.nodeprops;
+        let related = savedPropertyHash.related;
 
         let rprops = [];
         let ids = [];
@@ -170,10 +171,55 @@ export class SmartFilter {
             }
             rprops.push(rprop);
         }
-        return {ids:ids, props:rprops};
+        let spaceBoundaryItems = [];
+        let containedInItems = [];
+
+
+        if (related) {
+            for (let i=0;i<related.length;i++) {
+                let item = related[i];
+                if (item.e) {
+                    spaceBoundaryItems[parseInt(item.i)] = item.e;
+                }
+                else {
+                    spaceBoundaryItems[parseInt(item.i)] = [];
+                }
+                if (item.f) {
+                    containedInItems[parseInt(item.i)] = item.f;
+                }
+                else {
+                    containedInItems[parseInt(item.i)] = [];
+                }
+            }            
+        }
+
+        return {ids:ids, props:rprops, relatedSpaceBoundary:spaceBoundaryItems, relatedContainedIn:containedInItems};
     }
 
-    static exportPropertyHash() {
+
+    static gatherRelatedDataHashesRecursive(viewer,nodeid, la) {
+
+        let bimid = viewer.model.getBimIdFromNode(nodeid);
+
+        let elements = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
+
+        let lao = {i:nodeid};
+        let elements2 = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+        if (elements && elements.length > 0) {
+            lao.e = elements;
+        }
+        if (elements2 && elements2.length > 0) {
+            lao.f = elements2;
+        }
+        la.push(lao);
+        let children = viewer.model.getNodeChildren(nodeid);
+        for (let i = 0; i < children.length; i++) {
+            SmartFilter.gatherRelatedDataHashesRecursive(viewer, children[i], la);
+        }
+    }
+
+
+    static exportPropertyHash(viewer) {
         let allpropsarray = [];
         let nodeproparray = [];
 
@@ -204,7 +250,11 @@ export class SmartFilter {
         for (let i= 0;i<allpropsarray.length;i++) {
             allpropsarray[i].ehash = undefined;
         }
-            
+
+
+         let relhash = [];
+         SmartFilter.gatherRelatedDataHashesRecursive(viewer, viewer.model.getRootNode(), relhash);
+       
         return {allprops: allpropsarray, nodeprops: nodeproparray};
     }
 
@@ -240,6 +290,8 @@ export class SmartFilter {
                         let temp = SmartFilter.parseSavedPropertyHash(model.savedHash);
                         res = temp.props;
                         ids = temp.ids;
+                        SmartFilter._containedInSpatialStructureHash = temp.relatedContainedIn;
+                        SmartFilter._spaceBoundaryHash = temp.relatedSpaceBoundary;
                     }
                     model.properties = res;
                     model.ids = [];
@@ -539,11 +591,13 @@ export class SmartFilter {
 
         if (elements.length > 0) {
             let offset = this._viewer.model.getNodeIdOffset(id);
+            let nameaggregate = "";
             for (let i = 0; i < elements.length; i++) {
-                let res = await this._checkFilter(parseInt(elements[i]) + offset, condition);
-                if (res)
-                    return true;
+                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
+            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            if (res)
+                return true;
         }
         return false;
 
@@ -565,11 +619,13 @@ export class SmartFilter {
 
         if (elements.length > 0) {
             let offset = this._viewer.model.getNodeIdOffset(id);
+            let nameaggregate = "";
             for (let i = 0; i < elements.length; i++) {
-                let res = await this._checkFilter(parseInt(elements[i]) + offset, condition);
-                if (res)
-                    return true;
+                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
+            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            if (res)
+                return true;
         }
         return false;
     }
@@ -638,8 +694,11 @@ export class SmartFilter {
         else {
             let searchTerms = condition.text.split(",");
             let searchAgainst = "";
-            if (condition.propertyType == SmartFilterPropertyType.nodeName || condition.propertyType == SmartFilterPropertyType.relationship) {
+            if (condition.propertyType == SmartFilterPropertyType.nodeName) {
                 searchAgainst = this._viewer.model.getNodeName(id);
+            }
+            else if (condition.propertyType == SmartFilterPropertyType.relationship) {
+                searchAgainst = chaintext;
             }
             else if (condition.propertyType == SmartFilterPropertyType.nodeChain) {
                 if (chaintext) {
