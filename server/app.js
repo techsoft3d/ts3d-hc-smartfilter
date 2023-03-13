@@ -115,16 +115,22 @@ async function extractProperties() {
     return fres;
 }
 
- (async () => {
-        await imageservice.start();
-        let t1 = new Date();
-//        let res = await imageservice.generateImage("dev/models2/hospital.scs", 
-        let res = await imageservice.generateImage("dev/models/arboleda.scs", 
-        {callback:extractProperties,callbackParam:null,evaluate:true,cacheID:"arboleda"});
-        console.log(res.allprops.length + " " +  res.nodeprops.length + " " + res.related.length + " " + res.totals + " " + res.totalc);
-        let t2 = new Date();
-        console.log("Time in seconds: " + (t2 - t1) / 1000);
-        fs.writeFileSync("dev/models2/props.json", JSON.stringify(res));
-        await imageservice.shutdown();
 
-})();
+exports.generatePropData = async function (infile, outfile) {
+
+    await imageservice.start();
+    let t1 = new Date();
+    //        let res = await imageservice.generateImage("dev/models2/hospital.scs", 
+    let res = await imageservice.generateImage(infile, { callback: extractProperties, callbackParam: null, evaluate: true, cacheID: "xxx" });
+    console.log(res.allprops.length + " " + res.nodeprops.length + " " + res.related.length + " " + res.totals + " " + res.totalc);
+    let t2 = new Date();
+    console.log("Time in seconds: " + (t2 - t1) / 1000);
+    if (outfile) {
+        fs.writeFileSync(outfile, JSON.stringify(res));
+    }
+    await imageservice.shutdown();
+    return res;
+};
+
+
+//this.generatePropData("dev/models/arboleda.scs", "dev/models2/props.json");
