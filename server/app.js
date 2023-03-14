@@ -84,7 +84,16 @@ async function extractProperties() {
                 if (propertyHash[ids[i]] == null) {
                     propertyHash[ids[i]] = [];
                 }
-                propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                if (hwv.model.getNodeType(ids[i]) == 3) {
+                    let p = hwv.model.getNodeParent(ids[i]);
+                    if (propertyHash[p] == null) {
+                        propertyHash[p] = [];
+                    }
+                    propertyHash[p]["LAYER"] = layernames.get(layerid);
+                }
+                else {
+                    propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
             }
             for (let j in res[i]) {
                 allPropertiesHash[j] = [];
