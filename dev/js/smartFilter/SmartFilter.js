@@ -136,9 +136,19 @@ export class SmartFilter {
             SmartFilter._propertyHash[ids[i]] = res[i];
             let layerid = viewer.model.getNodeLayerId(ids[i]);
             if (layerid != null && layernames.size > 1) {
-                if (SmartFilter._propertyHash[ids[i]] == null)
+                if (SmartFilter._propertyHash[ids[i]] == null) {
                     SmartFilter._propertyHash[ids[i]] = [];
-                SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
+                if (viewer.model.getNodeType(ids[i]) == 3) {
+                    let p = viewer.model.getNodeParent(ids[i]);
+                    if (SmartFilter._propertyHash[p] == null) {
+                        SmartFilter._propertyHash[p] = [];
+                    }
+                    SmartFilter._propertyHash[p]["LAYER"] = layernames.get(layerid);
+                }
+                else {
+                    SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
             }
             for (let j in res[i]) {
                 SmartFilter._allPropertiesHash[j] = [];
