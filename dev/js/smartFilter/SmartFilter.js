@@ -268,6 +268,29 @@ export class SmartFilter {
         return {allprops: allpropsarray, nodeprops: nodeproparray};
     }
 
+    static _consolidateBodies(viewer) {
+        let lbs = [];
+        for (let i in  SmartFilter._propertyHash) {
+            if (viewer.model.getNodeType(parseInt(i)) == 3 && SmartFilter._propertyHash[i]["Volume"]) {
+                let p = viewer.model.getNodeParent(parseInt(i));
+                lbs[p] = true;
+            }
+        }
+
+        for (let i in lbs) {
+            let children = viewer.model.getNodeChildren(parseInt(i));
+            let tv = 0;
+            for (let j = 0; j < children.length; j++) {
+                let c = children[j];
+                if (SmartFilter._propertyHash[c] && SmartFilter._propertyHash[c]["Volume"]) {
+                    tv+=parseFloat(SmartFilter._propertyHash[c]["Volume"]);
+                }                          
+            }
+            SmartFilter._propertyHash[i]["Volume"] = tv;
+        }
+    }
+
+
     static async initialize(viewer) {
         SmartFilter._propertyHash = [];
         SmartFilter._allPropertiesHash = [];
@@ -283,6 +306,7 @@ export class SmartFilter {
             let res = await Promise.all(proms);
             SmartFilter._updateHashes(viewer, ids, res, layernames);
 
+            SmartFilter._consolidateBodies(viewer);
         }
         else {
             for (let i = 0; i < SmartFilter._modelHash.length; i++) {
