@@ -278,15 +278,23 @@ export class SmartFilter {
         }
 
         for (let i in lbs) {
-            let children = viewer.model.getNodeChildren(parseInt(i));
+            let children = hwv.model.getNodeChildren(parseInt(i));
             let tv = 0;
+            let sa = 0;
             for (let j = 0; j < children.length; j++) {
                 let c = children[j];
                 if (SmartFilter._propertyHash[c] && SmartFilter._propertyHash[c]["Volume"]) {
-                    tv+=parseFloat(SmartFilter._propertyHash[c]["Volume"]);
+                    tv += parseFloat(SmartFilter._propertyHash[c]["Volume"]);
+                }   
+                if (SmartFilter._propertyHash[c] && SmartFilter._propertyHash[c]["Surface Area"]) {
+                    sa += parseFloat(SmartFilter._propertyHash[c]["Surface Area"]);
                 }                          
             }
+            tv = tv + "mm³";
+            sa = sa + "mm²";
             SmartFilter._propertyHash[i]["Volume"] = tv;
+            SmartFilter._propertyHash[i]["Surface Area"] = sa;
+            
         }
     }
 

@@ -68,7 +68,6 @@ async function extractProperties() {
             allpropsarray[i].ehash = undefined;
         }
 
-
         gatherRelatedDataHashesRecursive(hwv.model.getRootNode());
        
         return {allprops: allpropsarray, nodeprops: nodeproparray, related: la, totals: totals, totalc: totalc};
@@ -129,14 +128,23 @@ async function extractProperties() {
         for (let i in lbs) {
             let children = hwv.model.getNodeChildren(parseInt(i));
             let tv = 0;
+            let sa = 0;
             for (let j = 0; j < children.length; j++) {
                 let c = children[j];
                 if (propertyHash[c] && propertyHash[c]["Volume"]) {
                     tv+=parseFloat(propertyHash[c]["Volume"]);
+                }   
+                if (propertyHash[c] && propertyHash[c]["Surface Area"]) {
+                    sa += parseFloat(propertyHash[c]["Surface Area"]);
                 }                          
             }
+            tv = tv + "mm³";
+            sa = sa + "mm²";
             propertyHash[i]["Volume"] = tv;
+            propertyHash[i]["Surface Area"] = sa;
+            
             allPropertiesHash["Volume"][tv] = true;
+            allPropertiesHash["Surface Area"][sa] = true;
         }
     }
 
