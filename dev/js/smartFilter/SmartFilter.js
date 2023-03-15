@@ -294,7 +294,14 @@ export class SmartFilter {
             sa = sa + "mm²";
             SmartFilter._propertyHash[i]["Volume"] = tv;
             SmartFilter._propertyHash[i]["Surface Area"] = sa;
-            
+
+            let nodename = viewer.model.getNodeName(parseInt(i));
+            if (nodename.startsWith("Product")) {
+                let parent = viewer.model.getNodeParent(parseInt(i));
+                SmartFilter._propertyHash[parent]["Volume"] = tv;
+                SmartFilter._propertyHash[parent]["Surface Area"] = sa;
+
+            }            
         }
     }
 

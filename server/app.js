@@ -142,7 +142,12 @@ async function extractProperties() {
             sa = sa + "mm²";
             propertyHash[i]["Volume"] = tv;
             propertyHash[i]["Surface Area"] = sa;
-            
+            let nodename = hwv.model.getNodeName(parseInt(i));
+            if (nodename.startsWith("Product")) {
+                let parent = hwv.model.getNodeParent(parseInt(i));
+                propertyHash[parent]["Volume"] = tv;
+                propertyHash[parent]["Surface Area"] = sa;
+            }                        
             allPropertiesHash["Volume"][tv] = true;
             allPropertiesHash["Surface Area"][sa] = true;
         }

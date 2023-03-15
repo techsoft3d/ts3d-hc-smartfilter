@@ -1,6 +1,6 @@
 # SmartFilters
 
-## Version Update (0.7.2)
+## Version Update (0.7.4)
 * Ability to pass property file during initialization
 * Server-Side generation of property file
 
