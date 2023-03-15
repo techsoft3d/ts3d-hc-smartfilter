@@ -307,7 +307,12 @@ export class SmartFilterEditor {
         let y = 0;
         let toggle = true;    
 
-        for (let i = 0; i < SmartFilterEditor._founditems.length; i++) {
+        let iskip = 1;
+        if (SmartFilterEditor._founditems.length >1000) {
+            iskip = Math.floor(SmartFilterEditor._founditems.length / 1000);
+        }
+
+        for (let i = 0; i < SmartFilterEditor._founditems.length; i+=iskip) {
             toggle = !toggle;
             if (SmartFilterEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SmartFilterEditor._founditems[i].id)))
                 html += '<div onclick=\'hcSmartFilterUI.SmartFilterEditor._select("' + SmartFilterEditor._founditems[i].id + '")\' class="smartFilterSearchItemselected">';

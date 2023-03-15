@@ -68,7 +68,6 @@ async function extractProperties() {
             allpropsarray[i].ehash = undefined;
         }
 
-
         gatherRelatedDataHashesRecursive(hwv.model.getRootNode());
        
         return {allprops: allpropsarray, nodeprops: nodeproparray, related: la, totals: totals, totalc: totalc};
@@ -84,7 +83,16 @@ async function extractProperties() {
                 if (propertyHash[ids[i]] == null) {
                     propertyHash[ids[i]] = [];
                 }
-                propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                if (hwv.model.getNodeType(ids[i]) == 3) {
+                    let p = hwv.model.getNodeParent(ids[i]);
+                    if (propertyHash[p] == null) {
+                        propertyHash[p] = [];
+                    }
+                    propertyHash[p]["LAYER"] = layernames.get(layerid);
+                }
+                else {
+                    propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
             }
             for (let j in res[i]) {
                 allPropertiesHash[j] = [];
@@ -107,10 +115,51 @@ async function extractProperties() {
             getModelTreeIdsRecursive(children[i]);
         }
     }
+
+    function consolidateBodies() {
+        let lbs = [];
+        for (let i in propertyHash) {
+            if (hwv.model.getNodeType(parseInt(i)) == 3 && propertyHash[i]["Volume"]) {
+                let p = hwv.model.getNodeParent(parseInt(i));
+                lbs[p] = true;
+            }
+        }
+
+        for (let i in lbs) {
+            let children = hwv.model.getNodeChildren(parseInt(i));
+            let tv = 0;
+            let sa = 0;
+            for (let j = 0; j < children.length; j++) {
+                let c = children[j];
+                if (propertyHash[c] && propertyHash[c]["Volume"]) {
+                    tv+=parseFloat(propertyHash[c]["Volume"]);
+                }   
+                if (propertyHash[c] && propertyHash[c]["Surface Area"]) {
+                    sa += parseFloat(propertyHash[c]["Surface Area"]);
+                }                          
+            }
+            tv = tv + "mm³";
+            sa = sa + "mm²";
+            propertyHash[i]["Volume"] = tv;
+            propertyHash[i]["Surface Area"] = sa;
+            let nodename = hwv.model.getNodeName(parseInt(i));
+            if (nodename.startsWith("Product")) {
+                let parent = hwv.model.getNodeParent(parseInt(i));
+                propertyHash[parent]["Volume"] = tv;
+                propertyHash[parent]["Surface Area"] = sa;
+            }                        
+            allPropertiesHash["Volume"][tv] = true;
+            allPropertiesHash["Surface Area"][sa] = true;
+        }
+    }
+
     getModelTreeIdsRecursive(hwv.model.getRootNode());
     let res = await Promise.all(proms);
-
     updateHashes(res);
+
+    consolidateBodies();
+
+
     let fres = exportPropertyHash();
     return fres;
 }
@@ -120,8 +169,7 @@ exports.generatePropData = async function (infile, outfile) {
 
     await imageservice.start();
     let t1 = new Date();
-    //        let res = await imageservice.generateImage("dev/models2/hospital.scs", 
-    let res = await imageservice.generateImage(infile, { callback: extractProperties, callbackParam: null, evaluate: true, cacheID: "xxx" });
+   let res = await imageservice.generateImage(infile, { callback: extractProperties, callbackParam: null, evaluate: true, cacheID: "xxx" });
     console.log(res.allprops.length + " " + res.nodeprops.length + " " + res.related.length + " " + res.totals + " " + res.totalc);
     let t2 = new Date();
     console.log("Time in seconds: " + (t2 - t1) / 1000);
@@ -133,4 +181,4 @@ exports.generatePropData = async function (infile, outfile) {
 };
 
 
-//this.generatePropData("dev/models/arboleda.scs", "dev/models2/props.json");
+//this.generatePropData("dev/models2/hospital.scs", "dev/models2/props.json");

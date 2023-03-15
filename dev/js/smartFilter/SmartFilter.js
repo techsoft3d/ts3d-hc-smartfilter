@@ -136,9 +136,19 @@ export class SmartFilter {
             SmartFilter._propertyHash[ids[i]] = res[i];
             let layerid = viewer.model.getNodeLayerId(ids[i]);
             if (layerid != null && layernames.size > 1) {
-                if (SmartFilter._propertyHash[ids[i]] == null)
+                if (SmartFilter._propertyHash[ids[i]] == null) {
                     SmartFilter._propertyHash[ids[i]] = [];
-                SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
+                if (viewer.model.getNodeType(ids[i]) == 3) {
+                    let p = viewer.model.getNodeParent(ids[i]);
+                    if (SmartFilter._propertyHash[p] == null) {
+                        SmartFilter._propertyHash[p] = [];
+                    }
+                    SmartFilter._propertyHash[p]["LAYER"] = layernames.get(layerid);
+                }
+                else {
+                    SmartFilter._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
+                }
             }
             for (let j in res[i]) {
                 SmartFilter._allPropertiesHash[j] = [];
@@ -258,6 +268,44 @@ export class SmartFilter {
         return {allprops: allpropsarray, nodeprops: nodeproparray};
     }
 
+    static _consolidateBodies(viewer) {
+        let lbs = [];
+        for (let i in  SmartFilter._propertyHash) {
+            if (viewer.model.getNodeType(parseInt(i)) == 3 && SmartFilter._propertyHash[i]["Volume"]) {
+                let p = viewer.model.getNodeParent(parseInt(i));
+                lbs[p] = true;
+            }
+        }
+
+        for (let i in lbs) {
+            let children = hwv.model.getNodeChildren(parseInt(i));
+            let tv = 0;
+            let sa = 0;
+            for (let j = 0; j < children.length; j++) {
+                let c = children[j];
+                if (SmartFilter._propertyHash[c] && SmartFilter._propertyHash[c]["Volume"]) {
+                    tv += parseFloat(SmartFilter._propertyHash[c]["Volume"]);
+                }   
+                if (SmartFilter._propertyHash[c] && SmartFilter._propertyHash[c]["Surface Area"]) {
+                    sa += parseFloat(SmartFilter._propertyHash[c]["Surface Area"]);
+                }                          
+            }
+            tv = tv + "mm³";
+            sa = sa + "mm²";
+            SmartFilter._propertyHash[i]["Volume"] = tv;
+            SmartFilter._propertyHash[i]["Surface Area"] = sa;
+
+            let nodename = viewer.model.getNodeName(parseInt(i));
+            if (nodename.startsWith("Product")) {
+                let parent = viewer.model.getNodeParent(parseInt(i));
+                SmartFilter._propertyHash[parent]["Volume"] = tv;
+                SmartFilter._propertyHash[parent]["Surface Area"] = sa;
+
+            }            
+        }
+    }
+
+
     static async initialize(viewer) {
         SmartFilter._propertyHash = [];
         SmartFilter._allPropertiesHash = [];
@@ -273,6 +321,7 @@ export class SmartFilter {
             let res = await Promise.all(proms);
             SmartFilter._updateHashes(viewer, ids, res, layernames);
 
+            SmartFilter._consolidateBodies(viewer);
         }
         else {
             for (let i = 0; i < SmartFilter._modelHash.length; i++) {
