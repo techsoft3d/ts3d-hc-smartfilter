@@ -492,6 +492,16 @@ export class SmartFilterEditor {
         return html;
     }
 
+    static _generateTrashBin() {
+        let text = '<div class="icon-trash" style="float: left;">'
+        text += '<div class="trash-lid"></div>'
+        text += '<div class="trash-container"></div>'
+        text += '<div class="trash-line-1"></div>'
+        text += '<div class="trash-line-2"></div>'
+        text += '<div class="trash-line-3"></div>';
+        text += '</div>';
+        return text;
+    }
     static async _generateConditions(smartFilterIn,index) {                
         let html = "";
         let smartFilter;
@@ -519,7 +529,8 @@ export class SmartFilterEditor {
                 SmartFilterEditor.tempId++;
                 html += '<div>';
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSmartFilterUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
-                html += '<div class="cross"></div></div>';
+                html += SmartFilterEditor._generateTrashBin();
+                html += '</div>';
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 html+= await this._generateConditions(filter.childFilter,i);
                 html += '</div>';
@@ -527,7 +538,8 @@ export class SmartFilterEditor {
             else {
                 html += '<div style="height:30px;margin-top:-3px">';
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSmartFilterUI.SmartFilterEditor._deleteFilter(' + i + "," + smartFilter.tempId + ')\'>';
-                html += '<div class="cross"></div></div>';                
+                html += SmartFilterEditor._generateTrashBin();
+                html += '</div>';                
                 html += SmartFilterEditor._generateAndOrChoiceSelect(filter, i, smartFilter);
                 let offset = 66;
                 if (smartFilterIn) {
