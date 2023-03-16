@@ -138,7 +138,7 @@ export class SmartFilterManagerUI {
                     separator:true,
                 },
                 {
-                    label: "<i class='fas fa-user'></i> Edit Description",
+                    label: "<i class='fas fa-user'></i> Edit Name",
                     action: async function (e, row) {
                         SmartFilterManagerUI._editable = true;
                     }
@@ -177,7 +177,7 @@ export class SmartFilterManagerUI {
                 rowContextMenu: rowMenu,
                 columns: [                                   
                     {
-                        title: "Description", field: "description", formatter:"textarea", editor:"input",editable: SmartFilterManagerUI.editCheck,tooltip:SmartFilterManagerUI.formatTooltip
+                        title: "Name", field: "description", formatter:"textarea", editor:"input",editable: SmartFilterManagerUI.editCheck,tooltip:SmartFilterManagerUI.formatTooltip
                     },  
                     {
                         title: "ID", field: "id", width: 20, visible: false

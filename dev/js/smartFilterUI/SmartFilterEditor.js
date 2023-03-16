@@ -565,11 +565,11 @@ export class SmartFilterEditor {
                 html += '</div>';
             }        
         }
-        html += '<button class="smartFilterSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add Condition</button>';
+        html += '<button class="smartFilterSearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(false,' +  smartFilter.tempId + ')\'>Add condition</button>';
         if (!smartFilterIn)
         {
-            html += '<button class="smartFilterSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>New SubFilter</button>';
-            html += '<button class="smartFilterSearchButton" type="button" style="left:6px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._convertToChildfilter(true,' +  smartFilter.tempId + ')\'>Convert to SubFilter</button>';
+            html += '<button class="smartFilterSearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._addFilterFromUI(true,' +  smartFilter.tempId + ')\'>Add condition group</button>';
+            html += '<button class="smartFilterSearchButton" type="button" style="left:6px;bottom:2px;position:relative;" onclick=\'hcSmartFilterUI.SmartFilterEditor._convertToChildfilter(true,' +  smartFilter.tempId + ')\'>Set condition group</button>';
 
         }
         else
