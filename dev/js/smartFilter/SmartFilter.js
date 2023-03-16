@@ -565,8 +565,8 @@ export class SmartFilter {
             current = newone;
         }
         let chaintext = "";
-        for (let j = chain.length - 1 - chainskip; j >= 0; j--) {
-            if (j > 0)
+        for (let j = chainskip;j<chain.length; j++) {
+            if (j < chain.length-1)
                 chaintext += chain[j] + "->";
             else
                 chaintext += chain[j];
