@@ -6,6 +6,7 @@
   "author": "Guido Hoffmann",
   "license": "",
   "dependencies": {
+    "filemanager-webpack-plugin": "^8.0.0",
     "tabulator-tables": "^5.4.4",
     "ts3d-hc-imageservice": "^0.3.5",
     "webpack": "^5.62.1",

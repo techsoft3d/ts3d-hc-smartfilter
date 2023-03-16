@@ -561,7 +561,7 @@ export class SmartFilterEditor {
                 }
                 else
                 {
-                    html += '<div style="display:flex;position:relative;top:-10px;left:64px;margin-right: 1em;width:calc(100%  - ' + offset + 'px)">';
+                    html += '<div style="display:flex;position:relative;top:-8px;left:64px;margin-right: 1em;width:calc(100%  - ' + offset + 'px)">';
                 }
                 html += SmartFilterEditor._generatePropertyTypeSelect(filter, i, smartFilter);
                 html += SmartFilterEditor._generateChoiceSelect(filter, i, smartFilter);
