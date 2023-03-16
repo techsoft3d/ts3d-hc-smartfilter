@@ -56,15 +56,16 @@ export class SmartFilterEditor {
 
     
     static async display() {
-
-
         
         await hcSmartFilter.SmartFilter.initialize(SmartFilterEditor._viewer);
         let html = "";
         html += '<div class = "smartFilterMain" id="' + SmartFilterEditor._maindiv + '_main">';
         if (SmartFilterEditor._showFirstRow) {
             if (SmartFilterEditor._showLimitOption) {
-                html += '<div id="' + SmartFilterEditor._maindiv + '_firstrow" style="position:relative;height:20px;"><label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection"></div>';
+                html += '<div id="' + SmartFilterEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
+                html += '<label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchfromselection">'
+                html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSmartFilterUI.SmartFilterEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SmartFilterEditor._maindiv + '_searchChildren">'
+                html += '</div>';
             }
             else {
                 html += '<div style="position:relative;height:20px;"></div>';
@@ -75,6 +76,7 @@ export class SmartFilterEditor {
             html += '<button class="smartFilterSearchButtonImportant" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSmartFilterUI.SmartFilterEditor.search()\'>Search</button>';
         }
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
+
         html += '<div id="' + SmartFilterEditor._maindiv + '_conditions">';
         html += await SmartFilterEditor._generateConditions();
         html += '</div><hr>';
@@ -298,6 +300,14 @@ export class SmartFilterEditor {
         SmartFilterEditor.refreshUI();
 
     }
+
+    static _setSearchChildren() {
+        let searchChildren = $("#" + SmartFilterEditor._maindiv + "_searchChildren")[0].checked;
+
+        SmartFilterEditor._mainFilter.setKeepSearchingChildren(searchChildren);
+
+    }
+
 
     static _limitSelection() {
       
