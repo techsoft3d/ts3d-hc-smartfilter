@@ -1,5 +1,10 @@
 # SmartFilters
 
+## Version Update (0.7.7)
+* Ability to search Dates
+* Ability to search past found nodes
+* Better Ui Styling
+
 ## Version Update (0.7.4)
 * Ability to pass property file during initialization
 * Server-Side generation of property file

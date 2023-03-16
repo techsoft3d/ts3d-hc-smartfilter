@@ -6,6 +6,9 @@ const SmartFilterConditionType = {
     lessOrEqual:4,
     equals:5,
     unequal:6,
+    greaterOrEqualDate:7,
+    lessOrEqualDate:8
+
 };
 
 export {SmartFilterConditionType};
@@ -52,6 +55,10 @@ export class SmartFilter {
                 return ">=";
             case SmartFilterConditionType.lessOrEqual:
                 return "<=";
+            case SmartFilterConditionType.greaterOrEqualDate:
+                return ">=(Date)";
+            case SmartFilterConditionType.lessOrEqualDate:
+                return "<=(Date)";
             case SmartFilterConditionType.equals:
                 return "=";
             case SmartFilterConditionType.unequal:
@@ -76,6 +83,11 @@ export class SmartFilter {
                 return SmartFilterConditionType.equals;
             case "\u2260":
                 return SmartFilterConditionType.unequal;
+            case ">=(Date)":
+                return SmartFilterConditionType.greaterOrEqualDate;
+            case "<=(Date)":
+                return SmartFilterConditionType.lessOrEqualDate;
+                    
         }
     }
 
@@ -696,17 +708,15 @@ export class SmartFilter {
             }
 
             let searchAgainstNumber;
-            if (condition.propertyType == SmartFilterPropertyType.nodeName) {      
+            if (condition.propertyType == SmartFilterPropertyType.nodeName) {
                 searchAgainstNumber = parseFloat(this._viewer.model.getNodeName(id));
             }
-            else if (condition.propertyType == SmartFilterPropertyType.nodeId)
-            {
+            else if (condition.propertyType == SmartFilterPropertyType.nodeId) {
                 searchAgainstNumber = id;
             }
             else {
                 let temp;
-                if (SmartFilter._propertyHash[id]) 
-                {
+                if (SmartFilter._propertyHash[id]) {
                     temp = SmartFilter._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
@@ -718,27 +728,61 @@ export class SmartFilter {
                 searchAgainstNumber = parseFloat(temp);
             }
 
-            let searchNumber = parseFloat(condition.text);
-            if (isNaN(searchNumber) || isNaN(searchAgainstNumber))
-                return false;
+            if (condition.conditionType == SmartFilterConditionType.greaterOrEqualDate || condition.conditionType == SmartFilterConditionType.lessOrEqualDate) {
+                let temp;
+                if (SmartFilter._propertyHash[id]) {
+                    temp = SmartFilter._propertyHash[id][condition.propertyName];
+                }
+                if (temp == undefined) {
+                   return false;
+                }
+                if (!isNaN(parseInt(temp))) {
+                    temp = parseInt(temp);
+                }
+                let searchAgainstDate = new Date(temp);
 
-            if (condition.conditionType == SmartFilterConditionType.greaterOrEqual) {
-                if (searchAgainstNumber >= searchNumber)
-                    return true;
-            }
-            else if (condition.conditionType == SmartFilterConditionType.lessOrEqual) {
-                if (searchAgainstNumber <= searchNumber)
-                    return true;
-            }
-            else if (condition.conditionType == SmartFilterConditionType.unequal) {
-                if (searchAgainstNumber != searchNumber)
-                    return true;
+                if (isNaN(searchAgainstDate.getDate())) {
+                    return false;
+                }
+                let ctext = condition.text;
+                if (!isNaN(parseInt(ctext))) {
+                    ctext = parseInt(ctext);
+                }
+                let searchDate = new Date(ctext);
+                if (condition.conditionType == SmartFilterConditionType.greaterOrEqualDate) {
+                    if (searchAgainstDate >= searchDate)
+                        return true;
+                }
+                else if (condition.conditionType == SmartFilterConditionType.lessOrEqualDate) {
+                    if (searchAgainstDate <= searchDate)
+                        return true;
+                }
+                return false;
             }
             else {
-                if (searchAgainstNumber == searchNumber)
-                    return true;
+
+                let searchNumber = parseFloat(condition.text);
+                if (isNaN(searchNumber) || isNaN(searchAgainstNumber))
+                    return false;
+
+                if (condition.conditionType == SmartFilterConditionType.greaterOrEqual) {
+                    if (searchAgainstNumber >= searchNumber)
+                        return true;
+                }
+                else if (condition.conditionType == SmartFilterConditionType.lessOrEqual) {
+                    if (searchAgainstNumber <= searchNumber)
+                        return true;
+                }
+                else if (condition.conditionType == SmartFilterConditionType.unequal) {
+                    if (searchAgainstNumber != searchNumber)
+                        return true;
+                }
+                else {
+                    if (searchAgainstNumber == searchNumber)
+                        return true;
+                }
+                return false;
             }
-            return false;
         }
         else {
             let searchTerms = condition.text.split(",");
