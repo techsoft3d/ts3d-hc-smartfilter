@@ -199,6 +199,7 @@ export class SmartFilterManagerUI {
         
                 let editorfilter = SmartFilterEditor.getFilter();
                 editorfilter.fromJSON(filterjson);
+                SmartFilterEditor.clearSearchResults();                
                 await SmartFilterEditor.refreshUI();                
             });
 
@@ -217,8 +218,6 @@ export class SmartFilterManagerUI {
                     SmartFilterManagerUI._handleSmartFilterIsPropEdit(cell.getRow());
                 }
             });
-
-
         }
         else
             await SmartFilterManagerUI._table.clearData();

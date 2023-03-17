@@ -252,7 +252,7 @@ export class SmartFilterEditor {
     }
     static async _addFilterFromUI(createChildFilter, id) {
         let smartFilter;
-        SmartFilterEditor._clearSearchResults();
+        SmartFilterEditor.clearSearchResults();
         SmartFilterEditor.updateFilterFromUI();
 
         smartFilter = SmartFilterEditor._getSmartFilterFromTempId(id);
@@ -292,7 +292,7 @@ export class SmartFilterEditor {
     }
 
     static _deleteFilter(i,id) {
-        SmartFilterEditor._clearSearchResults();
+        SmartFilterEditor.clearSearchResults();
         SmartFilterEditor.updateFilterFromUI();
         let smartFilter = SmartFilterEditor._getSmartFilterFromTempId(id);
         smartFilter.removeCondition(i);
@@ -325,7 +325,7 @@ export class SmartFilterEditor {
         }
     }
 
-    static _clearSearchResults() {
+    static clearSearchResults() {
         SmartFilterEditor._founditems = undefined; 
         SmartFilterEditor._generateSearchResults();
     }
