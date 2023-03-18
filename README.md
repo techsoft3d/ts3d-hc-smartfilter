@@ -1,5 +1,8 @@
 # SQuerys
 
+## Version Update (0.8.0)
+* Renamed to SQuery
+
 ## Version Update (0.7.7)
 * Ability to search Dates
 * Ability to search past found nodes
@@ -23,7 +26,7 @@
 * Abiltity to hide top row UI buttons
 * Update to HOOPS Communicator 2023 U1
 
-![alt text](https://github.com/techsoft3d/SQuerys/blob/master/readme_images/image1.png?raw=true)
+![alt text](https://github.com/techsoft3d/ts3d-hc-squery/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
