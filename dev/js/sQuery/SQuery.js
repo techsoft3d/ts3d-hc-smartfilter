@@ -234,7 +234,7 @@ export class SQuery {
         return text;
     }
 
-    async _checkSpaceBoundaryFilter(id, condition) {
+    async _checkSpaceBoundaryCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
@@ -254,7 +254,7 @@ export class SQuery {
             for (let i = 0; i < elements.length; i++) {
                 nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
-            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
             if (res)
                 return true;
         }
@@ -262,7 +262,7 @@ export class SQuery {
 
     }
 
-    async _checkContainedInFilter(id, condition) {
+    async _checkContainedInCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
@@ -282,14 +282,14 @@ export class SQuery {
             for (let i = 0; i < elements.length; i++) {
                 nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
-            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
             if (res)
                 return true;
         }
         return false;
     }
 
-    async _checkFilter(id, condition, chaintext) {
+    async _checkCondition(id, condition, chaintext) {
         if (condition.conditionType != SQueryConditionType.contains) {
             if (condition.conditionType == SQueryConditionType.exists) {
                 if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] != undefined)
@@ -525,10 +525,10 @@ export class SQuery {
             let res;
             if (conditions[i].propertyType == SQueryPropertyType.relationship) {
                 if (conditions[i].propertyName == "Rel:SpaceBoundary") {
-                    res = await this._checkSpaceBoundaryFilter(id, conditions[i]);
+                    res = await this._checkSpaceBoundaryCondition(id, conditions[i]);
                 }
                 else if (conditions[i].propertyName == "Rel:ContainedIn") {
-                    res = await this._checkContainedInFilter(id, conditions[i]);
+                    res = await this._checkContainedInCondition(id, conditions[i]);
                 }
             }
             else if (conditions[i].propertyType == SQueryPropertyType.SQuery) {
@@ -552,7 +552,7 @@ export class SQuery {
                 }    
                 else
                 {
-                    res = await this._checkFilter(id, conditions[i], chaintext);
+                    res = await this._checkCondition(id, conditions[i], chaintext);
                 }
             }
             if (res == false) {
