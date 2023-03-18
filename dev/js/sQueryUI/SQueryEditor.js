@@ -59,7 +59,7 @@ export class SQueryEditor {
     static async display() {
         
         await SQueryEditor._manager.initialize();
-        
+
         let html = "";
         html += '<div class = "SQueryMain" id="' + SQueryEditor._maindiv + '_main">';
         if (SQueryEditor._showFirstRow) {
@@ -440,10 +440,8 @@ export class SQueryEditor {
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
-        let sortedStrings = SQueryEditor._mainFilter.getAllProperties();
+        let sortedStrings = SQueryEditor._manager.getAllProperties();
             
-    
-
         let prefix = "";
 
         for (let i = 0; i < sortedStrings.length;i++) {

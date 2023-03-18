@@ -378,4 +378,38 @@ export class SQueryManager {
         }
     }
 
+    getAllProperties() {
+
+        let propsnames = [];
+        let hasType = false;
+        if (this._allPropertiesHash["TYPE"])
+        {
+            hasType = true;
+        }
+
+        for (let i in this._allPropertiesHash) {
+            if (i != "TYPE") {
+                propsnames.push(i);
+            }
+        }
+
+        propsnames.sort();
+        if (hasType) {
+            propsnames.unshift("TYPE");
+        }
+    
+        propsnames.unshift("SQuery");
+        propsnames.unshift("Rel:SpaceBoundary");
+        propsnames.unshift("Rel:ContainedIn");
+        propsnames.unshift("Node Color");
+        propsnames.unshift("Node Type");
+        propsnames.unshift("Node Chain");
+        propsnames.unshift("Node Parent");
+        propsnames.unshift("Nodeid");
+        propsnames.unshift("Node Name");
+
+
+        return propsnames;
+    }
+
 }
