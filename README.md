@@ -1,4 +1,4 @@
-# SmartFilters
+# SQuerys
 
 ## Version Update (0.7.7)
 * Ability to search Dates
@@ -16,14 +16,14 @@
 * Tabulator now included in UI library
 
 ## Version Update (0.5.3)
-* Ability to choose an existing smartfilter as a filter condition
+* Ability to choose an existing query as a filter condition
 
 ## Version Update (0.5.0) 
-* modules renamed to hcSmartFilter and hcSmartFilterUI
+* modules renamed to hcSQuery and hcSQueryUI
 * Abiltity to hide top row UI buttons
 * Update to HOOPS Communicator 2023 U1
 
-![alt text](https://github.com/techsoft3d/SmartFilters/blob/master/readme_images/image1.png?raw=true)
+![alt text](https://github.com/techsoft3d/SQuerys/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
 This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
@@ -36,19 +36,19 @@ For questions/feedback please send an email to guido@techsoft3d.com or post in o
 * Improved Documentation
 
 ## Install
-Add `dist/smartFilter.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
+Add `dist/squery.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
 ```
-    <script src="./js/smartFilter.min.js"></script>
-```
-
-Add `dist/smartFilterUI.min.js` for the optional UI functionality. 
-```
-    <script src="./js/smartFilterUI.min.js"></script>
+    <script src="./js/squery.min.js"></script>
 ```
 
-If you are using the UI library you also need to add `dist/smartFilterUI.css` to your project:
+Add `dist/squeryui.min.js` for the optional UI functionality. 
 ```
-    <link rel="stylesheet" href="./css/smartFilterUI.css">
+    <script src="./js/squeryui.min.js"></script>
+```
+
+If you are using the UI library you also need to add `dist/squeryui.css` to your project:
+```
+    <link rel="stylesheet" href="./css/squeryui.css">
 ```
 
 ## Demo
@@ -62,8 +62,8 @@ Here is how to start the demo with the provided sample model locally when using 
 ## Initialization
 
 ```
-hcSmartFilterUI.SmartFilterEditor.initialize("searcheditor", hwv);
-hcSmartFilterUI.SmartFilterEditor.display();
+hcSQueryUI.SQueryEditor.initialize("searcheditor", hwv);
+hcSQueryUI.SQueryEditor.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
@@ -125,28 +125,28 @@ This will find all elements that are related to all IFCSPACE's which contain kit
 **Rel: Contained Property**  
 If this option is selected the search will be performed on the elements "contained in" the nodes with the specified text.
 
-**Smart Filter**  
-If this option is selected the search will be performed on the specified Smart Filter.
+**SQuery**  
+If this option is selected the search will be performed on the specified Query
 
 
 ### Advanced Usage:
 
 ```
- hcSmartFilterUI.SmartFilterEditor.setChainSkip(1);
+ hcSQueryUI.SQueryEditor.setChainSkip(1);
 ```
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
- hcSmartFilterUI.SmartFilterEditor.setShowLimitOption(true);
+ hcSQueryUI.SQueryEditor.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
 
-## SmartfilterManager UI
+## SQueryManager UI
 ### Initialization
 
 ```
-    hcSmartFilterUI.SmartFilterManagerUI.initialize("smartfiltermanagercontainer",hwv, true);
+    hcSQueryUI.SQueryManagerUI.initialize("squerymanagercontainer",hwv, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
@@ -154,22 +154,22 @@ Initializes the Manager UI and displays it. The first parameter is the id of the
 
 ### Usage
 
-This class keeps track of a list of search filters that can be applied to a model. The user can add a new filter by pressing the add button which adds the current editor search to the smartfilter list.
+This class keeps track of a list of queries that can be applied to a model. The user can add a new query by pressing the add button which adds the current editor search to the query list.
 
-After a search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window (hold down shift to isolate the nodes instead). The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final column in the list indicates if the filter should become a smart property. See below for more information on this functionality.
+After a search has been added it can be executed via the "Select" button which will highlight all found nodes and update the search editor window (hold down shift to isolate the nodes instead). The user can also edit the generated text describing the search, update the filter from the current editor search or delete the filter from the list. The final column in the list indicates if the filter should become a  property. See below for more information on this functionality.
   
-With the optional Load/Export buttons the user can load and save the current list of smartfilters to a JSON file.
+With the optional Load/Export buttons the user can load and save the current list of queries to a JSON file.
 
 
 ### Advanced Usage:
 
-A callback function can be provided that gets triggered on any change of the list of smartfilters. In the callback the list of smartfilters can then be retrieved from the SmartFilterManager object and further processed (pushed to a server, etc.). See example below:
+A callback function can be provided that gets triggered on any change of the list of squeries. In the callback the list of queries can then be retrieved from the SQueryManager object and further processed (pushed to a server, etc.). See example below:
 ```
-    hcSmartFilterUI.SmartFilterManagerUI.setUpdatedCallback(smartFiltersUpdated);        
-    async function smartFiltersUpdated() {
-        let text = JSON.stringify({filtersarray:hcSmartFilter.SmartFilterManager.toJSON()});
+    hcSQueryUI.SQueryManagerUI.setUpdatedCallback(squeryupdated);        
+    async function squeryupdated() {
+        let text = JSON.stringify({filtersarray:hcSQuery.SQueryManager.toJSON()});
 
-        var res = await fetch(serveraddress + '/api/smartFilters', {
+        var res = await fetch(serveraddress + '/api/sQueries', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             headers: {
             'Content-Type': 'application/json'      
@@ -180,37 +180,37 @@ A callback function can be provided that gets triggered on any change of the lis
 }
 ```
 
-The JSON object representing a list of smartfilters can be added to the SmartFilter manager with the code below:
+The JSON object representing a list of squeries can be added to the SQueryManager with the code below:
 
 ```
-    hcSmartFilter.SmartFilterManager.fromJSON(data.filtersarray);
-    hcSmartFilterUI.SmartFilterManagerUI.refreshUI();
+    hcSQuery.SQueryManager.fromJSON(data.filtersarray);
+    hcSQueryUI.SQueryManagerUI.refreshUI();
 ```
 
 
 
-## SmartfilterProperties UI
+## SQueryProperties UI
 ### Initialization
 
 
 ```
-  hcSmartFilterUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
+  hcSQueryUI.SQueryPropertiesUI.initialize("spropertiescontainer",hwv);
 ```
 
 
-Initializes the SmartProperties UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. 
+Initializes the SQueryProperties UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. 
 
 
 ### Usage
 
-The SmartFilter Manager UI can turn a smartfilter into a smart property which means that it will be evaluated whenever the user selects an object in the webviewer. It basically becomes a dynamic user defined property. 
+The SQuery Manager UI can turn a query into a property which means that it will be evaluated whenever the user selects an object in the webviewer. It basically becomes a dynamic user defined property. 
 
 
 ## Performance and handling of Federated Models
-In order to ensure fast client-side search performance, the SmartFilter library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartFilter after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
+In order to ensure fast client-side search performance, the SQuery library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SQuery after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
 
 ```
-  hcSmartFilter.SmartFilter.addModel("arboleda",nodeid);
+  hcSQuery.SQuery.addModel("arboleda",nodeid);
 ```
 
 When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.
@@ -222,5 +222,5 @@ When calling this function whenever a new model is added to the webviewer the ac
 ### Demo:
 * [GoldenLayout](https://golden-layout.com/)
 
-### SmartFilter UI:
+### SQuery UI:
 * [Tabulator](http://tabulator.info/)
