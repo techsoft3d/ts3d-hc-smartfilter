@@ -6,15 +6,15 @@ async function msready() {
 
     // let res = await fetch('models2/props.json');
     // let json = await res.json();
-    // hcSmartFilter.SmartFilter.addModel("hospital",hwv.model.getRootNode(),json);
+    // hcSQuery.SQuery.addModel("hospital",hwv.model.getRootNode(),json);
 
 
-    hcSmartFilterUI.SmartFilterEditor.initialize("searchtools", hwv);
-    hcSmartFilterUI.SmartFilterEditor.display();
+    hcSQueryUI.SQueryEditor.initialize("searchtools", hwv);
+    hcSQueryUI.SQueryEditor.display();
 
 
-    hcSmartFilterUI.SmartFilterManagerUI.initialize("smartfilterscontainer",hwv, true);
-    hcSmartFilterUI.SmartPropertiesUI.initialize("smartpropertiescontainer",hwv);
+    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",hwv, true);
+    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",hwv);
 
 }
 
@@ -59,14 +59,14 @@ function createUILayout() {
                             },
                             {
                                 type: 'component',
-                                componentName: 'Smart Filters',
+                                componentName: 'SQueries',
                                 isClosable: true,
                                 height: 40,
                                 componentState: { label: 'C' }
                             },
                             {
                                 type: 'component',
-                                componentName: 'Smart Properties',
+                                componentName: 'SProperties',
                                 isClosable: true,
                                 height: 20,
                                 componentState: { label: 'C' }
@@ -89,12 +89,12 @@ function createUILayout() {
         $(container.getElement()).append($("#searchtoolcontainer"));
     });
 
-    myLayout.registerComponent('Smart Filters', function (container, componentState) {
-        $(container.getElement()).append($("#smartfilterscontainer"));
+    myLayout.registerComponent('SQueries', function (container, componentState) {
+        $(container.getElement()).append($("#squeryfilterscontainer"));
     });
 
-    myLayout.registerComponent('Smart Properties', function (container, componentState) {
-        $(container.getElement()).append($("#smartpropertiescontainer"));
+    myLayout.registerComponent('SProperties', function (container, componentState) {
+        $(container.getElement()).append($("#squerypropertiescontainer"));
     });
 
     myLayout.on('stateChanged', function () {
@@ -130,8 +130,8 @@ function createUILayout() {
 
 function initializeSearch(){
     if(hwv.selectionManager.getLast())   
-        hcSmartFilterUI.SmartFilterEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
+        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
     else
-        hcSmartFilterUI.SmartFilterEditor.initialize("searchtools",hwv);
-    hcSmartFilterUI.SmartFilterEditor.display();
+        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv);
+    hcSQueryUI.SQueryEditor.display();
 }

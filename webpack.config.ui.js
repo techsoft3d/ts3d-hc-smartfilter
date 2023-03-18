@@ -2,12 +2,12 @@ const path = require('path');
 const FileManagerPlugin = require('filemanager-webpack-plugin');
 
 module.exports = {
-  entry: './dev/js/smartFilterUI/hcSmartFilterUI.js',
+  entry: './dev/js/sQueryUI/hcSQueryUI.js',
   mode: "production",
   output: {
     path: path.resolve(__dirname, 'dist'),
-    filename: 'smartFilterUI.min.js',
-    library: 'hcSmartFilterUI', //add this line to enable re-use
+    filename: 'squeryui.min.js',
+    library: 'hcSQueryUI', //add this line to enable re-use
   },
   plugins: [
     new FileManagerPlugin({
@@ -15,8 +15,8 @@ module.exports = {
             onEnd: {
                 copy: [
                     {
-                        source: path.join(__dirname, 'dev/css/SmartFilterUI.css'),
-                        destination: path.join(__dirname, 'dist/SMartFilterUI.css')
+                        source: path.join(__dirname, 'dev/css/squeryui.css'),
+                        destination: path.join(__dirname, 'dist/squeryui.css')
                     }
                 ]
             }

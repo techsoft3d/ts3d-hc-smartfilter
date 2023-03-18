@@ -53,22 +53,21 @@
     <script type="text/javascript" src="js/contextMenu.min.js"></script>
 
      
-    <link rel="stylesheet" href="css/SmartFilterUI.css" type="text/css" />
+    <link rel="stylesheet" href="css/squeryui.css" type="text/css" />
     
     <link rel="stylesheet" href="css/Relationships.css" type="text/css" />
 
     
     <script type="text/javascript" src="js/app/startup.js"></script>
   
-    <!-- <script src="./js/smartFilter.min.js"></script>   -->
-
+    
     <script type="module" id="viewerStartup">
 
-      import * as hcSmartFilter from './js/smartFilter/hcSmartFilter.js';
-      import * as hcSmartFilterUI from './js/smartFilterUI/hcSmartFilterUI.js';
+      import * as hcSQuery from './js/sQuery/hcSQuery.js';
+      import * as hcSQueryUI from './js/sQueryUI/hcSQueryUI.js';
 
-      window.hcSmartFilter = hcSmartFilter;
-      window.hcSmartFilterUI = hcSmartFilterUI;
+      window.hcSQuery = hcSQuery;
+      window.hcSQueryUI = hcSQueryUI;
 
       let md = new MobileDetect(window.navigator.userAgent);
 
@@ -1214,8 +1213,8 @@
     </div>
 </div>
 
-<div id="smartfilterscontainer" style="width:100%;height:100%;position:relative"></div>
-<div id="smartpropertiescontainer" style="width:100%;height:100%;position:relative"></div>
+<div id="squeryfilterscontainer" style="width:100%;height:100%;position:relative"></div>
+<div id="squerypropertiescontainer" style="width:100%;height:100%;position:relative"></div>
 
   </body>
 </html>
