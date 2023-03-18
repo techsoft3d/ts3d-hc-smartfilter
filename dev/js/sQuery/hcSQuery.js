@@ -1,8 +1,8 @@
 export { SQuery } from './SQuery.js';
 export { SQueryCondition } from './SQueryCondition.js';
 export { SQueryManager } from './SQueryManager.js';
-export { SQueryConditionType } from './SQuery.js';
-export { SQueryPropertyType } from './SQuery.js';
+export { SQueryConditionType } from './SQueryCondition.js';
+export { SQueryPropertyType } from './SQueryCondition.js';
 
 
 export function getVersion() {

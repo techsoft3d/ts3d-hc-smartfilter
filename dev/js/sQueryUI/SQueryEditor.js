@@ -190,8 +190,8 @@ export class SQueryEditor {
                 this.updateFilterFromUI(filter.childFilter);
             }
             else {
-                filter.conditionType = hcSQuery.SQuery.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
-                filter.propertyType = hcSQuery.SQuery.convertStringPropertyTypeToEnum(filter.propertyName);
+                filter.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
+                filter.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum(filter.propertyName);
 
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
                     if (!filter.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
@@ -414,7 +414,7 @@ export class SQueryEditor {
         let choices = ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
 
         for (let i = 0; i < choices.length; i++) {
-            if (choices[i] == hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType)) {
+            if (choices[i] == hcSQuery.SQueryCondition.convertEnumConditionToString(filter.conditionType)) {
                 html += '<option selected value="' + choices[i] + '">' + choices[i] + '</option>\n';
             }
             else {
@@ -565,7 +565,7 @@ export class SQueryEditor {
                 }
                 html += SQueryEditor._generatePropertyTypeSelect(filter, i, SQuery);
                 html += SQueryEditor._generateChoiceSelect(filter, i, SQuery);
-                if (hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType) != "exists" && hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType) != "!exists") {
+                if (hcSQuery.SQueryCondition.convertEnumConditionToString(filter.conditionType) != "exists" && hcSQuery.SQueryCondition.convertEnumConditionToString(filter.conditionType) != "!exists") {
                     html += await SQueryEditor._generateInput(filter, i, SQuery);
                 }
                 else {

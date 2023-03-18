@@ -1,116 +1,8 @@
-const SQueryConditionType = {
-    contains:0,
-    exists:1,
-    notExists:2,
-    greaterOrEqual:3,
-    lessOrEqual:4,
-    equals:5,
-    unequal:6,
-    greaterOrEqualDate:7,
-    lessOrEqualDate:8
-
-};
-
-export {SQueryConditionType};
-
-const SQueryPropertyType = {
-    nodeName:0,
-    nodeId:1,
-    nodeChain:2,
-    nodeType:3,
-    nodeColor:4,
-    relationship:5,
-    property:6,
-    SQuery:7,
-    nodeParent:8,
-};
-
 import { SQueryCondition } from './SQueryCondition.js';
-
-export {SQueryPropertyType};
+import { SQueryConditionType } from './SQueryCondition.js';
+import { SQueryPropertyType } from './SQueryCondition.js';
 
 export class SQuery {
-
-
-    static convertEnumConditionToString(c) {
-    
-        switch (c) {
-            case SQueryConditionType.contains:
-                return "contains";
-            case SQueryConditionType.exists:
-                return "exists";
-            case SQueryConditionType.notExists:
-                return "!exists";
-            case SQueryConditionType.greaterOrEqual:
-                return ">=";
-            case SQueryConditionType.lessOrEqual:
-                return "<=";
-            case SQueryConditionType.greaterOrEqualDate:
-                return ">=(Date)";
-            case SQueryConditionType.lessOrEqualDate:
-                return "<=(Date)";
-            case SQueryConditionType.equals:
-                return "=";
-            case SQueryConditionType.unequal:
-                return "\u2260";
-        }
-    }
-
-    static convertStringConditionToEnum(c) {
-    
-        switch (c) {
-            case "contains":
-                return SQueryConditionType.contains;
-            case "exists":
-                return SQueryConditionType.exists;
-            case "!exists":
-                return SQueryConditionType.notExists;
-            case ">=":
-                return SQueryConditionType.greaterOrEqual;
-            case "<=":
-                return SQueryConditionType.lessOrEqual;
-            case "=":
-                return SQueryConditionType.equals;
-            case "\u2260":
-                return SQueryConditionType.unequal;
-            case ">=(Date)":
-                return SQueryConditionType.greaterOrEqualDate;
-            case "<=(Date)":
-                return SQueryConditionType.lessOrEqualDate;
-                    
-        }
-    }
-
-    static convertStringPropertyTypeToEnum(c) {
-
-        if (c.indexOf("SQuery") > -1) {
-            return SQueryPropertyType.SQuery;
-        }
-        switch (c) {
-            case "Node Name":
-                return SQueryPropertyType.nodeName;
-            case "Nodeid":
-                return SQueryPropertyType.nodeId;
-            case "Node Chain":
-                return SQueryPropertyType.nodeChain;
-            case "Node Type":
-                return SQueryPropertyType.nodeType;
-            case "Node Color":
-                return SQueryPropertyType.nodeColor;
-            case "Rel:ContainedIn":
-            case "Rel:SpaceBoundary":
-                return SQueryPropertyType.relationship;
-            case "SQuery":
-                 return SQueryPropertyType.SQuery;
-            case "Node Parent":
-                      return SQueryPropertyType.nodeParent;
-        
-            default:
-                return SQueryPropertyType.property;
-        }
-    }
-
-    
     constructor(manager, startnode) {
         this._manager = manager;
         this._viewer = this._manager._viewer;
@@ -335,7 +227,7 @@ export class SQuery {
             }
             else
             {
-                text += this._conditions[i].propertyName + " " + SQuery.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
+                text += this._conditions[i].propertyName + " " + SQueryCondition.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
             }
         }
         text = text.replace(/&quot;/g, '"');
