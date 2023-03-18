@@ -31,14 +31,6 @@ export {SQueryPropertyType};
 
 export class SQuery {
 
-    static _propertyHash = [];
-    static _allPropertiesHash = [];        
-
-    static _containedInSpatialStructureHash = [];
-    static _spaceBoundaryHash = [];
-    static _modelHash = [];
-
-
 
     static convertEnumConditionToString(c) {
     
@@ -118,258 +110,7 @@ export class SQuery {
         }
     }
 
-    static _getModelTreeIdsRecursive(nodeid,proms, ids, viewer) {
-
-        proms.push(viewer.model.getNodeProperties(nodeid));
-        ids.push(nodeid);
-        let children = viewer.model.getNodeChildren(nodeid);
-        for (let i = 0; i < children.length; i++) {
-            SQuery._getModelTreeIdsRecursive(children[i],proms, ids, viewer);
-        }
-    }
-
-    static addModel(id,nodeid,savedHash) {
-        for (let i=0;i<SQuery._modelHash.length;i++)
-        {
-            if (SQuery._modelHash[i].id == id)
-            {
-                SQuery._modelHash[i].nodeid = nodeid;
-                return;
-            }
-        }
-        SQuery._modelHash.push({id:id, nodeid: nodeid,savedHash:savedHash, ids: null, properties:null});
-    }
-
-    static _updateHashes(viewer, ids,res,layernames)
-    {
-        for (let i = 0; i < res.length; i++) {
-            SQuery._propertyHash[ids[i]] = res[i];
-            let layerid = viewer.model.getNodeLayerId(ids[i]);
-            if (layerid != null && layernames.size > 1) {
-                if (SQuery._propertyHash[ids[i]] == null) {
-                    SQuery._propertyHash[ids[i]] = [];
-                }
-                if (viewer.model.getNodeType(ids[i]) == 3) {
-                    let p = viewer.model.getNodeParent(ids[i]);
-                    if (SQuery._propertyHash[p] == null) {
-                        SQuery._propertyHash[p] = [];
-                    }
-                    SQuery._propertyHash[p]["LAYER"] = layernames.get(layerid);
-                }
-                else {
-                    SQuery._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
-                }
-            }
-            for (let j in res[i]) {
-                SQuery._allPropertiesHash[j] = [];
-            }
-        }
-
-        for (let i in SQuery._propertyHash) {
-            for (let j in SQuery._propertyHash[i]) {
-                SQuery._allPropertiesHash[j][SQuery._propertyHash[i][j]] = true;
-            }
-        }
-    }
-
-    static parseSavedPropertyHash(savedPropertyHash) {
-
-        let allprops = savedPropertyHash.allprops;
-        let nodeprops = savedPropertyHash.nodeprops;
-        let related = savedPropertyHash.related;
-
-        let rprops = [];
-        let ids = [];
-
-        for (let i=0;i<nodeprops.length;i++) {
-            let nprop = nodeprops[i];
-            ids.push(nprop.i);
-            let rprop = {};
-            let pa = nprop.p;
-            for (let j=0;j<pa.length;j+=2) {
-                rprop[allprops[pa[j]].name] = allprops[pa[j]].values[pa[j+1]];
-            }
-            rprops.push(rprop);
-        }
-        let spaceBoundaryItems = [];
-        let containedInItems = [];
-
-
-        if (related) {
-            for (let i=0;i<related.length;i++) {
-                let item = related[i];
-                if (item.e) {
-                    spaceBoundaryItems[parseInt(item.i)] = item.e;
-                }
-                else {
-                    spaceBoundaryItems[parseInt(item.i)] = [];
-                }
-                if (item.f) {
-                    containedInItems[parseInt(item.i)] = item.f;
-                }
-                else {
-                    containedInItems[parseInt(item.i)] = [];
-                }
-            }            
-        }
-
-        return {ids:ids, props:rprops, relatedSpaceBoundary:spaceBoundaryItems, relatedContainedIn:containedInItems};
-    }
-
-
-    static gatherRelatedDataHashesRecursive(viewer,nodeid, la) {
-
-        let bimid = viewer.model.getBimIdFromNode(nodeid);
-
-        let elements = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
-
-        let lao = {i:nodeid};
-        let elements2 = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
-        if (elements && elements.length > 0) {
-            lao.e = elements;
-        }
-        if (elements2 && elements2.length > 0) {
-            lao.f = elements2;
-        }
-        la.push(lao);
-        let children = viewer.model.getNodeChildren(nodeid);
-        for (let i = 0; i < children.length; i++) {
-            SQuery.gatherRelatedDataHashesRecursive(viewer, children[i], la);
-        }
-    }
-
-
-    static exportPropertyHash(viewer) {
-        let allpropsarray = [];
-        let nodeproparray = [];
-
-        let tempHash = [];
-
-        for (let i in SQuery._allPropertiesHash) {
-            let ppp = {name:i , values: Object.keys(SQuery._allPropertiesHash[i])};
-
-            let thash1 = [];
-            for (let j=0;j<ppp.values.length;j++) {
-                thash1[ppp.values[j]] = j;
-            }
-            ppp.ehash= thash1;            
-            allpropsarray.push(ppp);
-            tempHash[i] = allpropsarray.length -1;
-        }
-
-        for (let i in SQuery._propertyHash) {
-            let props = [];
-            for (let j in SQuery._propertyHash[i]) {
-                let prop = allpropsarray[tempHash[j]];
-                props.push(tempHash[j], prop.ehash[SQuery._propertyHash[i][j]]);
-              }
-          
-            nodeproparray.push({i: i, p: props});
-        }
-
-        for (let i= 0;i<allpropsarray.length;i++) {
-            allpropsarray[i].ehash = undefined;
-        }
-
-
-         let relhash = [];
-         SQuery.gatherRelatedDataHashesRecursive(viewer, viewer.model.getRootNode(), relhash);
-       
-        return {allprops: allpropsarray, nodeprops: nodeproparray};
-    }
-
-    static _consolidateBodies(viewer) {
-        let lbs = [];
-        for (let i in  SQuery._propertyHash) {
-            if (viewer.model.getNodeType(parseInt(i)) == 3 && SQuery._propertyHash[i]["Volume"]) {
-                let p = viewer.model.getNodeParent(parseInt(i));
-                lbs[p] = true;
-            }
-        }
-
-        for (let i in lbs) {
-            let children = hwv.model.getNodeChildren(parseInt(i));
-            let tv = 0;
-            let sa = 0;
-            for (let j = 0; j < children.length; j++) {
-                let c = children[j];
-                if (SQuery._propertyHash[c] && SQuery._propertyHash[c]["Volume"]) {
-                    tv += parseFloat(SQuery._propertyHash[c]["Volume"]);
-                }   
-                if (SQuery._propertyHash[c] && SQuery._propertyHash[c]["Surface Area"]) {
-                    sa += parseFloat(SQuery._propertyHash[c]["Surface Area"]);
-                }                          
-            }
-            tv = tv + "mm³";
-            sa = sa + "mm²";
-            SQuery._propertyHash[i]["Volume"] = tv;
-            SQuery._propertyHash[i]["Surface Area"] = sa;
-
-            let nodename = viewer.model.getNodeName(parseInt(i));
-            if (nodename.startsWith("Product")) {
-                let parent = viewer.model.getNodeParent(parseInt(i));
-                SQuery._propertyHash[parent]["Volume"] = tv;
-                SQuery._propertyHash[parent]["Surface Area"] = sa;
-
-            }            
-        }
-    }
-
-
-    static async initialize(viewer) {
-        SQuery._propertyHash = [];
-        SQuery._allPropertiesHash = [];
-        SQuery._containedInSpatialStructureHash = [];
-        SQuery._spaceBoundaryHash = [];
-        let layernames = viewer.model.getLayers();
-
-        if (SQuery._modelHash.length == 0) {
-            let proms = [];
-            let ids = [];
-
-            SQuery._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
-            let res = await Promise.all(proms);
-            SQuery._updateHashes(viewer, ids, res, layernames);
-
-            SQuery._consolidateBodies(viewer);
-        }
-        else {
-            for (let i = 0; i < SQuery._modelHash.length; i++) {
-                let model = SQuery._modelHash[i];
-                let ids = [];
-                let res = null;
-                let offset = viewer.model.getNodeIdOffset(model.nodeid);
-                if (!model.ids) {
-                    let proms = [];
-                    if (!model.savedHash) {
-                        SQuery._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
-                        res = await Promise.all(proms);
-                    }
-                    else {
-                        let temp = SQuery.parseSavedPropertyHash(model.savedHash);
-                        res = temp.props;
-                        ids = temp.ids;
-                        SQuery._containedInSpatialStructureHash = temp.relatedContainedIn;
-                        SQuery._spaceBoundaryHash = temp.relatedSpaceBoundary;
-                    }
-                    model.properties = res;
-                    model.ids = [];
-                    for (let j = 0; j < ids.length; j++) {
-                        model.ids.push(ids[j] - offset);
-                    }
-                }
-                else {
-                    for (let j = 0; j < model.ids.length; j++) {
-                        ids.push(model.ids[j] + offset);
-                    }
-                    res = model.properties;
-
-                }
-                SQuery._updateHashes(viewer, ids, res, layernames);
-            }
-        }
-    }
-
+    
     constructor(manager, startnode) {
         this._manager = manager;
         this._viewer = this._manager._viewer;
@@ -436,12 +177,12 @@ export class SQuery {
 
         let propsnames = [];
         let hasType = false;
-        if (SQuery._allPropertiesHash["TYPE"])
+        if (this._manager._allPropertiesHash["TYPE"])
         {
             hasType = true;
         }
 
-        for (let i in SQuery._allPropertiesHash) {
+        for (let i in this._manager._allPropertiesHash) {
             if (i != "TYPE") {
                 propsnames.push(i);
             }
@@ -468,7 +209,7 @@ export class SQuery {
 
     getAllOptionsForProperty(propertyname) {
 
-        return SQuery._allPropertiesHash[propertyname];
+        return this._manager._allPropertiesHash[propertyname];
     }
 
     fromJSON(json) {
@@ -602,7 +343,7 @@ export class SQuery {
             }
             else {
                 if (conditions[i].propertyType == SQueryPropertyType.property) {
-                    let conditionsOnNode = SQuery._propertyHash[id];
+                    let conditionsOnNode = this._manager._propertyHash[id];
                     if (conditionsOnNode[conditions[i].propertyName] && !alreadyDoneHash[conditions[i].propertyName]) {
                         alreadyDoneHash[conditions[i].propertyName] = true;
                         foundConditions.push({name: conditions[i].propertyName, value: conditionsOnNode[conditions[i].propertyName]});
@@ -637,14 +378,14 @@ export class SQuery {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SQuery._spaceBoundaryHash[id])
+        if (this._manager._spaceBoundaryHash[id])
         {
-            elements = SQuery._spaceBoundaryHash[id];
+            elements = this._manager._spaceBoundaryHash[id];
         }
         else
         {
             elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.SpaceBoundary);
-            SQuery._spaceBoundaryHash[id] = elements;
+            this._manager._spaceBoundaryHash[id] = elements;
         }
 
         if (elements.length > 0) {
@@ -665,14 +406,14 @@ export class SQuery {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SQuery._containedInSpatialStructureHash[id])
+        if (this._manager._containedInSpatialStructureHash[id])
         {
-            elements = SQuery._containedInSpatialStructureHash[id];
+            elements = this._manager._containedInSpatialStructureHash[id];
         }
         else
         {
             elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
-            SQuery._containedInSpatialStructureHash[id] = elements;
+            this._manager._containedInSpatialStructureHash[id] = elements;
         }
 
         if (elements.length > 0) {
@@ -691,14 +432,14 @@ export class SQuery {
     async _checkFilter(id, condition, chaintext) {
         if (condition.conditionType != SQueryConditionType.contains) {
             if (condition.conditionType == SQueryConditionType.exists) {
-                if (SQuery._propertyHash[id] && SQuery._propertyHash[id][condition.propertyName] != undefined)
+                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] != undefined)
                     return true;
                 else
                     return false;
             }
 
             if (condition.conditionType == SQueryConditionType.notExists) {
-                if (SQuery._propertyHash[id] && SQuery._propertyHash[id][condition.propertyName] == undefined)
+                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] == undefined)
                     return true;
                 else
                     return false;
@@ -713,8 +454,8 @@ export class SQuery {
             }
             else {
                 let temp;
-                if (SQuery._propertyHash[id]) {
-                    temp = SQuery._propertyHash[id][condition.propertyName];
+                if (this._manager._propertyHash[id]) {
+                    temp = this._manager._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
                     if (condition.conditionType == SQueryConditionType.unequal)
@@ -727,8 +468,8 @@ export class SQuery {
 
             if (condition.conditionType == SQueryConditionType.greaterOrEqualDate || condition.conditionType == SQueryConditionType.lessOrEqualDate) {
                 let temp;
-                if (SQuery._propertyHash[id]) {
-                    temp = SQuery._propertyHash[id][condition.propertyName];
+                if (this._manager._propertyHash[id]) {
+                    temp = this._manager._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
                    return false;
@@ -827,11 +568,11 @@ export class SQuery {
             }
             else
             {   
-                if (SQuery._propertyHash[id] == undefined || SQuery._propertyHash[id][condition.propertyName] == undefined) {                
+                if (this._manager._propertyHash[id] == undefined || this._manager._propertyHash[id][condition.propertyName] == undefined) {                
                    searchAgainst = undefined;
                 }
                 else {
-                   searchAgainst = SQuery._propertyHash[id][condition.propertyName];
+                   searchAgainst = this._manager._propertyHash[id][condition.propertyName];
                 }
             }
 

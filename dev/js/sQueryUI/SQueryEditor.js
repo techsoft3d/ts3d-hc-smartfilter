@@ -58,7 +58,8 @@ export class SQueryEditor {
     
     static async display() {
         
-        await hcSQuery.SQuery.initialize(SQueryEditor._viewer);
+        await SQueryEditor._manager.initialize();
+        
         let html = "";
         html += '<div class = "SQueryMain" id="' + SQueryEditor._maindiv + '_main">';
         if (SQueryEditor._showFirstRow) {
