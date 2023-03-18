@@ -22,7 +22,7 @@ export class SQueryEditor {
         });
     }
 
-    static initialize(maindiv, viewer, startnode) {
+    static initialize(maindiv, manager, startnode) {
         SQueryEditor.ctrlPressed = false;
 
      
@@ -32,8 +32,9 @@ export class SQueryEditor {
         } );
 
         SQueryEditor._maindiv = maindiv;
-        SQueryEditor._viewer = viewer;
-        SQueryEditor._mainFilter = new hcSQuery.SQuery(viewer, startnode);
+        SQueryEditor._manager = manager;
+        SQueryEditor._viewer = manager._viewer;
+        SQueryEditor._mainFilter = new hcSQuery.SQuery(SQueryEditor._manager, startnode);
         SQueryEditor._mainFilter.tempId = 0;
 
         new ResizeObserver(function () {
@@ -227,7 +228,7 @@ export class SQueryEditor {
 
     static async _convertToChildfilter() {
         let SQuery = SQueryEditor._mainFilter; 
-        let newfilter = new hcSQuery.SQuery(SQueryEditor._viewer, SQueryEditor._mainFilter.getStartNode());
+        let newfilter = new hcSQuery.SQuery(SQueryEditor._manager, SQueryEditor._mainFilter.getStartNode());
 
         for (let i = 0; i < SQuery.getNumConditions(); i++) {
 
@@ -258,7 +259,7 @@ export class SQueryEditor {
         SQuery = SQueryEditor._getSQueryFromTempId(id);
         let childFilter = null;
         if (createChildFilter) {
-            childFilter = new hcSQuery.SQuery(SQueryEditor._viewer, SQueryEditor._mainFilter.getStartNode());
+            childFilter = new hcSQuery.SQuery(SQueryEditor._manager, SQueryEditor._mainFilter.getStartNode());
             childFilter.addCondition(new hcSQuery.SQueryCondition());
         }
             
@@ -478,8 +479,8 @@ export class SQueryEditor {
                 sortedStrings.push(colors[0].r + " " + colors[0].g + " " + colors[0].b);
             }
         }        
-        else if (filter.propertyName == "Smart Filter") {
-            let SQuerys = hcSQuery.SQueryManager.getSQuerys();
+        else if (filter.propertyName == "SQuery") {
+            let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
                 sortedStrings.push(SQuerys[i].filter.getName());
             }

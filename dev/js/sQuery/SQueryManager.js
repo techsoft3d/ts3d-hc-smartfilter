@@ -1,106 +1,102 @@
 import { SQuery } from './SQuery.js';
 
-
-
 export class SQueryManager {
 
-    static _SQuerys = [];
-
-    static initialize(viewer) {
-        SQueryManager._viewer = viewer;
-        SQueryManager._SQuerys = [];
+    constructor(viewer) {
+        this._viewer = viewer;
+        this._SQuerys = [];
     }
 
-    static addSQuery(SQuery,isProp) {
+    addSQuery(SQuery,isProp) {
         let filter = {filter:SQuery, isProp:isProp};
-        SQueryManager._SQuerys.push({filter:SQuery, isProp:isProp});
+        this._SQuerys.push({filter:SQuery, isProp:isProp});
     }
 
-    static getSQuerys() {
-        return SQueryManager._SQuerys;
+    getSQuerys() {
+        return this._SQuerys;
 
     }
 
-    static getSQueryByName(name) {
-        for (let i=0;i<SQueryManager._SQuerys.length;i++) {
-            if (SQueryManager._SQuerys[i].filter.getName() == name)
-                return SQueryManager._SQuerys[i];
+    getSQueryByName(name) {
+       for (let i=0;i<this._SQuerys.length;i++) {
+            if (this._SQuerys[i].filter.getName() == name)
+                return this._SQuerys[i];
         }
     }
 
-    static getSQueryByID(id) {
-        for (let i=0;i<SQueryManager._SQuerys.length;i++) {
-            if (SQueryManager._SQuerys[i].filter._id == id)
-                return SQueryManager._SQuerys[i].filter;
+    getSQueryByID(id) {
+        for (let i=0;i<this._SQuerys.length;i++) {
+            if (this._SQuerys[i].filter._id == id)
+                return this._SQuerys[i].filter;
         }
     }
-    static getSQueryNum() {
-        return SQueryManager._SQuerys.length;
+    getSQueryNum() {
+        return this._SQuerys.length;
     }
 
-    static getSQuery(pos) {
-        return SQueryManager._SQuerys[pos].filter;                
+    getSQuery(pos) {
+        return this._SQuerys[pos].filter;                
     }
 
-    static getSQueryID(pos) {
-        return SQueryManager._SQuerys[pos].filter._id;                
+    getSQueryID(pos) {
+        return this._SQuerys[pos].filter._id;                
     }
 
-    static getIsProp(pos) {
-        return SQueryManager._SQuerys[pos].isProp;                
+    getIsProp(pos) {
+        return this._SQuerys[pos].isProp;                
     }
 
-    static removeSQuery(id) {
-        for (let i=0;i<SQueryManager._SQuerys.length;i++) {
-            if (SQueryManager._SQuerys[i].filter._id == id) {
-                return SQueryManager._SQuerys.splice(i, 1);
+    removeSQuery(id) {
+        for (let i=0;i<this._SQuerys.length;i++) {
+            if (this._SQuerys[i].filter._id == id) {
+                return this._SQuerys.splice(i, 1);
             }
         }
     }
 
-    static updateSQuery(pos, SQuery) {
-        SQueryManager._SQuerys[pos].filter = SQuery;
+    updateSQuery(pos, SQuery) {
+        this._SQuerys[pos].filter = SQuery;
     }
 
-    static updateSQueryIsProp(id,isProp) {
-        for (let i=0;i<SQueryManager._SQuerys.length;i++) {
-            if (SQueryManager._SQuerys[i].filter._id == id) {
-                SQueryManager._SQuerys[i].isProp = isProp;
+    updateSQueryIsProp(id,isProp) {
+        for (let i=0;i<this._SQuerys.length;i++) {
+            if (this._SQuerys[i].filter._id == id) {
+                this._SQuerys[i].isProp = isProp;
             }
         }
     }
 
-    static toJSON() {
+    toJSON() {
         let json = [];
-        for (let i = 0; i < SQueryManager._SQuerys.length; i++) {
-            json.push({filter:SQueryManager._SQuerys[i].filter.toJSON(), isProp:SQueryManager._SQuerys[i].isProp});
+        for (let i = 0; i < this._SQuerys.length; i++) {
+            json.push({filter:this._SQuerys[i].filter.toJSON(), isProp:this._SQuerys[i].isProp});
         }
         return json;
     }
 
-    static fromJSON(json) {
-        SQueryManager._SQuerys = [];
+    fromJSON(json) {
+        this._SQuerys = [];
         for (let i = 0; i < json.length; i++) {
-            let sf = new SQuery(SQueryManager._viewer);
+            let sf = new SQuery(this);
             sf.fromJSON(json[i].filter);
-            SQueryManager.addSQuery(sf,json[i].isProp);
+            this.addSQuery(sf,json[i].isProp);
         }
         return json;
     }
 
-    static async evaluateProperties(nodeid)
+    async evaluateProperties(nodeid)
     {
         let properties = [];
-        for (let i = 0; i < SQueryManager._SQuerys.length; i++) {
-            if (SQueryManager._SQuerys[i].isProp) {
-                let SQuery = SQueryManager._SQuerys[i].filter;
+        for (let i = 0; i < this._SQuerys.length; i++) {
+            if (this._SQuerys[i].isProp) {
+                let SQuery = this._SQuerys[i].filter;
 
                 let stop = false;
                 if (!SQuery._keepSearchingChildren) {
                     let tnodeid = nodeid;
                     while (1) {
-                        tnodeid = SQueryManager._viewer.model.getNodeParent(tnodeid);
-                        if (tnodeid == SQueryManager._viewer.model.getRootNode()) {
+                        tnodeid = this._viewer.model.getNodeParent(tnodeid);
+                        if (tnodeid == this._viewer.model.getRootNode()) {
                             break;
                         }
                         let res = await SQuery.testOneNodeAgainstConditions(tnodeid);

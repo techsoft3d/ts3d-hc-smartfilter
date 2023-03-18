@@ -26,8 +26,6 @@ const SQueryPropertyType = {
 };
 
 import { SQueryCondition } from './SQueryCondition.js';
-import { SQueryManager } from './SQueryManager.js';
-
 
 export {SQueryPropertyType};
 
@@ -110,7 +108,7 @@ export class SQuery {
             case "Rel:ContainedIn":
             case "Rel:SpaceBoundary":
                 return SQueryPropertyType.relationship;
-            case "Smart Filter":
+            case "SQuery":
                  return SQueryPropertyType.SQuery;
             case "Node Parent":
                       return SQueryPropertyType.nodeParent;
@@ -372,15 +370,14 @@ export class SQuery {
         }
     }
 
-    constructor(viewer, startnode) {
-        this._viewer = viewer;
+    constructor(manager, startnode) {
+        this._manager = manager;
+        this._viewer = this._manager._viewer;
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
         this._keepSearchingChildren = false;
         this._id = this._generateGUID();
-
-
             
         if (startnode)
             this._startnode = startnode;
@@ -455,7 +452,7 @@ export class SQuery {
             propsnames.unshift("TYPE");
         }
     
-        propsnames.unshift("Smart Filter");
+        propsnames.unshift("SQuery");
         propsnames.unshift("Rel:SpaceBoundary");
         propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
@@ -486,7 +483,7 @@ export class SQuery {
         {
             if (this._conditions[i].childFilter)
             {
-                let newfilter = new SQuery(this._viewer, this._conditions[i].childFilter.startnode);
+                let newfilter = new SQuery(this._manager, this._conditions[i].childFilter.startnode);
                 newfilter.fromJSON(this._conditions[i].childFilter);
                 this._conditions[i].childFilter = newfilter;
             }
@@ -507,7 +504,7 @@ export class SQuery {
 
         let newconditions = [];
         for (let i=0;i<this._conditions.length;i++) {
-            let fjson =this._conditions[i].toJSON();
+            let fjson =this._conditions[i].toJSON(this._manager);
 
             if (this._conditions[i].childFilter)
             {
@@ -937,12 +934,12 @@ export class SQuery {
 
                 if (!conditions[i].SQuery) {
                     if (!conditions[i].SQueryID) {
-                        let f=  SQueryManager.getSQueryByName(conditions[i].text);
+                        let f=  this._manager.getSQueryByName(conditions[i].text);
                         conditions[i].SQueryID = f.filter._id;
                         conditions[i].SQuery = f.filter;
                     }
                     else {
-                        conditions[i].SQuery = SQueryManager.getSQueryByID(conditions[i].SQueryID);
+                        conditions[i].SQuery = this._manager.getSQueryByID(conditions[i].SQueryID);
                     }
                 }
                 res  = await this._testNodeAgainstConditions(id,conditions[i].SQuery._conditions,chaintext);

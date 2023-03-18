@@ -1,7 +1,5 @@
 import { SQueryConditionType } from './SQuery.js';
 import { SQueryPropertyType } from './SQuery.js';
-import { SQueryManager } from './SQueryManager.js';
-
 
 export class SQueryCondition {
 
@@ -17,12 +15,12 @@ export class SQueryCondition {
 
     }
 
-    toJSON() {
+    toJSON(manager) {
 
         if (this.propertyType == SQueryPropertyType.SQuery &&
             !this.squeryFitlerID) {
 
-            let f = SQueryManager.getSQueryByName(this.text);
+            let f = manager.getSQueryByName(this.text);
             if (f) {
                 this.SQueryID =  f.filter._id;
             }
