@@ -55,14 +55,16 @@ export class SQuery {
     }
 
     removeCondition(conditionpos) {
-        this._conditions.splice(conditionpos, 1);
-        // if (this._conditions.length && this._conditions[0].childFilter) {
-        //     let cf = this._conditions[0].childFilter;
-        //     this._conditions.splice(0, 1);
-        //     for (let i=0;i<cf._conditions.length;i++) {                
-        //         this._conditions.unshift(cf._conditions[i]);
-        //     }
-        // }
+        if (this._conditions.length == 1 && this._conditions[0].childFilter) {
+            let cf = this._conditions[0].childFilter;
+            this._conditions.splice(0, 1);
+            for (let i=0;i<cf._conditions.length;i++) {                
+                this._conditions.unshift(cf._conditions[i]);
+            }
+        }
+        else {
+            this._conditions.splice(conditionpos, 1);
+        }
     }
 
    
