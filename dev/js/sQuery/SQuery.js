@@ -546,6 +546,9 @@ export class SQuery {
                     }
                 }
                 res  = await this._testNodeAgainstConditions(id,conditions[i].SQuery._conditions,chaintext);
+                if (conditions[i].conditionType ==  SQueryConditionType.unequal) {
+                    res = !res;
+                }
             }
             else {
                 if (conditions[i].childFilter)

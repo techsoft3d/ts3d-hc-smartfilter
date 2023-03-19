@@ -412,7 +412,15 @@ export class SQueryEditor {
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' class="SQueryAndOrSelect" id="' +  
             SQueryEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
-        let choices = ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
+        let choices;
+        
+        if (condition.propertyName == "SQuery") {
+            choices =  ["=", "\u2260"];
+        }
+        else {
+            choices =  ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
+        }
+
 
         for (let i = 0; i < choices.length; i++) {
             if (choices[i] == hcSQuery.SQueryCondition.convertEnumConditionToString(condition.conditionType)) {
