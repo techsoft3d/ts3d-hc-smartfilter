@@ -79,7 +79,7 @@ export class SQueryEditor {
         }
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
 
-        html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="searchtoolsConditions">';
+        html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
         html += '</div><hr>';
         html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
@@ -531,7 +531,7 @@ export class SQueryEditor {
 
         if (SQueryIn)
         {
-                html += '<div style = "position:relative;left:65px;top:-10px;background:#e6e8ea;border-radius:5px;">';
+                html += '<div class = "SQueryChildCondition" style = "position:relative;left:65px;top:-10px">';
             
         }
         for (let i = 0; i < SQuery.getNumConditions(); i++) {

@@ -33,6 +33,10 @@
     padding:2px;
   }
 
+  .SQueryChildCondition {
+    background:#e6e8ea;
+    border-radius:5px;
+  }
   
   .SQuerySearchItemText {
     margin-bottom:-3px;
@@ -62,11 +66,9 @@
     font-size: 11px;
   }
 
-  .searchtoolsConditions {
-    background: #f9f9f9;
+  .SQuerySearchtoolsConditions {
+    background: #ffffff;
   }
-
-  
   .SQueryAndOrSelect {
     font-size:11px;
     width:75px;
