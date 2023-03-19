@@ -79,7 +79,7 @@ export class SQueryEditor {
         }
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
 
-        html += '<div id="' + SQueryEditor._maindiv + '_conditions">';
+        html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="searchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
         html += '</div><hr>';
         html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
@@ -458,7 +458,7 @@ export class SQueryEditor {
     static async _generateInput(condition,filterpos,SQuery) {
       
 
-        let html = '<input list="datalist' + filterpos + "-" + SQuery.tempId +'" +  style="flex:1 1 auto; font-size:11px;min-width:100px" id="' + SQueryEditor._maindiv + 
+        let html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
         html += '<datalist id="datalist' + filterpos + "-" + SQuery.tempId +'">\n';
         let sortedStrings = [];

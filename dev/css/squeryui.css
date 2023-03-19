@@ -62,6 +62,9 @@
     font-size: 11px;
   }
 
+  .searchtoolsConditions {
+    background: #f9f9f9;
+  }
 
   
   .SQueryAndOrSelect {
@@ -69,6 +72,8 @@
     width:75px;
     margin-right:3px;
     font-family: monospace;
+    border-width:1px;
+    margin-right:-1px;
   }
 
   .propertyTypeSelect {
@@ -76,7 +81,19 @@
     flex: 1 1 auto;
     max-width:150px;
     margin-right:3px;
-    min-width:50px
+    min-width:50px;
+    background:#e6e6ff;
+    border-width:1px;
+    margin-right:-1px;
+  }
+
+  
+  .valueinput {  
+    border-width:1px;
+    background:#e6e6ff;
+    flex:1 1 auto; 
+    font-size:11px;
+    min-width:100px;
   }
 
 
