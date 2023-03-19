@@ -98,40 +98,6 @@
     min-width:100px;
   }
 
-
-  .cross{
-    width:40px;
-    height:40px;
-    position:relative;
-    border-radius:6px;
-    transform:scale(0.5);
-    left:-12px;
-    top:-12px;
-}
-
-.cross:before,.cross:after{
-    content:'';
-    position:absolute;
-    width:36px;
-    height:4px;
-    background-color:black;
-    border-radius:2px;
-    top:8px;
-}
-
-.cross:before{
-    -webkit-transform:rotate(45deg);
-    -moz-transform:rotate(45deg);
-    transform:rotate(45deg);
-    left:2px;
-}
-.cross:after{
-    -webkit-transform:rotate(-45deg);
-    -moz-transform:rotate(-45deg);
-    transform:rotate(-45deg);
-    right:2px;
-}
-
 .SQueryManagerButtons {
   position: relative;
   top: 2px;
