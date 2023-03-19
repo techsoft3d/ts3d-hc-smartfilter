@@ -275,6 +275,7 @@ export class SQueryEditor {
         {
             let previousCondition = SQuery.getCondition(SQuery.getNumConditions() - 1);
             let condition = new hcSQuery.SQueryCondition();
+            condition.propertyName = "Node Name";
             condition.setChildFilter(childFilter);
             condition.setAndOr(previousCondition.getAndOr());
             SQuery.addCondition(condition);

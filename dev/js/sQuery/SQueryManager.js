@@ -387,18 +387,52 @@ export class SQueryManager {
             hasType = true;
         }
 
+        let hasLayer = false;
+        if (this._allPropertiesHash["LAYER"])
+        {
+            hasLayer = true;
+        }
+
+        let hasSurfaceArea = false;
+        if (this._allPropertiesHash["Surface Area"])
+        {
+            hasSurfaceArea = true;
+        }
+
+        let hasVolume = false;
+        if (this._allPropertiesHash["Volume"])
+        {
+            hasVolume = true;
+        }
+
+
         for (let i in this._allPropertiesHash) {
-            if (i != "TYPE") {
+            if (i != "TYPE" && i != "LAYER" && i != "Surface Area" && i != "Volume") {
                 propsnames.push(i);
             }
         }
 
         propsnames.sort();
+        propsnames.unshift("---");
+        propsnames.unshift("SQuery");
+
+        if (hasLayer) {
+            propsnames.unshift("LAYER");
+        }
+
+
         if (hasType) {
             propsnames.unshift("TYPE");
         }
-    
-        propsnames.unshift("SQuery");
+
+        if (hasSurfaceArea) {
+            propsnames.unshift("Surface Area");
+        }
+
+        if (hasVolume) {
+            propsnames.unshift("Volume");
+        }
+       
         propsnames.unshift("Rel:SpaceBoundary");
         propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
