@@ -165,15 +165,14 @@ export class SQuery {
             current = newone;
         }
         let chaintext = "";
-        for (let j = chainskip;j<chain.length; j++) {
-            if (j < chain.length-1)
+        for (let j = chain.length - 1 - chainskip; j >= 0; j--) {
+            if (j > 0)
                 chaintext += chain[j] + "->";
             else
                 chaintext += chain[j];
         }
         return chaintext;
     }
-
     async testOneNodeAgainstConditions(id)
     {
         let conditions = this._conditions;
