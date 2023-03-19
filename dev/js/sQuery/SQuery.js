@@ -1,386 +1,16 @@
-const SQueryConditionType = {
-    contains:0,
-    exists:1,
-    notExists:2,
-    greaterOrEqual:3,
-    lessOrEqual:4,
-    equals:5,
-    unequal:6,
-    greaterOrEqualDate:7,
-    lessOrEqualDate:8
-
-};
-
-export {SQueryConditionType};
-
-const SQueryPropertyType = {
-    nodeName:0,
-    nodeId:1,
-    nodeChain:2,
-    nodeType:3,
-    nodeColor:4,
-    relationship:5,
-    property:6,
-    SQuery:7,
-    nodeParent:8,
-};
-
 import { SQueryCondition } from './SQueryCondition.js';
-import { SQueryManager } from './SQueryManager.js';
-
-
-export {SQueryPropertyType};
+import { SQueryConditionType } from './SQueryCondition.js';
+import { SQueryPropertyType } from './SQueryCondition.js';
 
 export class SQuery {
-
-    static _propertyHash = [];
-    static _allPropertiesHash = [];        
-
-    static _containedInSpatialStructureHash = [];
-    static _spaceBoundaryHash = [];
-    static _modelHash = [];
-
-
-
-    static convertEnumConditionToString(c) {
-    
-        switch (c) {
-            case SQueryConditionType.contains:
-                return "contains";
-            case SQueryConditionType.exists:
-                return "exists";
-            case SQueryConditionType.notExists:
-                return "!exists";
-            case SQueryConditionType.greaterOrEqual:
-                return ">=";
-            case SQueryConditionType.lessOrEqual:
-                return "<=";
-            case SQueryConditionType.greaterOrEqualDate:
-                return ">=(Date)";
-            case SQueryConditionType.lessOrEqualDate:
-                return "<=(Date)";
-            case SQueryConditionType.equals:
-                return "=";
-            case SQueryConditionType.unequal:
-                return "\u2260";
-        }
-    }
-
-    static convertStringConditionToEnum(c) {
-    
-        switch (c) {
-            case "contains":
-                return SQueryConditionType.contains;
-            case "exists":
-                return SQueryConditionType.exists;
-            case "!exists":
-                return SQueryConditionType.notExists;
-            case ">=":
-                return SQueryConditionType.greaterOrEqual;
-            case "<=":
-                return SQueryConditionType.lessOrEqual;
-            case "=":
-                return SQueryConditionType.equals;
-            case "\u2260":
-                return SQueryConditionType.unequal;
-            case ">=(Date)":
-                return SQueryConditionType.greaterOrEqualDate;
-            case "<=(Date)":
-                return SQueryConditionType.lessOrEqualDate;
-                    
-        }
-    }
-
-    static convertStringPropertyTypeToEnum(c) {
-
-        if (c.indexOf("SQuery") > -1) {
-            return SQueryPropertyType.SQuery;
-        }
-        switch (c) {
-            case "Node Name":
-                return SQueryPropertyType.nodeName;
-            case "Nodeid":
-                return SQueryPropertyType.nodeId;
-            case "Node Chain":
-                return SQueryPropertyType.nodeChain;
-            case "Node Type":
-                return SQueryPropertyType.nodeType;
-            case "Node Color":
-                return SQueryPropertyType.nodeColor;
-            case "Rel:ContainedIn":
-            case "Rel:SpaceBoundary":
-                return SQueryPropertyType.relationship;
-            case "Smart Filter":
-                 return SQueryPropertyType.SQuery;
-            case "Node Parent":
-                      return SQueryPropertyType.nodeParent;
-        
-            default:
-                return SQueryPropertyType.property;
-        }
-    }
-
-    static _getModelTreeIdsRecursive(nodeid,proms, ids, viewer) {
-
-        proms.push(viewer.model.getNodeProperties(nodeid));
-        ids.push(nodeid);
-        let children = viewer.model.getNodeChildren(nodeid);
-        for (let i = 0; i < children.length; i++) {
-            SQuery._getModelTreeIdsRecursive(children[i],proms, ids, viewer);
-        }
-    }
-
-    static addModel(id,nodeid,savedHash) {
-        for (let i=0;i<SQuery._modelHash.length;i++)
-        {
-            if (SQuery._modelHash[i].id == id)
-            {
-                SQuery._modelHash[i].nodeid = nodeid;
-                return;
-            }
-        }
-        SQuery._modelHash.push({id:id, nodeid: nodeid,savedHash:savedHash, ids: null, properties:null});
-    }
-
-    static _updateHashes(viewer, ids,res,layernames)
-    {
-        for (let i = 0; i < res.length; i++) {
-            SQuery._propertyHash[ids[i]] = res[i];
-            let layerid = viewer.model.getNodeLayerId(ids[i]);
-            if (layerid != null && layernames.size > 1) {
-                if (SQuery._propertyHash[ids[i]] == null) {
-                    SQuery._propertyHash[ids[i]] = [];
-                }
-                if (viewer.model.getNodeType(ids[i]) == 3) {
-                    let p = viewer.model.getNodeParent(ids[i]);
-                    if (SQuery._propertyHash[p] == null) {
-                        SQuery._propertyHash[p] = [];
-                    }
-                    SQuery._propertyHash[p]["LAYER"] = layernames.get(layerid);
-                }
-                else {
-                    SQuery._propertyHash[ids[i]]["LAYER"] = layernames.get(layerid);
-                }
-            }
-            for (let j in res[i]) {
-                SQuery._allPropertiesHash[j] = [];
-            }
-        }
-
-        for (let i in SQuery._propertyHash) {
-            for (let j in SQuery._propertyHash[i]) {
-                SQuery._allPropertiesHash[j][SQuery._propertyHash[i][j]] = true;
-            }
-        }
-    }
-
-    static parseSavedPropertyHash(savedPropertyHash) {
-
-        let allprops = savedPropertyHash.allprops;
-        let nodeprops = savedPropertyHash.nodeprops;
-        let related = savedPropertyHash.related;
-
-        let rprops = [];
-        let ids = [];
-
-        for (let i=0;i<nodeprops.length;i++) {
-            let nprop = nodeprops[i];
-            ids.push(nprop.i);
-            let rprop = {};
-            let pa = nprop.p;
-            for (let j=0;j<pa.length;j+=2) {
-                rprop[allprops[pa[j]].name] = allprops[pa[j]].values[pa[j+1]];
-            }
-            rprops.push(rprop);
-        }
-        let spaceBoundaryItems = [];
-        let containedInItems = [];
-
-
-        if (related) {
-            for (let i=0;i<related.length;i++) {
-                let item = related[i];
-                if (item.e) {
-                    spaceBoundaryItems[parseInt(item.i)] = item.e;
-                }
-                else {
-                    spaceBoundaryItems[parseInt(item.i)] = [];
-                }
-                if (item.f) {
-                    containedInItems[parseInt(item.i)] = item.f;
-                }
-                else {
-                    containedInItems[parseInt(item.i)] = [];
-                }
-            }            
-        }
-
-        return {ids:ids, props:rprops, relatedSpaceBoundary:spaceBoundaryItems, relatedContainedIn:containedInItems};
-    }
-
-
-    static gatherRelatedDataHashesRecursive(viewer,nodeid, la) {
-
-        let bimid = viewer.model.getBimIdFromNode(nodeid);
-
-        let elements = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
-
-        let lao = {i:nodeid};
-        let elements2 = viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
-        if (elements && elements.length > 0) {
-            lao.e = elements;
-        }
-        if (elements2 && elements2.length > 0) {
-            lao.f = elements2;
-        }
-        la.push(lao);
-        let children = viewer.model.getNodeChildren(nodeid);
-        for (let i = 0; i < children.length; i++) {
-            SQuery.gatherRelatedDataHashesRecursive(viewer, children[i], la);
-        }
-    }
-
-
-    static exportPropertyHash(viewer) {
-        let allpropsarray = [];
-        let nodeproparray = [];
-
-        let tempHash = [];
-
-        for (let i in SQuery._allPropertiesHash) {
-            let ppp = {name:i , values: Object.keys(SQuery._allPropertiesHash[i])};
-
-            let thash1 = [];
-            for (let j=0;j<ppp.values.length;j++) {
-                thash1[ppp.values[j]] = j;
-            }
-            ppp.ehash= thash1;            
-            allpropsarray.push(ppp);
-            tempHash[i] = allpropsarray.length -1;
-        }
-
-        for (let i in SQuery._propertyHash) {
-            let props = [];
-            for (let j in SQuery._propertyHash[i]) {
-                let prop = allpropsarray[tempHash[j]];
-                props.push(tempHash[j], prop.ehash[SQuery._propertyHash[i][j]]);
-              }
-          
-            nodeproparray.push({i: i, p: props});
-        }
-
-        for (let i= 0;i<allpropsarray.length;i++) {
-            allpropsarray[i].ehash = undefined;
-        }
-
-
-         let relhash = [];
-         SQuery.gatherRelatedDataHashesRecursive(viewer, viewer.model.getRootNode(), relhash);
-       
-        return {allprops: allpropsarray, nodeprops: nodeproparray};
-    }
-
-    static _consolidateBodies(viewer) {
-        let lbs = [];
-        for (let i in  SQuery._propertyHash) {
-            if (viewer.model.getNodeType(parseInt(i)) == 3 && SQuery._propertyHash[i]["Volume"]) {
-                let p = viewer.model.getNodeParent(parseInt(i));
-                lbs[p] = true;
-            }
-        }
-
-        for (let i in lbs) {
-            let children = hwv.model.getNodeChildren(parseInt(i));
-            let tv = 0;
-            let sa = 0;
-            for (let j = 0; j < children.length; j++) {
-                let c = children[j];
-                if (SQuery._propertyHash[c] && SQuery._propertyHash[c]["Volume"]) {
-                    tv += parseFloat(SQuery._propertyHash[c]["Volume"]);
-                }   
-                if (SQuery._propertyHash[c] && SQuery._propertyHash[c]["Surface Area"]) {
-                    sa += parseFloat(SQuery._propertyHash[c]["Surface Area"]);
-                }                          
-            }
-            tv = tv + "mm³";
-            sa = sa + "mm²";
-            SQuery._propertyHash[i]["Volume"] = tv;
-            SQuery._propertyHash[i]["Surface Area"] = sa;
-
-            let nodename = viewer.model.getNodeName(parseInt(i));
-            if (nodename.startsWith("Product")) {
-                let parent = viewer.model.getNodeParent(parseInt(i));
-                SQuery._propertyHash[parent]["Volume"] = tv;
-                SQuery._propertyHash[parent]["Surface Area"] = sa;
-
-            }            
-        }
-    }
-
-
-    static async initialize(viewer) {
-        SQuery._propertyHash = [];
-        SQuery._allPropertiesHash = [];
-        SQuery._containedInSpatialStructureHash = [];
-        SQuery._spaceBoundaryHash = [];
-        let layernames = viewer.model.getLayers();
-
-        if (SQuery._modelHash.length == 0) {
-            let proms = [];
-            let ids = [];
-
-            SQuery._getModelTreeIdsRecursive(viewer.model.getRootNode(), proms, ids, viewer);
-            let res = await Promise.all(proms);
-            SQuery._updateHashes(viewer, ids, res, layernames);
-
-            SQuery._consolidateBodies(viewer);
-        }
-        else {
-            for (let i = 0; i < SQuery._modelHash.length; i++) {
-                let model = SQuery._modelHash[i];
-                let ids = [];
-                let res = null;
-                let offset = viewer.model.getNodeIdOffset(model.nodeid);
-                if (!model.ids) {
-                    let proms = [];
-                    if (!model.savedHash) {
-                        SQuery._getModelTreeIdsRecursive(model.nodeid, proms, ids, viewer);
-                        res = await Promise.all(proms);
-                    }
-                    else {
-                        let temp = SQuery.parseSavedPropertyHash(model.savedHash);
-                        res = temp.props;
-                        ids = temp.ids;
-                        SQuery._containedInSpatialStructureHash = temp.relatedContainedIn;
-                        SQuery._spaceBoundaryHash = temp.relatedSpaceBoundary;
-                    }
-                    model.properties = res;
-                    model.ids = [];
-                    for (let j = 0; j < ids.length; j++) {
-                        model.ids.push(ids[j] - offset);
-                    }
-                }
-                else {
-                    for (let j = 0; j < model.ids.length; j++) {
-                        ids.push(model.ids[j] + offset);
-                    }
-                    res = model.properties;
-
-                }
-                SQuery._updateHashes(viewer, ids, res, layernames);
-            }
-        }
-    }
-
-    constructor(viewer, startnode) {
-        this._viewer = viewer;
+    constructor(manager, startnode) {
+        this._manager = manager;
+        this._viewer = this._manager._viewer;
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
         this._keepSearchingChildren = false;
         this._id = this._generateGUID();
-
-
             
         if (startnode)
             this._startnode = startnode;
@@ -425,53 +55,23 @@ export class SQuery {
     }
 
     removeCondition(conditionpos) {
-        this._conditions.splice(conditionpos, 1);
-        // if (this._conditions.length && this._conditions[0].childFilter) {
-        //     let cf = this._conditions[0].childFilter;
-        //     this._conditions.splice(0, 1);
-        //     for (let i=0;i<cf._conditions.length;i++) {                
-        //         this._conditions.unshift(cf._conditions[i]);
-        //     }
-        // }
-    }
-
-    getAllProperties() {
-
-        let propsnames = [];
-        let hasType = false;
-        if (SQuery._allPropertiesHash["TYPE"])
-        {
-            hasType = true;
-        }
-
-        for (let i in SQuery._allPropertiesHash) {
-            if (i != "TYPE") {
-                propsnames.push(i);
+        if (this._conditions.length == 1 && this._conditions[0].childFilter) {
+            let cf = this._conditions[0].childFilter;
+            this._conditions.splice(0, 1);
+            for (let i=0;i<cf._conditions.length;i++) {                
+                this._conditions.unshift(cf._conditions[i]);
             }
         }
-
-        propsnames.sort();
-        if (hasType) {
-            propsnames.unshift("TYPE");
+        else {
+            this._conditions.splice(conditionpos, 1);
         }
-    
-        propsnames.unshift("Smart Filter");
-        propsnames.unshift("Rel:SpaceBoundary");
-        propsnames.unshift("Rel:ContainedIn");
-        propsnames.unshift("Node Color");
-        propsnames.unshift("Node Type");
-        propsnames.unshift("Node Chain");
-        propsnames.unshift("Node Parent");
-        propsnames.unshift("Nodeid");
-        propsnames.unshift("Node Name");
-
-
-        return propsnames;
     }
+
+   
 
     getAllOptionsForProperty(propertyname) {
 
-        return SQuery._allPropertiesHash[propertyname];
+        return this._manager._allPropertiesHash[propertyname];
     }
 
     fromJSON(json) {
@@ -486,7 +86,7 @@ export class SQuery {
         {
             if (this._conditions[i].childFilter)
             {
-                let newfilter = new SQuery(this._viewer, this._conditions[i].childFilter.startnode);
+                let newfilter = new SQuery(this._manager, this._conditions[i].childFilter.startnode);
                 newfilter.fromJSON(this._conditions[i].childFilter);
                 this._conditions[i].childFilter = newfilter;
             }
@@ -507,7 +107,7 @@ export class SQuery {
 
         let newconditions = [];
         for (let i=0;i<this._conditions.length;i++) {
-            let fjson =this._conditions[i].toJSON();
+            let fjson =this._conditions[i].toJSON(this._manager);
 
             if (this._conditions[i].childFilter)
             {
@@ -605,7 +205,7 @@ export class SQuery {
             }
             else {
                 if (conditions[i].propertyType == SQueryPropertyType.property) {
-                    let conditionsOnNode = SQuery._propertyHash[id];
+                    let conditionsOnNode = this._manager._propertyHash[id];
                     if (conditionsOnNode[conditions[i].propertyName] && !alreadyDoneHash[conditions[i].propertyName]) {
                         alreadyDoneHash[conditions[i].propertyName] = true;
                         foundConditions.push({name: conditions[i].propertyName, value: conditionsOnNode[conditions[i].propertyName]});
@@ -629,25 +229,25 @@ export class SQuery {
             }
             else
             {
-                text += this._conditions[i].propertyName + " " + SQuery.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
+                text += this._conditions[i].propertyName + " " + SQueryCondition.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
             }
         }
         text = text.replace(/&quot;/g, '"');
         return text;
     }
 
-    async _checkSpaceBoundaryFilter(id, condition) {
+    async _checkSpaceBoundaryCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SQuery._spaceBoundaryHash[id])
+        if (this._manager._spaceBoundaryHash[id])
         {
-            elements = SQuery._spaceBoundaryHash[id];
+            elements = this._manager._spaceBoundaryHash[id];
         }
         else
         {
             elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.SpaceBoundary);
-            SQuery._spaceBoundaryHash[id] = elements;
+            this._manager._spaceBoundaryHash[id] = elements;
         }
 
         if (elements.length > 0) {
@@ -656,7 +256,7 @@ export class SQuery {
             for (let i = 0; i < elements.length; i++) {
                 nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
-            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
             if (res)
                 return true;
         }
@@ -664,18 +264,18 @@ export class SQuery {
 
     }
 
-    async _checkContainedInFilter(id, condition) {
+    async _checkContainedInCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
         let elements;
-        if (SQuery._containedInSpatialStructureHash[id])
+        if (this._manager._containedInSpatialStructureHash[id])
         {
-            elements = SQuery._containedInSpatialStructureHash[id];
+            elements = this._manager._containedInSpatialStructureHash[id];
         }
         else
         {
             elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
-            SQuery._containedInSpatialStructureHash[id] = elements;
+            this._manager._containedInSpatialStructureHash[id] = elements;
         }
 
         if (elements.length > 0) {
@@ -684,24 +284,24 @@ export class SQuery {
             for (let i = 0; i < elements.length; i++) {
                 nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
             }
-            let res = await this._checkFilter(parseInt(elements[i]) + offset, condition, nameaggregate);
+            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
             if (res)
                 return true;
         }
         return false;
     }
 
-    async _checkFilter(id, condition, chaintext) {
+    async _checkCondition(id, condition, chaintext) {
         if (condition.conditionType != SQueryConditionType.contains) {
             if (condition.conditionType == SQueryConditionType.exists) {
-                if (SQuery._propertyHash[id] && SQuery._propertyHash[id][condition.propertyName] != undefined)
+                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] != undefined)
                     return true;
                 else
                     return false;
             }
 
             if (condition.conditionType == SQueryConditionType.notExists) {
-                if (SQuery._propertyHash[id] && SQuery._propertyHash[id][condition.propertyName] == undefined)
+                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] == undefined)
                     return true;
                 else
                     return false;
@@ -716,8 +316,8 @@ export class SQuery {
             }
             else {
                 let temp;
-                if (SQuery._propertyHash[id]) {
-                    temp = SQuery._propertyHash[id][condition.propertyName];
+                if (this._manager._propertyHash[id]) {
+                    temp = this._manager._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
                     if (condition.conditionType == SQueryConditionType.unequal)
@@ -730,13 +330,14 @@ export class SQuery {
 
             if (condition.conditionType == SQueryConditionType.greaterOrEqualDate || condition.conditionType == SQueryConditionType.lessOrEqualDate) {
                 let temp;
-                if (SQuery._propertyHash[id]) {
-                    temp = SQuery._propertyHash[id][condition.propertyName];
+                if (this._manager._propertyHash[id]) {
+                    temp = this._manager._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
                    return false;
                 }
-                if (!isNaN(parseInt(temp))) {
+
+                if (temp.indexOf(" ") == -1 && !isNaN(parseInt(temp))) {
                     temp = parseInt(temp);
                 }
                 let searchAgainstDate = new Date(temp);
@@ -745,7 +346,7 @@ export class SQuery {
                     return false;
                 }
                 let ctext = condition.text;
-                if (!isNaN(parseInt(ctext))) {
+                if (ctext.indexOf(" ") == -1 && !isNaN(parseInt(ctext))) {
                     ctext = parseInt(ctext);
                 }
                 let searchDate = new Date(ctext);
@@ -830,11 +431,11 @@ export class SQuery {
             }
             else
             {   
-                if (SQuery._propertyHash[id] == undefined || SQuery._propertyHash[id][condition.propertyName] == undefined) {                
+                if (this._manager._propertyHash[id] == undefined || this._manager._propertyHash[id][condition.propertyName] == undefined) {                
                    searchAgainst = undefined;
                 }
                 else {
-                   searchAgainst = SQuery._propertyHash[id][condition.propertyName];
+                   searchAgainst = this._manager._propertyHash[id][condition.propertyName];
                 }
             }
 
@@ -927,22 +528,22 @@ export class SQuery {
             let res;
             if (conditions[i].propertyType == SQueryPropertyType.relationship) {
                 if (conditions[i].propertyName == "Rel:SpaceBoundary") {
-                    res = await this._checkSpaceBoundaryFilter(id, conditions[i]);
+                    res = await this._checkSpaceBoundaryCondition(id, conditions[i]);
                 }
                 else if (conditions[i].propertyName == "Rel:ContainedIn") {
-                    res = await this._checkContainedInFilter(id, conditions[i]);
+                    res = await this._checkContainedInCondition(id, conditions[i]);
                 }
             }
             else if (conditions[i].propertyType == SQueryPropertyType.SQuery) {
 
                 if (!conditions[i].SQuery) {
                     if (!conditions[i].SQueryID) {
-                        let f=  SQueryManager.getSQueryByName(conditions[i].text);
+                        let f=  this._manager.getSQueryByName(conditions[i].text);
                         conditions[i].SQueryID = f.filter._id;
                         conditions[i].SQuery = f.filter;
                     }
                     else {
-                        conditions[i].SQuery = SQueryManager.getSQueryByID(conditions[i].SQueryID);
+                        conditions[i].SQuery = this._manager.getSQueryByID(conditions[i].SQueryID);
                     }
                 }
                 res  = await this._testNodeAgainstConditions(id,conditions[i].SQuery._conditions,chaintext);
@@ -954,7 +555,7 @@ export class SQuery {
                 }    
                 else
                 {
-                    res = await this._checkFilter(id, conditions[i], chaintext);
+                    res = await this._checkCondition(id, conditions[i], chaintext);
                 }
             }
             if (res == false) {

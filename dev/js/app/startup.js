@@ -8,13 +8,12 @@ async function msready() {
     // let json = await res.json();
     // hcSQuery.SQuery.addModel("hospital",hwv.model.getRootNode(),json);
 
+    let manager = new hcSQuery.SQueryManager(hwv);
 
-    hcSQueryUI.SQueryEditor.initialize("searchtools", hwv);
+    hcSQueryUI.SQueryEditor.initialize("searchtools", manager);
     hcSQueryUI.SQueryEditor.display();
-
-
-    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",hwv, true);
-    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",hwv);
+    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",manager, true);
+    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",manager);
 
 }
 

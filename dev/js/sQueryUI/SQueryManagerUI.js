@@ -8,12 +8,12 @@ export class SQueryManagerUI {
 
     static _showButtonRow = true;
 
-    static initialize(div, viewer, showImportExportButtons) {
-        SQueryManagerUI._table = null;
-        SQueryManagerUI._viewer = viewer;
-        SQueryManagerUI._uidiv = div;
+    static initialize(div, manager, showImportExportButtons) {
+        SQueryManagerUI._manager =  manager;
+        SQueryManagerUI._viewer = manager._viewer;
 
-        hcSQuery.SQueryManager.initialize(viewer);
+        SQueryManagerUI._table = null;
+        SQueryManagerUI._uidiv = div;
 
         if (SQueryManagerUI._showButtonRow) {
 
@@ -58,7 +58,7 @@ export class SQueryManagerUI {
             return async function (e) {
                 // Render thumbnail.
                 let res = JSON.parse(e.target.result);
-                hcSQuery.SQueryManager.fromJSON(res);
+                SQueryManagerUI._manager.fromJSON(res);
                 SQueryManagerUI.refreshUI();
             };
         })(file);
@@ -79,13 +79,13 @@ export class SQueryManagerUI {
         let filter = SQueryEditor.getFilter();
         let jfilter = filter.toJSON();
 
-        let sf = new hcSQuery.SQuery(SQueryManagerUI._viewer);
+        let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);
 
         sf.fromJSON(jfilter);
         
         sf._id =  SQueryManagerUI._generateGUID();
         sf.setName("");
-        hcSQuery.SQueryManager.addSQuery(sf, false);
+        SQueryManagerUI._manager.addSQuery(sf, false);
         
 
         let prop = {};
@@ -100,7 +100,7 @@ export class SQueryManagerUI {
 
     static formatTooltip(e,cell) {
         let id = cell.getData().id
-        let SQuery = hcSQuery.SQueryManager.getSQueryByID(id);
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(id);
         return SQuery.generateString();        
 
     }
@@ -152,7 +152,7 @@ export class SQueryManagerUI {
                 {
                     label: "<i class='fas fa-user'></i> Delete",
                     action: async function (e, row) {
-                        hcSQuery.SQueryManager.removeSQuery(row.getData().id);
+                        SQueryManagerUI._manager.removeSQuery(row.getData().id);
                         row.delete();
                         if (SQueryManagerUI._updatedCallback) {
                             SQueryManagerUI._updatedCallback();
@@ -172,7 +172,7 @@ export class SQueryManagerUI {
 
             SQueryManagerUI._table = new Tabulator("#" + SQueryManagerUI._uidiv + "Tabulator", {
                 data: [],                             
-                selectable:0,
+                selectable:1,
                 layout: "fitColumns",
                 rowContextMenu: rowMenu,
                 columns: [                                   
@@ -194,7 +194,7 @@ export class SQueryManagerUI {
 
             SQueryManagerUI._table.on("rowClick", async function (e, row) {
                 let data = row.getData();
-                let SQuery = hcSQuery.SQueryManager.getSQueryByID(data.id);
+                let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
                 let filterjson = SQuery.toJSON();
         
                 let editorfilter = SQueryEditor.getFilter();
@@ -222,8 +222,8 @@ export class SQueryManagerUI {
         else
             await SQueryManagerUI._table.clearData();
 
-        for (let i=0;i<hcSQuery.SQueryManager.getSQueryNum();i++) {
-            let filter = hcSQuery.SQueryManager.getSQuery(i);
+        for (let i=0;i<SQueryManagerUI._manager.getSQueryNum();i++) {
+            let filter = SQueryManagerUI._manager.getSQuery(i);
             
             let text;
             if (filter.getName() == "")
@@ -237,9 +237,9 @@ export class SQueryManagerUI {
             
             let prop = {};
             text = text.replace(/&quot;/g, '"');
-            prop.id =  hcSQuery.SQueryManager.getSQueryID(i);;
+            prop.id =  SQueryManagerUI._manager.getSQueryID(i);;
             prop.description = text;
-            prop.prop = hcSQuery.SQueryManager.getIsProp(i);
+            prop.prop = SQueryManagerUI._manager.getIsProp(i);
             await SQueryManagerUI._table.addRow(prop);
         }     
     }
@@ -247,7 +247,7 @@ export class SQueryManagerUI {
 
     static async _handleTableSelection(data, select, isolate) {
 
-        let SQuery = hcSQuery.SQueryManager.getSQueryByID(data.id);
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
         let filterjson = SQuery.toJSON();
 
@@ -268,7 +268,7 @@ export class SQueryManagerUI {
     static async _handleSQueryNameEdit(row) {
 
         let data = row.getData();
-        let SQuery = hcSQuery.SQueryManager.getSQueryByID(data.id);
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
         SQuery.setName(data.description);
         if (data.description == "")
         {
@@ -282,7 +282,7 @@ export class SQueryManagerUI {
 
     static async _handleSQueryIsPropEdit(row) {
         let data = row.getData();
-        hcSQuery.SQueryManager.updateSQueryIsProp(data.id,data.prop);
+        SQueryManagerUI._manager.updateSQueryIsProp(data.id,data.prop);
         if (SQueryManagerUI._updatedCallback) {
             SQueryManagerUI._updatedCallback();
         }
@@ -290,13 +290,13 @@ export class SQueryManagerUI {
 
     static _handleSQueryUpdate(row) {
         let data = row.getData();
-        let SQuery = hcSQuery.SQueryManager.getSQueryByID(data.id);
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
         SQueryEditor.updateFilterFromUI();
         let filter = SQueryEditor.getFilter();
         let jfilter = filter.toJSON();
 
-        let sf = new hcSQuery.SQuery(SQueryManagerUI._viewer);
+        let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);
         sf.fromJSON(jfilter);
         SQuery.updateConditions(sf._conditions);
         SQuery.setName("");
@@ -317,7 +317,7 @@ export class SQueryManagerUI {
             return textFile;
           }
 
-        let text = JSON.stringify(hcSQuery.SQueryManager.toJSON());
+        let text = JSON.stringify(SQueryManagerUI._manager.toJSON());
 
         let link = document.createElement('a');
         link.setAttribute('download', filename);

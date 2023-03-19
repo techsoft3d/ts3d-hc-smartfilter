@@ -36,6 +36,7 @@ For questions/feedback please send an email to guido@techsoft3d.com or post in o
 * various performance improvements
 * server-side Search Evaluation
 * More UI Customization Options
+* More robust date parsing
 * Improved Documentation
 
 ## Install
@@ -65,7 +66,8 @@ Here is how to start the demo with the provided sample model locally when using 
 ## Initialization
 
 ```
-hcSQueryUI.SQueryEditor.initialize("searcheditor", hwv);
+let manager = new hcSQuery.SQueryManager(hwv);
+hcSQueryUI.SQueryEditor.initialize("searcheditor", manager);
 hcSQueryUI.SQueryEditor.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
@@ -149,7 +151,7 @@ Controls if the Limit checkbox should be visible in the UI.
 ### Initialization
 
 ```
-    hcSQueryUI.SQueryManagerUI.initialize("squerymanagercontainer",hwv, true);
+    hcSQueryUI.SQueryManagerUI.initialize("squerymanagercontainer",manager, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
@@ -197,7 +199,7 @@ The JSON object representing a list of squeries can be added to the SQueryManage
 
 
 ```
-  hcSQueryUI.SQueryPropertiesUI.initialize("spropertiescontainer",hwv);
+  hcSQueryUI.SQueryPropertiesUI.initialize("spropertiescontainer",manager);
 ```
 
 

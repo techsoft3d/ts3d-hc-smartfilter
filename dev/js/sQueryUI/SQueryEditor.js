@@ -22,7 +22,7 @@ export class SQueryEditor {
         });
     }
 
-    static initialize(maindiv, viewer, startnode) {
+    static initialize(maindiv, manager, startnode) {
         SQueryEditor.ctrlPressed = false;
 
      
@@ -32,8 +32,9 @@ export class SQueryEditor {
         } );
 
         SQueryEditor._maindiv = maindiv;
-        SQueryEditor._viewer = viewer;
-        SQueryEditor._mainFilter = new hcSQuery.SQuery(viewer, startnode);
+        SQueryEditor._manager = manager;
+        SQueryEditor._viewer = manager._viewer;
+        SQueryEditor._mainFilter = new hcSQuery.SQuery(SQueryEditor._manager, startnode);
         SQueryEditor._mainFilter.tempId = 0;
 
         new ResizeObserver(function () {
@@ -57,7 +58,8 @@ export class SQueryEditor {
     
     static async display() {
         
-        await hcSQuery.SQuery.initialize(SQueryEditor._viewer);
+        await SQueryEditor._manager.initialize();
+
         let html = "";
         html += '<div class = "SQueryMain" id="' + SQueryEditor._maindiv + '_main">';
         if (SQueryEditor._showFirstRow) {
@@ -140,10 +142,10 @@ export class SQueryEditor {
 
         for (let i=0;i<SQueryEditor._mainFilter.getNumConditions();i++)
         {
-            let filter = SQueryEditor._mainFilter.getCondition(i);
-            if (filter.childFilter && filter.childFilter.tempId == id)
+            let condition = SQueryEditor._mainFilter.getCondition(i);
+            if (condition.childFilter && condition.childFilter.tempId == id)
             {
-                return filter.childFilter;
+                return condition.childFilter;
             }
         }
 
@@ -183,31 +185,31 @@ export class SQueryEditor {
         }
 
         for (let i = 0; i < SQuery.getNumConditions(); i++) {
-            let filter = SQuery.getCondition(i);
-            if (filter.childFilter) {
-                this.updateFilterFromUI(filter.childFilter);
+            let condition = SQuery.getCondition(i);
+            if (condition.childFilter) {
+                this.updateFilterFromUI(condition.childFilter);
             }
             else {
-                filter.conditionType = hcSQuery.SQuery.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
-                filter.propertyType = hcSQuery.SQuery.convertStringPropertyTypeToEnum(filter.propertyName);
+                condition.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
+                condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum(condition.propertyName);
 
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
-                    if (!filter.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
-                        filter.text = SQueryEditor._htmlEncode($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value);
+                    if (!condition.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
+                        condition.text = SQueryEditor._htmlEncode($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value);
                     }
                     else {
-                        filter.text = $("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value;
+                        condition.text = $("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value;
 
                     }
                 }
-                filter.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;
+                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;
 
             }
             if (i == 1) {
-                filter.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + i + "-" + SQuery.tempId)[0].value == "and") ? true : false;
+                condition.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + i + "-" + SQuery.tempId)[0].value == "and") ? true : false;
             }
             else if (i > 1) {
-                filter.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + SQuery.tempId)[0].value == "and") ? true : false;
+                condition.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + 1 + "-" + SQuery.tempId)[0].value == "and") ? true : false;
             }    
         }
     }
@@ -227,7 +229,7 @@ export class SQueryEditor {
 
     static async _convertToChildfilter() {
         let SQuery = SQueryEditor._mainFilter; 
-        let newfilter = new hcSQuery.SQuery(SQueryEditor._viewer, SQueryEditor._mainFilter.getStartNode());
+        let newfilter = new hcSQuery.SQuery(SQueryEditor._manager, SQueryEditor._mainFilter.getStartNode());
 
         for (let i = 0; i < SQuery.getNumConditions(); i++) {
 
@@ -258,7 +260,7 @@ export class SQueryEditor {
         SQuery = SQueryEditor._getSQueryFromTempId(id);
         let childFilter = null;
         if (createChildFilter) {
-            childFilter = new hcSQuery.SQuery(SQueryEditor._viewer, SQueryEditor._mainFilter.getStartNode());
+            childFilter = new hcSQuery.SQuery(SQueryEditor._manager, SQueryEditor._mainFilter.getStartNode());
             childFilter.addCondition(new hcSQuery.SQueryCondition());
         }
             
@@ -273,6 +275,7 @@ export class SQueryEditor {
         {
             let previousCondition = SQuery.getCondition(SQuery.getNumConditions() - 1);
             let condition = new hcSQuery.SQueryCondition();
+            condition.propertyName = "Node Name";
             condition.setChildFilter(childFilter);
             condition.setAndOr(previousCondition.getAndOr());
             SQuery.addCondition(condition);
@@ -368,11 +371,11 @@ export class SQueryEditor {
     }
 
 
-    static _generateAndOrChoiceSelect(filter, filterpos, SQuery) {
+    static _generateAndOrChoiceSelect(condition, filterpos, SQuery) {
         let html = "";
         if (filterpos == 0 || filterpos > 1) {
             if (filterpos ==0) {      
-                if (!filter.childFilter) {
+                if (!condition.childFilter) {
                     return '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;width:50px;max-width:50px;min-width:50px">Where:</span>';
                 }
                 else {
@@ -381,7 +384,7 @@ export class SQueryEditor {
                 }
             }
             else {
-                return '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (filter.and ? "and":"or") + '</span>';
+                return '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (condition.and ? "and":"or") + '</span>';
             }
         }
         else {
@@ -390,7 +393,7 @@ export class SQueryEditor {
             html += '<select class="SQuerySearchSelect" onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' id="' +  
             SQueryEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
-            if (filter.and) {
+            if (condition.and) {
                 html += '<option value="and" selected>and</option>\n';
                 html += '<option value="or">or</option>\n';
             }
@@ -404,7 +407,7 @@ export class SQueryEditor {
         }
     }
 
-    static _generateChoiceSelect(filter, filterpos,SQuery) {
+    static _generateChoiceSelect(condition, filterpos,SQuery) {
 
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' class="SQueryAndOrSelect" id="' +  
             SQueryEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
@@ -412,7 +415,7 @@ export class SQueryEditor {
         let choices = ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
 
         for (let i = 0; i < choices.length; i++) {
-            if (choices[i] == hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType)) {
+            if (choices[i] == hcSQuery.SQueryCondition.convertEnumConditionToString(condition.conditionType)) {
                 html += '<option selected value="' + choices[i] + '">' + choices[i] + '</option>\n';
             }
             else {
@@ -432,20 +435,18 @@ export class SQueryEditor {
         }
     }
 
-    static _generatePropertyTypeSelect(filter, filterpos, SQuery) {
+    static _generatePropertyTypeSelect(condition, filterpos, SQuery) {
       
 
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
-        let sortedStrings = SQueryEditor._mainFilter.getAllProperties();
+        let sortedStrings = SQueryEditor._manager.getAllProperties();
             
-    
-
         let prefix = "";
 
         for (let i = 0; i < sortedStrings.length;i++) {
-            if (filter.propertyName == sortedStrings[i])
+            if (condition.propertyName == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected>' + prefix + sortedStrings[i] + '</option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '">' + prefix + sortedStrings[i] + '</option>\n';
@@ -454,21 +455,21 @@ export class SQueryEditor {
         return html;
     }
 
-    static async _generateInput(filter,filterpos,SQuery) {
+    static async _generateInput(condition,filterpos,SQuery) {
       
 
         let html = '<input list="datalist' + filterpos + "-" + SQuery.tempId +'" +  style="flex:1 1 auto; font-size:11px;min-width:100px" id="' + SQueryEditor._maindiv + 
-            '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + filter.text + '">\n';
+            '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
         html += '<datalist id="datalist' + filterpos + "-" + SQuery.tempId +'">\n';
         let sortedStrings = [];
-        if (filter.propertyName == "Node Type") {
+        if (condition.propertyName == "Node Type") {
             for (const property in Communicator.NodeType) {
                 if (isNaN(parseFloat(Communicator.NodeType[property])))
                     sortedStrings.push(Communicator.NodeType[property]);
             }
 
         }
-        else if (filter.propertyName == "Node Color") {
+        else if (condition.propertyName == "Node Color") {
             if (SQueryEditor._viewer.selectionManager.getLast()) {
                 let nodeid = SQueryEditor._viewer.selectionManager.getLast().getNodeId();
                 let children = SQueryEditor._viewer.model.getNodeChildren(nodeid);
@@ -478,14 +479,14 @@ export class SQueryEditor {
                 sortedStrings.push(colors[0].r + " " + colors[0].g + " " + colors[0].b);
             }
         }        
-        else if (filter.propertyName == "Smart Filter") {
-            let SQuerys = hcSQuery.SQueryManager.getSQuerys();
+        else if (condition.propertyName == "SQuery") {
+            let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
                 sortedStrings.push(SQuerys[i].filter.getName());
             }
         }        
         else {
-            let options = SQueryEditor._mainFilter.getAllOptionsForProperty(filter.propertyName);
+            let options = SQueryEditor._mainFilter.getAllOptionsForProperty(condition.propertyName);
             for (let i in options) {
                 sortedStrings.push(i);
             }
@@ -493,7 +494,7 @@ export class SQueryEditor {
         sortedStrings.sort();
 
         for (let i = 0; i < sortedStrings.length; i++) {
-            if (filter.propertyName == sortedStrings[i])
+            if (condition.propertyName == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected></option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '"></option>\n';
@@ -534,15 +535,15 @@ export class SQueryEditor {
             
         }
         for (let i = 0; i < SQuery.getNumConditions(); i++) {
-            let filter = SQuery.getCondition(i);
-            if (filter.childFilter) {
+            let condition = SQuery.getCondition(i);
+            if (condition.childFilter) {
                 SQueryEditor.tempId++;
                 html += '<div>';
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();
                 html += '</div>';
-                html += SQueryEditor._generateAndOrChoiceSelect(filter, i, SQuery);
-                html+= await this._generateConditions(filter.childFilter,i);
+                html += SQueryEditor._generateAndOrChoiceSelect(condition, i, SQuery);
+                html+= await this._generateConditions(condition.childFilter,i);
                 html += '</div>';
             }
             else {
@@ -550,7 +551,7 @@ export class SQueryEditor {
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();
                 html += '</div>';                
-                html += SQueryEditor._generateAndOrChoiceSelect(filter, i, SQuery);
+                html += SQueryEditor._generateAndOrChoiceSelect(condition, i, SQuery);
                 let offset = 66;
                 if (SQueryIn) {
                     offset*=2;
@@ -563,10 +564,10 @@ export class SQueryEditor {
                 {
                     html += '<div style="display:flex;position:relative;top:-8px;left:64px;margin-right: 1em;width:calc(100%  - ' + offset + 'px)">';
                 }
-                html += SQueryEditor._generatePropertyTypeSelect(filter, i, SQuery);
-                html += SQueryEditor._generateChoiceSelect(filter, i, SQuery);
-                if (hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType) != "exists" && hcSQuery.SQuery.convertEnumConditionToString(filter.conditionType) != "!exists") {
-                    html += await SQueryEditor._generateInput(filter, i, SQuery);
+                html += SQueryEditor._generatePropertyTypeSelect(condition, i, SQuery);
+                html += SQueryEditor._generateChoiceSelect(condition, i, SQuery);
+                if (hcSQuery.SQueryCondition.convertEnumConditionToString(condition.conditionType) != "exists" && hcSQuery.SQueryCondition.convertEnumConditionToString(condition.conditionType) != "!exists") {
+                    html += await SQueryEditor._generateInput(condition, i, SQuery);
                 }
                 else {
                     html += '<div style="position:relative;left:5px;top:0px;width:275px"></div>';

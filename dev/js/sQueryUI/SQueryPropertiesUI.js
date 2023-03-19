@@ -2,12 +2,13 @@ import { dummy } from './tabulator_esm.min.js';
 
 export class SQueryPropertiesUI {
 
-    static initialize(div, viewer) {
+    static initialize(div, manager) {
         SQueryPropertiesUI._table = null;
-        SQueryPropertiesUI._viewer = viewer;
+        SQueryPropertiesUI._manager = manager;
+        SQueryPropertiesUI._viewer =  manager._viewer;
         SQueryPropertiesUI._uidiv = div;
 
-        viewer.setCallbacks({
+        SQueryPropertiesUI._viewer.setCallbacks({
             selectionArray: function (selarray, removed) {
                 SQueryPropertiesUI._itemSelected();
             },
@@ -59,7 +60,7 @@ export class SQueryPropertiesUI {
         if (selarray.length > 0) {
             let nodeid = selarray[0].getNodeId();
 
-            let foundProperties = await hcSQuery.SQueryManager.evaluateProperties(nodeid);
+            let foundProperties = await SQueryPropertiesUI._manager.evaluateProperties(nodeid);
             let ii=0;
             for (let i = 0; i < foundProperties.length; i++) {
                 let propsOnNode = foundProperties[i].properties;
