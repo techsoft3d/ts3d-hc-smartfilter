@@ -336,7 +336,8 @@ export class SQuery {
                 if (temp == undefined) {
                    return false;
                 }
-                if (!isNaN(parseInt(temp))) {
+
+                if (temp.indexOf(" ") == -1 && !isNaN(parseInt(temp))) {
                     temp = parseInt(temp);
                 }
                 let searchAgainstDate = new Date(temp);
@@ -345,7 +346,7 @@ export class SQuery {
                     return false;
                 }
                 let ctext = condition.text;
-                if (!isNaN(parseInt(ctext))) {
+                if (ctext.indexOf(" ") == -1 && !isNaN(parseInt(ctext))) {
                     ctext = parseInt(ctext);
                 }
                 let searchDate = new Date(ctext);
