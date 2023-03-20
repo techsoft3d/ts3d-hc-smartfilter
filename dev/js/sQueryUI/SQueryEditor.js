@@ -4,6 +4,7 @@ export class SQueryEditor {
     static _showLimitOption = true;
     static _showFirstRow = true;
     static _showPropertyStats = true;
+    static _showSearchResults = true;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -70,7 +71,7 @@ export class SQueryEditor {
         if (SQueryEditor._showFirstRow) {
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<label style="position:relative;">Limit to Selection:</label><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit Selection</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchChildren">'
                 html += '</div>';
             }
@@ -319,6 +320,19 @@ export class SQueryEditor {
 
     }
 
+    static _limitSelectionShow() {
+      
+        let nodeids = SQueryEditor._mainFilter.getLimitSelectionList();
+        SQueryEditor._founditems = [];
+        for (let i = 0; i < nodeids.length; i++) {
+            let chaintext = SQueryEditor._mainFilter.createChainText(nodeids[i], SQueryEditor._viewer.model.getRootNode(), 0);
+            let item = {name: SQueryEditor._viewer.model.getNodeName(nodeids[i]), id: nodeids[i], chaintext: chaintext};            
+            SQueryEditor._founditems.push(item);
+        }    
+
+        SQueryEditor._generateSearchResults();        
+    }
+
 
     static _limitSelection() {
       
@@ -342,54 +356,59 @@ export class SQueryEditor {
     }
 
     static _generateSearchResults() {
-        $("#" + SQueryEditor._maindiv + "_searchitems").empty();
-        $("#" +  SQueryEditor._maindiv + "_found").empty();
-        if (SQueryEditor._founditems == undefined)
-            return;
-
-        $("#" +  SQueryEditor._maindiv + "_found").append("Found:" + SQueryEditor._founditems.length);
-      
-        let html = "";
-        let y = 0;
-        let toggle = true;    
-
-        let more = false;
-        let lend = SQueryEditor._founditems.length;
-        if (SQueryEditor._founditems.length > 2000) {
-            lend = 2000;
-            more = true;
+        if (SQueryEditor._searchResultCallback) {
+            SQueryEditor._searchResultCallback(SQueryEditor._founditems);
         }
+        else {
+            $("#" + SQueryEditor._maindiv + "_searchitems").empty();
+            $("#" + SQueryEditor._maindiv + "_found").empty();
+            if (SQueryEditor._founditems == undefined)
+                return;
 
-        for (let i = 0; i < lend; i++) {
-            toggle = !toggle;
-            if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id))) {
-                let parent = SQueryEditor._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
-                if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
-                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">'; 
+            $("#" + SQueryEditor._maindiv + "_found").append("Found:" + SQueryEditor._founditems.length);
+
+            let html = "";
+            let y = 0;
+            let toggle = true;
+
+            let more = false;
+            let lend = SQueryEditor._founditems.length;
+            if (SQueryEditor._founditems.length > 2000) {
+                lend = 2000;
+                more = true;
+            }
+
+            for (let i = 0; i < lend; i++) {
+                toggle = !toggle;
+                if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id))) {
+                    let parent = SQueryEditor._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
+                    if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
+                        html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
+                    }
+                    else {
+                        html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">';
+                    }
                 }
                 else {
-                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">'; 
+                    if (toggle)
+                        html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem1">';
+                    else
+                        html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem2">';
                 }
-            }
-            else {
-                if (toggle)
-                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem1">';
-                else
-                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem2">';
-            }
-        
-            html += '<div class="SQuerySearchItemText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].name) + '</div>';
-            html += '<div class="SQuerySearchItemChainText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].chaintext) + '</div>';
-            html += '</div>';
-            y++;        
-        }
-        if (more) {
-            html += '<div style="left:3px;" >More...</div>';
-        }
-        
-        $("#" + SQueryEditor._maindiv + "_searchitems").append(html);
 
-        SQueryEditor.adjust();
+                html += '<div class="SQuerySearchItemText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].name) + '</div>';
+                html += '<div class="SQuerySearchItemChainText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].chaintext) + '</div>';
+                html += '</div>';
+                y++;
+            }
+            if (more) {
+                html += '<div style="left:3px;" >More...</div>';
+            }
+
+            $("#" + SQueryEditor._maindiv + "_searchitems").append(html);
+
+            SQueryEditor.adjust();
+        }
     }
 
 

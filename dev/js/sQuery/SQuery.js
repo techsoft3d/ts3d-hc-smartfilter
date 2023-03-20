@@ -120,6 +120,10 @@ export class SQuery {
 
     }
 
+    getLimitSelectionList() {
+        return this._limitselectionlist;
+    }
+
     getStartNode() {
         return this._startnode;
     }
