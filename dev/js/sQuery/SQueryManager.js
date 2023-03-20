@@ -170,7 +170,13 @@ export class SQueryManager {
                 }
             }
             for (let j in res[i]) {
-                this._allPropertiesHash[j] = [];
+                this._allPropertiesHash[j] = [];                
+                if (this._allPropertiesHashNum[j] == undefined) {
+                    this._allPropertiesHashNum[j] = 0;
+                }
+                else {
+                    this._allPropertiesHashNum[j]++;
+                }
             }
         }
 
@@ -327,6 +333,7 @@ export class SQueryManager {
     async initialize() {
         this._propertyHash = [];
         this._allPropertiesHash = [];
+        this._allPropertiesHashNum = [];
         this._containedInSpatialStructureHash = [];
         this._spaceBoundaryHash = [];
         let layernames = this._viewer.model.getLayers();
@@ -386,6 +393,12 @@ export class SQueryManager {
     getNumOptions(propertyname) {
         if (this._allPropertiesHash[propertyname] != undefined) {
             return  Object.keys(this._allPropertiesHash[propertyname]).length;
+        }
+    }
+
+    getNumOptionsUsed(propertyname) {
+        if (this._allPropertiesHash[propertyname] != undefined) {
+            return this._allPropertiesHashNum[propertyname];
         }
     }
 

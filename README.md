@@ -1,5 +1,10 @@
 # SQuerys
 
+## Version Update (0.8.3)
+* Ability to search by node children (count and name)
+* Display of property stats (nummber of options, number of occurences) in editor
+* Various other improvements and fixes
+
 ## Version Update (0.8.0)
 * Renamed to SQuery
 
@@ -22,7 +27,6 @@
 * Ability to choose an existing query as a filter condition
 
 ## Version Update (0.5.0) 
-* modules renamed to hcSQuery and hcSQueryUI
 * Abiltity to hide top row UI buttons
 * Update to HOOPS Communicator 2023 U1
 

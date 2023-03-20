@@ -3,6 +3,7 @@ export class SQueryEditor {
     static _chainSkip = 0;
     static _showLimitOption = true;
     static _showFirstRow = true;
+    static _showPropertyStats = true;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -53,6 +54,10 @@ export class SQueryEditor {
     static showFirstRow(showFirstRow) {
         SQueryEditor._showFirstRow = showFirstRow;
 
+    }
+
+    static showPropertyStats(onoff) {
+        SQueryEditor._showPropertyStats = onoff;
     }
 
     
@@ -202,12 +207,11 @@ export class SQueryEditor {
 
                     }
                 }
-                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;
-                if (condition.propertyName.endsWith(")")) {
+                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                if (SQueryEditor._showPropertyStats && condition.propertyName.endsWith(")")) {
                     let lastindex = condition.propertyName.lastIndexOf("(") - 1;
                     condition.propertyName = condition.propertyName.substring(0, lastindex);
                 }
-
             }
             if (i == 1) {
                 condition.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + i + "-" + SQuery.tempId)[0].value == "and") ? true : false;
@@ -469,23 +473,28 @@ export class SQueryEditor {
 
         let sortedStrings = SQueryEditor._manager.getAllProperties();
 
-        for (let i = 0; i < sortedStrings.length;i++) {
-            let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
-            if (numOptions) {
-                sortedStrings[i] = sortedStrings[i] + " (" + numOptions + ")";
+        if (SQueryEditor._showPropertyStats) {
+            for (let i = 0; i < sortedStrings.length; i++) {
+                if (SQueryEditor._showPropertyStats) { }
+                let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
+                if (numOptions) {
+                    let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(sortedStrings[i]);
+                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "," + numOptionsUsed + ")";
+                }
             }
         }
-            
+
         let prefix = "";
-        
+
         let propertyNamePlus = condition.propertyName;
 
-        let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
-        if (numOptions) {
-            propertyNamePlus = propertyNamePlus + " (" + numOptions + ")";
+        if (SQueryEditor._showPropertyStats) {
+            let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
+            if (numOptions) {
+                let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(propertyNamePlus);
+                propertyNamePlus = propertyNamePlus + " (" + numOptions + "," + numOptionsUsed + ")";
+            }
         }
-
-
 
         for (let i = 0; i < sortedStrings.length;i++) {
             if (propertyNamePlus == sortedStrings[i])
