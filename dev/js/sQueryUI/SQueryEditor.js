@@ -71,7 +71,7 @@ export class SQueryEditor {
         if (SQueryEditor._showFirstRow) {
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit Selection</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit Selection</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchChildren">'
                 html += '</div>';
             }
@@ -343,10 +343,12 @@ export class SQueryEditor {
                 limitselectionlist.push(r[i].getNodeId());
             }
             SQueryEditor._mainFilter.limitToNodes(limitselectionlist);
+            $( "#SQUeryLimitSelectionButton" ).prop( "disabled", false );
         }
         else
         {
             SQueryEditor._mainFilter.limitToNodes([]);
+            $( "#SQUeryLimitSelectionButton" ).prop( "disabled", true );
         }
     }
 
