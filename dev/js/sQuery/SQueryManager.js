@@ -172,7 +172,7 @@ export class SQueryManager {
             for (let j in res[i]) {
                 this._allPropertiesHash[j] = [];                
                 if (this._allPropertiesHashNum[j] == undefined) {
-                    this._allPropertiesHashNum[j] = 0;
+                    this._allPropertiesHashNum[j] = 1;
                 }
                 else {
                     this._allPropertiesHashNum[j]++;
