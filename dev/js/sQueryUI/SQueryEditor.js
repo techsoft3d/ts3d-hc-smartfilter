@@ -3,6 +3,7 @@ export class SQueryEditor {
     static _chainSkip = 0;
     static _showLimitOption = true;
     static _showFirstRow = true;
+    static _showPropertyStats = true;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -53,6 +54,10 @@ export class SQueryEditor {
     static showFirstRow(showFirstRow) {
         SQueryEditor._showFirstRow = showFirstRow;
 
+    }
+
+    static showPropertyStats(onoff) {
+        SQueryEditor._showPropertyStats = onoff;
     }
 
     
@@ -202,8 +207,11 @@ export class SQueryEditor {
 
                     }
                 }
-                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;
-
+                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                if (SQueryEditor._showPropertyStats && condition.propertyName.endsWith(")")) {
+                    let lastindex = condition.propertyName.lastIndexOf("(") - 1;
+                    condition.propertyName = condition.propertyName.substring(0, lastindex);
+                }
             }
             if (i == 1) {
                 condition.and = ($("#" + SQueryEditor._maindiv + "_andOrchoiceSelect" + i + "-" + SQuery.tempId)[0].value == "and") ? true : false;
@@ -345,12 +353,14 @@ export class SQueryEditor {
         let y = 0;
         let toggle = true;    
 
-        let iskip = 1;
-        if (SQueryEditor._founditems.length >1000) {
-            iskip = Math.floor(SQueryEditor._founditems.length / 1000);
+        let more = false;
+        let lend = SQueryEditor._founditems.length;
+        if (SQueryEditor._founditems.length > 2000) {
+            lend = 2000;
+            more = true;
         }
 
-        for (let i = 0; i < SQueryEditor._founditems.length; i+=iskip) {
+        for (let i = 0; i < lend; i++) {
             toggle = !toggle;
             if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id))) {
                 let parent = SQueryEditor._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
@@ -367,10 +377,14 @@ export class SQueryEditor {
                 else
                     html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem2">';
             }
+        
             html += '<div class="SQuerySearchItemText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].name) + '</div>';
             html += '<div class="SQuerySearchItemChainText">' + SQueryEditor._htmlEncode(SQueryEditor._founditems[i].chaintext) + '</div>';
             html += '</div>';
-            y++;
+            y++;        
+        }
+        if (more) {
+            html += '<div style="left:3px;" >More...</div>';
         }
         
         $("#" + SQueryEditor._maindiv + "_searchitems").append(html);
@@ -458,11 +472,32 @@ export class SQueryEditor {
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
         let sortedStrings = SQueryEditor._manager.getAllProperties();
-            
+
+        if (SQueryEditor._showPropertyStats) {
+            for (let i = 0; i < sortedStrings.length; i++) {
+                if (SQueryEditor._showPropertyStats) { }
+                let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
+                if (numOptions) {
+                    let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(sortedStrings[i]);
+                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "," + numOptionsUsed + ")";
+                }
+            }
+        }
+
         let prefix = "";
 
+        let propertyNamePlus = condition.propertyName;
+
+        if (SQueryEditor._showPropertyStats) {
+            let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
+            if (numOptions) {
+                let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(propertyNamePlus);
+                propertyNamePlus = propertyNamePlus + " (" + numOptions + "," + numOptionsUsed + ")";
+            }
+        }
+
         for (let i = 0; i < sortedStrings.length;i++) {
-            if (condition.propertyName == sortedStrings[i])
+            if (propertyNamePlus == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected>' + prefix + sortedStrings[i] + '</option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '">' + prefix + sortedStrings[i] + '</option>\n';
@@ -502,7 +537,7 @@ export class SQueryEditor {
             }
         }        
         else {
-            let options = SQueryEditor._mainFilter.getAllOptionsForProperty(condition.propertyName);
+            let options = SQueryEditor._manager.getAllOptionsForProperty(condition.propertyName);
             for (let i in options) {
                 sortedStrings.push(i);
             }

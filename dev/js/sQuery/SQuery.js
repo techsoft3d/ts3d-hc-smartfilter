@@ -69,11 +69,6 @@ export class SQuery {
 
    
 
-    getAllOptionsForProperty(propertyname) {
-
-        return this._manager._allPropertiesHash[propertyname];
-    }
-
     fromJSON(json) {
         this._conditions = [];
      
@@ -313,6 +308,9 @@ export class SQuery {
             else if (condition.propertyType == SQueryPropertyType.nodeId) {
                 searchAgainstNumber = id;
             }
+            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+                searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
+            }
             else {
                 let temp;
                 if (this._manager._propertyHash[id]) {
@@ -400,6 +398,12 @@ export class SQuery {
                 else {
                     searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(),0);
 
+                }
+            }
+            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+                let children = this._viewer.model.getNodeChildren(id);
+                for (let i = 0; i < children.length; i++) {
+                    searchAgainst += this._viewer.model.getNodeName(children[i]);
                 }
             }
             else if (condition.propertyType == SQueryPropertyType.nodeParent) {

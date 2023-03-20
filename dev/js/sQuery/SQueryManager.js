@@ -170,7 +170,13 @@ export class SQueryManager {
                 }
             }
             for (let j in res[i]) {
-                this._allPropertiesHash[j] = [];
+                this._allPropertiesHash[j] = [];                
+                if (this._allPropertiesHashNum[j] == undefined) {
+                    this._allPropertiesHashNum[j] = 0;
+                }
+                else {
+                    this._allPropertiesHashNum[j]++;
+                }
             }
         }
 
@@ -327,6 +333,7 @@ export class SQueryManager {
     async initialize() {
         this._propertyHash = [];
         this._allPropertiesHash = [];
+        this._allPropertiesHashNum = [];
         this._containedInSpatialStructureHash = [];
         this._spaceBoundaryHash = [];
         let layernames = this._viewer.model.getLayers();
@@ -378,6 +385,23 @@ export class SQueryManager {
         }
     }
 
+    getAllOptionsForProperty(propertyname) {
+
+        return this._allPropertiesHash[propertyname];
+    }
+
+    getNumOptions(propertyname) {
+        if (this._allPropertiesHash[propertyname] != undefined) {
+            return  Object.keys(this._allPropertiesHash[propertyname]).length;
+        }
+    }
+
+    getNumOptionsUsed(propertyname) {
+        if (this._allPropertiesHash[propertyname] != undefined) {
+            return this._allPropertiesHashNum[propertyname];
+        }
+    }
+
     getAllProperties() {
 
         let propsnames = [];
@@ -408,7 +432,7 @@ export class SQueryManager {
 
         for (let i in this._allPropertiesHash) {
             if (i != "TYPE" && i != "LAYER" && i != "Surface Area" && i != "Volume") {
-                propsnames.push(i);
+                propsnames.push(i);                
             }
         }
 
@@ -437,6 +461,7 @@ export class SQueryManager {
         propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
         propsnames.unshift("Node Type");
+        propsnames.unshift("Node Children");
         propsnames.unshift("Node Chain");
         propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");
