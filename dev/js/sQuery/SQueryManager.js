@@ -437,6 +437,7 @@ export class SQueryManager {
         propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
         propsnames.unshift("Node Type");
+        propsnames.unshift("Node Children");
         propsnames.unshift("Node Chain");
         propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");

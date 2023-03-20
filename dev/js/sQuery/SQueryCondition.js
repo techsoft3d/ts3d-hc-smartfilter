@@ -23,6 +23,7 @@ const SQueryPropertyType = {
     property:6,
     SQuery:7,
     nodeParent:8,
+    nodeChildren:9
 };
 
 export {SQueryPropertyType};
@@ -101,8 +102,9 @@ export class SQueryCondition {
             case "SQuery":
                  return SQueryPropertyType.SQuery;
             case "Node Parent":
-                      return SQueryPropertyType.nodeParent;
-        
+                 return SQueryPropertyType.nodeParent;
+            case "Node Children":
+                return SQueryPropertyType.nodeChildren;        
             default:
                 return SQueryPropertyType.property;
         }
