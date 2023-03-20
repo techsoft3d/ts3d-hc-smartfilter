@@ -203,6 +203,10 @@ export class SQueryEditor {
                     }
                 }
                 condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;
+                if (condition.propertyName.endsWith(")")) {
+                    let lastindex = condition.propertyName.lastIndexOf("(") - 1;
+                    condition.propertyName = condition.propertyName.substring(0, lastindex);
+                }
 
             }
             if (i == 1) {
@@ -464,11 +468,27 @@ export class SQueryEditor {
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
         let sortedStrings = SQueryEditor._manager.getAllProperties();
-            
-        let prefix = "";
 
         for (let i = 0; i < sortedStrings.length;i++) {
-            if (condition.propertyName == sortedStrings[i])
+            let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
+            if (numOptions) {
+                sortedStrings[i] = sortedStrings[i] + " (" + numOptions + ")";
+            }
+        }
+            
+        let prefix = "";
+        
+        let propertyNamePlus = condition.propertyName;
+
+        let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
+        if (numOptions) {
+            propertyNamePlus = propertyNamePlus + " (" + numOptions + ")";
+        }
+
+
+
+        for (let i = 0; i < sortedStrings.length;i++) {
+            if (propertyNamePlus == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected>' + prefix + sortedStrings[i] + '</option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '">' + prefix + sortedStrings[i] + '</option>\n';
@@ -508,7 +528,7 @@ export class SQueryEditor {
             }
         }        
         else {
-            let options = SQueryEditor._mainFilter.getAllOptionsForProperty(condition.propertyName);
+            let options = SQueryEditor._manager.getAllOptionsForProperty(condition.propertyName);
             for (let i in options) {
                 sortedStrings.push(i);
             }

@@ -378,6 +378,17 @@ export class SQueryManager {
         }
     }
 
+    getAllOptionsForProperty(propertyname) {
+
+        return this._allPropertiesHash[propertyname];
+    }
+
+    getNumOptions(propertyname) {
+        if (this._allPropertiesHash[propertyname] != undefined) {
+            return  Object.keys(this._allPropertiesHash[propertyname]).length;
+        }
+    }
+
     getAllProperties() {
 
         let propsnames = [];
@@ -408,7 +419,7 @@ export class SQueryManager {
 
         for (let i in this._allPropertiesHash) {
             if (i != "TYPE" && i != "LAYER" && i != "Surface Area" && i != "Volume") {
-                propsnames.push(i);
+                propsnames.push(i);                
             }
         }
 

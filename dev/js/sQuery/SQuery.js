@@ -69,11 +69,6 @@ export class SQuery {
 
    
 
-    getAllOptionsForProperty(propertyname) {
-
-        return this._manager._allPropertiesHash[propertyname];
-    }
-
     fromJSON(json) {
         this._conditions = [];
      
