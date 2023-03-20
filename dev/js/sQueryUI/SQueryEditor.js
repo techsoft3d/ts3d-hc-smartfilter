@@ -79,7 +79,7 @@ export class SQueryEditor {
         }
         html += '<hr style="margin-bottom:0px;margin-top:3px" >';
 
-        html += '<div id="' + SQueryEditor._maindiv + '_conditions">';
+        html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
         html += '</div><hr>';
         html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
@@ -352,8 +352,15 @@ export class SQueryEditor {
 
         for (let i = 0; i < SQueryEditor._founditems.length; i+=iskip) {
             toggle = !toggle;
-            if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id)))
-                html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">';
+            if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id))) {
+                let parent = SQueryEditor._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
+                if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
+                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">'; 
+                }
+                else {
+                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">'; 
+                }
+            }
             else {
                 if (toggle)
                     html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem1">';
@@ -365,6 +372,7 @@ export class SQueryEditor {
             html += '</div>';
             y++;
         }
+        
         $("#" + SQueryEditor._maindiv + "_searchitems").append(html);
 
         SQueryEditor.adjust();
@@ -412,7 +420,15 @@ export class SQueryEditor {
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' class="SQueryAndOrSelect" id="' +  
             SQueryEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
-        let choices = ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
+        let choices;
+        
+        if (condition.propertyName == "SQuery") {
+            choices =  ["=", "\u2260"];
+        }
+        else {
+            choices =  ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
+        }
+
 
         for (let i = 0; i < choices.length; i++) {
             if (choices[i] == hcSQuery.SQueryCondition.convertEnumConditionToString(condition.conditionType)) {
@@ -458,7 +474,7 @@ export class SQueryEditor {
     static async _generateInput(condition,filterpos,SQuery) {
       
 
-        let html = '<input list="datalist' + filterpos + "-" + SQuery.tempId +'" +  style="flex:1 1 auto; font-size:11px;min-width:100px" id="' + SQueryEditor._maindiv + 
+        let html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
         html += '<datalist id="datalist' + filterpos + "-" + SQuery.tempId +'">\n';
         let sortedStrings = [];
@@ -531,7 +547,7 @@ export class SQueryEditor {
 
         if (SQueryIn)
         {
-                html += '<div style = "position:relative;left:65px;top:-10px;background:#e6e8ea;border-radius:5px;">';
+                html += '<div class = "SQueryChildCondition" style = "position:relative;left:65px;top:-10px">';
             
         }
         for (let i = 0; i < SQuery.getNumConditions(); i++) {

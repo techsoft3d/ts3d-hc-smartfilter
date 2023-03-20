@@ -24,8 +24,13 @@
   }
   
   .SQuerySearchItemselected {
-    background-color:rgb(255,255,0); 
+    background-color:rgb(200,200,0); 
   }
+
+  .SQuerySearchItemselectedIndirect {
+    background-color:rgb(255,255,128); 
+  }
+  
   
   .SQuerySearchItemChainText {
     font-size:9px;
@@ -33,6 +38,10 @@
     padding:2px;
   }
 
+  .SQueryChildCondition {
+    background:#e6e8ea;
+    border-radius:5px;
+  }
   
   .SQuerySearchItemText {
     margin-bottom:-3px;
@@ -62,13 +71,16 @@
     font-size: 11px;
   }
 
-
-  
+  .SQuerySearchtoolsConditions {
+    background: #ffffff;
+  }
   .SQueryAndOrSelect {
     font-size:11px;
     width:75px;
     margin-right:3px;
     font-family: monospace;
+    border-width:1px;
+    margin-right:-1px;
   }
 
   .propertyTypeSelect {
@@ -76,42 +88,20 @@
     flex: 1 1 auto;
     max-width:150px;
     margin-right:3px;
-    min-width:50px
+    min-width:50px;
+    background:#e6e6ff;
+    border-width:1px;
+    margin-right:-1px;
   }
 
-
-  .cross{
-    width:40px;
-    height:40px;
-    position:relative;
-    border-radius:6px;
-    transform:scale(0.5);
-    left:-12px;
-    top:-12px;
-}
-
-.cross:before,.cross:after{
-    content:'';
-    position:absolute;
-    width:36px;
-    height:4px;
-    background-color:black;
-    border-radius:2px;
-    top:8px;
-}
-
-.cross:before{
-    -webkit-transform:rotate(45deg);
-    -moz-transform:rotate(45deg);
-    transform:rotate(45deg);
-    left:2px;
-}
-.cross:after{
-    -webkit-transform:rotate(-45deg);
-    -moz-transform:rotate(-45deg);
-    transform:rotate(-45deg);
-    right:2px;
-}
+  
+  .valueinput {  
+    border-width:1px;
+    background:#e6e6ff;
+    flex:1 1 auto; 
+    font-size:11px;
+    min-width:100px;
+  }
 
 .SQueryManagerButtons {
   position: relative;
