@@ -24,8 +24,13 @@
   }
   
   .SQuerySearchItemselected {
-    background-color:rgb(255,255,0); 
+    background-color:rgb(200,200,0); 
   }
+
+  .SQuerySearchItemselectedIndirect {
+    background-color:rgb(255,255,128); 
+  }
+  
   
   .SQuerySearchItemChainText {
     font-size:9px;

@@ -352,8 +352,15 @@ export class SQueryEditor {
 
         for (let i = 0; i < SQueryEditor._founditems.length; i+=iskip) {
             toggle = !toggle;
-            if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id)))
-                html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">';
+            if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(SQueryEditor._founditems[i].id))) {
+                let parent = SQueryEditor._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
+                if (SQueryEditor._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
+                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">'; 
+                }
+                else {
+                    html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItemselected">'; 
+                }
+            }
             else {
                 if (toggle)
                     html += '<div onclick=\'hcSQueryUI.SQueryEditor._select("' + SQueryEditor._founditems[i].id + '")\' class="SQuerySearchItem1">';
@@ -365,6 +372,7 @@ export class SQueryEditor {
             html += '</div>';
             y++;
         }
+        
         $("#" + SQueryEditor._maindiv + "_searchitems").append(html);
 
         SQueryEditor.adjust();
