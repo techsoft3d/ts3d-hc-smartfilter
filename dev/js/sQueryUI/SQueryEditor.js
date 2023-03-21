@@ -68,12 +68,17 @@ export class SQueryEditor {
 
     static _generateDropdown() {
         let html = "";
-        html += '<button style="right:65px;top:2px;position:absolute;" class="SQuerySearchButton dropdown-button">Menu</button>';
-        html += '<ul style="right:20px;top:10px;position:absolute;" class="dropdown-content">';
+        html += '<button style="right:57px;top:2px;position:absolute;" class="SQuerySearchButton dropdown-button">...</button>';
+        html += '<ul style="right:22px;top:10px;position:absolute;" class="dropdown-content">';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
+        html +='<li >---</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
         html += '</ul>';
         return html;
     }
@@ -97,7 +102,7 @@ export class SQueryEditor {
             }
 
             html += SQueryEditor._generateDropdown();
-//            html += '<button class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
+            html += '<button class="SQuerySearchButton" type="button" style="right:92px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
             html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
             html += '<hr class="SQueryEditorDivider">';
         }
@@ -115,21 +120,23 @@ export class SQueryEditor {
         $("#" + SQueryEditor._maindiv).empty();
         $("#" + SQueryEditor._maindiv).append(html);
 
-        const dropdownButton = document.querySelector('.dropdown-button');
-        const dropdownContent = document.querySelector('.dropdown-content');
-    
-        dropdownButton.addEventListener('click', function () {
-            dropdownContent.classList.toggle('dropdownShow');
-        });
-    
-        window.addEventListener('click', function (event) {
-            if (!event.target.matches('.dropdown-button')) {
-                if (dropdownContent.classList.contains('dropdownShow')) {
-                    dropdownContent.classList.remove('dropdownShow');
+        if (SQueryEditor._showFirstRow) {
+            const dropdownButton = document.querySelector('.dropdown-button');
+            const dropdownContent = document.querySelector('.dropdown-content');
+
+            dropdownButton.addEventListener('click', function () {
+                dropdownContent.classList.toggle('dropdownShow');
+            });
+
+            window.addEventListener('click', function (event) {
+                if (!event.target.matches('.dropdown-button')) {
+                    if (dropdownContent.classList.contains('dropdownShow')) {
+                        dropdownContent.classList.remove('dropdownShow');
+                    }
                 }
-            }
-        });
-    
+            });
+        }
+
         SQueryEditor._generateSearchResults();
         SQueryEditor._addFilterFromUI(false,0);
 
@@ -206,6 +213,16 @@ export class SQueryEditor {
         }
         SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
     }
+
+    static colorize(color) {        
+                            
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesFaceColor(selections, color);
+    }
+
 
     static isolateAll() {        
                             

@@ -260,6 +260,7 @@
   z-index: 1;
   font-size:12px;
   list-style-type:none;
+  user-select:none;
 }
 
 .dropdown-content li {
