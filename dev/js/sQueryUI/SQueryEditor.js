@@ -90,9 +90,12 @@ export class SQueryEditor {
 
         html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
-        html += '</div><hr>';
-        html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
-        html += '<div style="position:absolute; right:20px;bottom:0px; font-size:12px;background-color:white" id="' + SQueryEditor._maindiv + '_found">Found:</div>';
+        html += '</div>';
+        if (!SQueryEditor._searchResultsCallback) {
+            html += '<hr>';
+            html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
+            html += '<div style="position:absolute; right:20px;bottom:0px; font-size:12px;background-color:white" id="' + SQueryEditor._maindiv + '_found"></div>';
+        }
         html += '</div>';
         $("#" + SQueryEditor._maindiv).empty();
         $("#" + SQueryEditor._maindiv).append(html);
@@ -107,6 +110,10 @@ export class SQueryEditor {
 
     static adjust() 
     {
+
+        if (SQueryEditor._searchResultsCallback) {
+            return;
+        }
 
         let newheight = $("#" + SQueryEditor._maindiv).height() - ($("#" + SQueryEditor._maindiv + "_searchitems").offset().top - $("#" + SQueryEditor._maindiv).parent().offset().top);
         $("#" + SQueryEditor._maindiv + "_searchitems").css({ "height": newheight + "px" });
