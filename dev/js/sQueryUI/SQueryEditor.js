@@ -78,6 +78,7 @@ export class SQueryEditor {
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
         html += '</ul>';
         return html;
@@ -567,7 +568,7 @@ export class SQueryEditor {
                 let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
                 if (numOptions) {
                     let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(sortedStrings[i]);
-                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "," + numOptionsUsed + ")";
+                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "/" + numOptionsUsed + ")";
                 }
             }
         }
@@ -580,7 +581,7 @@ export class SQueryEditor {
             let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
             if (numOptions) {
                 let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(propertyNamePlus);
-                propertyNamePlus = propertyNamePlus + " (" + numOptions + "," + numOptionsUsed + ")";
+                propertyNamePlus = propertyNamePlus + " (" + numOptions + "/" + numOptionsUsed + ")";
             }
         }
 
