@@ -4,7 +4,7 @@ export class SQueryEditor {
     static _showLimitOption = true;
     static _showFirstRow = true;
     static _showPropertyStats = true;
-    static _showSearchResults = true;
+    static _searchResultsCallback = null;
 
     static _htmlEncode(html) {
         html = $.trim(html);
@@ -61,7 +61,10 @@ export class SQueryEditor {
         SQueryEditor._showPropertyStats = onoff;
     }
 
-    
+    static setSearchResultsCallback(callback) {
+        SQueryEditor._searchResultsCallback = callback;
+    }
+
     static async display() {
         
         await SQueryEditor._manager.initialize();
@@ -330,7 +333,7 @@ export class SQueryEditor {
             SQueryEditor._founditems.push(item);
         }    
 
-        SQueryEditor._generateSearchResults();        
+        SQueryEditor.selectAll();        
     }
 
 
@@ -358,8 +361,8 @@ export class SQueryEditor {
     }
 
     static _generateSearchResults() {
-        if (SQueryEditor._searchResultCallback) {
-            SQueryEditor._searchResultCallback(SQueryEditor._founditems);
+        if (SQueryEditor._searchResultsCallback) {
+            SQueryEditor._searchResultsCallback(SQueryEditor._founditems);
         }
         else {
             $("#" + SQueryEditor._maindiv + "_searchitems").empty();
