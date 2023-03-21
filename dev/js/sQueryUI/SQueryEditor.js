@@ -65,6 +65,19 @@ export class SQueryEditor {
         SQueryEditor._searchResultsCallback = callback;
     }
 
+
+    static _generateDropdown() {
+        let html = "";
+        html += '<button style="right:65px;top:2px;position:absolute;" class="SQuerySearchButton dropdown-button">Menu</button>';
+        html += '<ul style="right:20px;top:10px;position:absolute;" class="dropdown-content">';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
+        html += '</ul>';
+        return html;
+    }
+
     static async display() {
         
         await SQueryEditor._manager.initialize();
@@ -83,7 +96,8 @@ export class SQueryEditor {
 
             }
 
-            html += '<button class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
+            html += SQueryEditor._generateDropdown();
+//            html += '<button class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
             html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
             html += '<hr class="SQueryEditorDivider">';
         }
@@ -91,6 +105,7 @@ export class SQueryEditor {
         html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
         html += '</div>';
+        
         if (!SQueryEditor._searchResultsCallback) {
             html += '<hr>';
             html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
@@ -99,6 +114,22 @@ export class SQueryEditor {
         html += '</div>';
         $("#" + SQueryEditor._maindiv).empty();
         $("#" + SQueryEditor._maindiv).append(html);
+
+        const dropdownButton = document.querySelector('.dropdown-button');
+        const dropdownContent = document.querySelector('.dropdown-content');
+    
+        dropdownButton.addEventListener('click', function () {
+            dropdownContent.classList.toggle('dropdownShow');
+        });
+    
+        window.addEventListener('click', function (event) {
+            if (!event.target.matches('.dropdown-button')) {
+                if (dropdownContent.classList.contains('dropdownShow')) {
+                    dropdownContent.classList.remove('dropdownShow');
+                }
+            }
+        });
+    
         SQueryEditor._generateSearchResults();
         SQueryEditor._addFilterFromUI(false,0);
 
@@ -165,6 +196,15 @@ export class SQueryEditor {
             }
         }
 
+    }
+
+    static makeVisible(onoff) {        
+                            
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
     }
 
     static isolateAll() {        
