@@ -172,7 +172,7 @@ export class SQueryManagerUI {
 
             SQueryManagerUI._table = new Tabulator("#" + SQueryManagerUI._uidiv + "Tabulator", {
                 data: [],                             
-                selectable:1,
+                selectable:0,
                 layout: "fitColumns",
                 rowContextMenu: rowMenu,
                 columns: [                                   

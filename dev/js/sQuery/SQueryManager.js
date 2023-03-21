@@ -172,7 +172,7 @@ export class SQueryManager {
             for (let j in res[i]) {
                 this._allPropertiesHash[j] = [];                
                 if (this._allPropertiesHashNum[j] == undefined) {
-                    this._allPropertiesHashNum[j] = 0;
+                    this._allPropertiesHashNum[j] = 1;
                 }
                 else {
                     this._allPropertiesHashNum[j]++;
@@ -182,6 +182,7 @@ export class SQueryManager {
 
         for (let i in this._propertyHash) {
             for (let j in this._propertyHash[i]) {
+                this._propertyHash[i][j] = this._propertyHash[i][j].replace(/,/g, '.');
                 this._allPropertiesHash[j][this._propertyHash[i][j]] = true;
             }
         }

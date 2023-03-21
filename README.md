@@ -1,5 +1,8 @@
 # SQuerys
 
+## Version Update (0.8.4)
+* Callback for search results
+
 ## Version Update (0.8.3)
 * Ability to search by node children (count and name)
 * Display of property stats (nummber of options, number of occurences) in editor
