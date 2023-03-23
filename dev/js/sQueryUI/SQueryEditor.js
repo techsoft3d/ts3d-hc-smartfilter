@@ -68,8 +68,8 @@ export class SQueryEditor {
 
     static _generateDropdown() {
         let html = "";
-        html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton dropdown-button">...</button>';
-        html += '<ul style="right:22px;top:10px;position:absolute;" class="dropdown-content">';
+        html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
+        html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
@@ -122,17 +122,17 @@ export class SQueryEditor {
         $("#" + SQueryEditor._maindiv).append(html);
 
         if (SQueryEditor._showFirstRow) {
-            const dropdownButton = document.querySelector('.dropdown-button');
-            const dropdownContent = document.querySelector('.dropdown-content');
+            const SQueryDropdowButton = document.querySelector('.SQueryDropdow-button');
+            const SQueryDropdowContent = document.querySelector('.SQueryDropdow-content');
 
-            dropdownButton.addEventListener('click', function () {
-                dropdownContent.classList.toggle('dropdownShow');
+            SQueryDropdowButton.addEventListener('click', function () {
+                SQueryDropdowContent.classList.toggle('SQueryDropdowShow');
             });
 
             window.addEventListener('click', function (event) {
-                if (!event.target.matches('.dropdown-button')) {
-                    if (dropdownContent.classList.contains('dropdownShow')) {
-                        dropdownContent.classList.remove('dropdownShow');
+                if (!event.target.matches('.SQueryDropdow-button')) {
+                    if (SQueryDropdowContent.classList.contains('SQueryDropdowShow')) {
+                        SQueryDropdowContent.classList.remove('SQueryDropdowShow');
                     }
                 }
             });
@@ -557,7 +557,7 @@ export class SQueryEditor {
     static _generatePropertyTypeSelect(condition, filterpos, SQuery) {
       
 
-        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
+        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
         let sortedStrings = SQueryEditor._manager.getAllProperties();
