@@ -65,6 +65,25 @@ export class SQueryEditor {
         SQueryEditor._searchResultsCallback = callback;
     }
 
+
+    static _generateDropdown() {
+        let html = "";
+        html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
+        html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
+        html +='<li >---</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
+        html += '</ul>';
+        return html;
+    }
+
     static async display() {
         
         await SQueryEditor._manager.initialize();
@@ -74,7 +93,7 @@ export class SQueryEditor {
         if (SQueryEditor._showFirstRow) {
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit Selection</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchChildren">'
                 html += '</div>';
             }
@@ -83,14 +102,16 @@ export class SQueryEditor {
 
             }
 
-            html += '<button class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
-            html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
+            html += SQueryEditor._generateDropdown();
+            html += '<button class="SQuerySearchButton" type="button" style="right:92px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
+            html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
             html += '<hr class="SQueryEditorDivider">';
         }
 
         html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
         html += await SQueryEditor._generateConditions();
         html += '</div>';
+        
         if (!SQueryEditor._searchResultsCallback) {
             html += '<hr>';
             html += '<div id="' + SQueryEditor._maindiv + '_searchitems" class="SQuerySearchItems"></div>';
@@ -99,6 +120,24 @@ export class SQueryEditor {
         html += '</div>';
         $("#" + SQueryEditor._maindiv).empty();
         $("#" + SQueryEditor._maindiv).append(html);
+
+        if (SQueryEditor._showFirstRow) {
+            const SQueryDropdowButton = document.querySelector('.SQueryDropdow-button');
+            const SQueryDropdowContent = document.querySelector('.SQueryDropdow-content');
+
+            SQueryDropdowButton.addEventListener('click', function () {
+                SQueryDropdowContent.classList.toggle('SQueryDropdowShow');
+            });
+
+            window.addEventListener('click', function (event) {
+                if (!event.target.matches('.SQueryDropdow-button')) {
+                    if (SQueryDropdowContent.classList.contains('SQueryDropdowShow')) {
+                        SQueryDropdowContent.classList.remove('SQueryDropdowShow');
+                    }
+                }
+            });
+        }
+
         SQueryEditor._generateSearchResults();
         SQueryEditor._addFilterFromUI(false,0);
 
@@ -166,6 +205,25 @@ export class SQueryEditor {
         }
 
     }
+
+    static makeVisible(onoff) {        
+                            
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
+    }
+
+    static colorize(color) {        
+                            
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesFaceColor(selections, color);
+    }
+
 
     static isolateAll() {        
                             
@@ -499,7 +557,7 @@ export class SQueryEditor {
     static _generatePropertyTypeSelect(condition, filterpos, SQuery) {
       
 
-        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="propertyTypeSelect" id="' +  
+        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
         let sortedStrings = SQueryEditor._manager.getAllProperties();
@@ -510,7 +568,7 @@ export class SQueryEditor {
                 let numOptions = SQueryEditor._manager.getNumOptions(sortedStrings[i]);
                 if (numOptions) {
                     let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(sortedStrings[i]);
-                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "," + numOptionsUsed + ")";
+                    sortedStrings[i] = sortedStrings[i] + " (" + numOptions + "/" + numOptionsUsed + ")";
                 }
             }
         }
@@ -523,7 +581,7 @@ export class SQueryEditor {
             let numOptions = SQueryEditor._manager.getNumOptions(propertyNamePlus);
             if (numOptions) {
                 let numOptionsUsed = SQueryEditor._manager.getNumOptionsUsed(propertyNamePlus);
-                propertyNamePlus = propertyNamePlus + " (" + numOptions + "," + numOptionsUsed + ")";
+                propertyNamePlus = propertyNamePlus + " (" + numOptions + "/" + numOptionsUsed + ")";
             }
         }
 
