@@ -189,6 +189,22 @@ export class SQueryManagerUI {
                     }
                 },
                 {
+                    label: "<i class='fas fa-user'></i> Transparent",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.setOpacity(0.7);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Opaque",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.setOpacity(1.0);
+                    }
+                },
+                {
                     separator:true,
                 },
                 {

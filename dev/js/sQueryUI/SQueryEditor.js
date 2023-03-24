@@ -80,6 +80,8 @@ export class SQueryEditor {
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';        
         html += '</ul>';
         return html;
     }
@@ -230,6 +232,17 @@ export class SQueryEditor {
             selections.push(parseInt(SQueryEditor._founditems[i].id));
         }
         SQueryEditor._viewer.model.setNodesFaceColor(selections, color);
+    }
+
+    static async setOpacity(opacity) {        
+                   
+        await SQueryEditor._updateSearch();
+
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesOpacity(selections, opacity);
     }
 
 
