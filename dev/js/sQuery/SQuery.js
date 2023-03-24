@@ -10,6 +10,7 @@ export class SQuery {
         this._conditions = [];
         this._name = "";
         this._keepSearchingChildren = false;
+        this._prop = false;
         this._id = this._generateGUID();
             
         if (startnode)
@@ -28,6 +29,14 @@ export class SQuery {
 
     updateConditions(conditions) {
         this._conditions = conditions;
+    }
+
+    setProp (isProp) {
+        this._prop = isProp;
+    }
+
+    getProp () {
+        return this._prop;
     }
 
     setName(name) {
@@ -87,6 +96,14 @@ export class SQuery {
             }
         }
         this._name = json.name;
+
+        if (json.prop == undefined) {
+            this._prop = false;
+        }
+        else {
+            this._prop = json.prop;
+        }
+
         if (json.keepSearchingChildren == undefined) {
             this._keepSearchingChildren = false;
         }
@@ -110,7 +127,7 @@ export class SQuery {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren};        
+        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {
@@ -590,7 +607,7 @@ export class SQuery {
         if (id != startid) {
             if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);
-                if (!this._keepSearchingChildren) {
+                if (this._manager.getKeepSearchingChildren() != undefined ?  !this._manager.getKeepSearchingChildren() :  !this._keepSearchingChildren) {
                     return;
                 }
             }

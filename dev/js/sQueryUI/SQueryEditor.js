@@ -206,6 +206,12 @@ export class SQueryEditor {
 
     }
 
+    static async _updateSearch() {
+        if (SQueryEditor._founditems || SQueryEditor._mainFilter.getNumConditions()) {
+            await SQueryEditor.search();
+        }
+    }
+
     static makeVisible(onoff) {        
                             
         let selections = [];
@@ -215,8 +221,10 @@ export class SQueryEditor {
         SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
     }
 
-    static colorize(color) {        
-                            
+    static async colorize(color) {        
+                   
+        await SQueryEditor._updateSearch();
+
         let selections = [];
         for (let i = 0; i < SQueryEditor._founditems.length; i++) {
             selections.push(parseInt(SQueryEditor._founditems[i].id));
@@ -383,8 +391,7 @@ export class SQueryEditor {
 
     static _setSearchChildren() {
         let searchChildren = $("#" + SQueryEditor._maindiv + "_searchChildren")[0].checked;
-
-        SQueryEditor._mainFilter.setKeepSearchingChildren(searchChildren);
+        SQueryEditor._manager.setKeepSearchingChildren(searchChildren);
 
     }
 

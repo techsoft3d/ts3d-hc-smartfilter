@@ -112,30 +112,98 @@ export class SQueryManagerUI {
 
         if (!SQueryManagerUI._table) {
 
-            let rowMenu = [
+            let rowMenu = [               
                 {
-                    label: "<i class='fas fa-user'></i> Search",
+                    label: "<i class='fas fa-user'></i> Select",
                     action: async function (e, row) {
-                        let rowdata = row.getData();
-                        SQueryManagerUI._handleTableSelection(row.getData(), false, false);
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.selectAll();
                     }
                 },
                 {
-                    label: "<i class='fas fa-user'></i> Search & Select",
+                    label: "<i class='fas fa-user'></i> Isolate",
                     action: async function (e, row) {
-                        let rowdata = row.getData();
-                        SQueryManagerUI._handleTableSelection(row.getData(), true, false);
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.isolateAll();
                     }
                 },
                 {
-                    label: "<i class='fas fa-user'></i> Search & Isolate",
+                    label: "<i class='fas fa-user'></i> Show",
                     action: async function (e, row) {
-                        let rowdata = row.getData();
-                        SQueryManagerUI._handleTableSelection(row.getData(), true,true);
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.makeVisible(true);
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Hide",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.makeVisible(false);
                     }
                 },
                 {
                     separator:true,
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Red",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.colorize(new Communicator.Color(255,0,0));
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Green",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.colorize(new Communicator.Color(0,255,0));
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Blue",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.colorize(new Communicator.Color(0,0,255));
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> Yellow",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.colorize(new Communicator.Color(255,255,0));
+                    }
+                },
+                {
+                    label: "<i class='fas fa-user'></i> White",
+                    action: async function (e, row) {
+                        await SQueryManagerUI._updateEditor(row.getData().id);
+                        await SQueryEditor.search();
+                        SQueryEditor.colorize(new Communicator.Color(255,255,255));
+                    }
+                },
+                {
+                    separator:true,
+                },
+                {
+                    label: "<i class='fas fa-user'></i> View",
+                    action: async function (e, row) {
+
+                        let data = row.getData();
+                        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
+                        let filterjson = SQuery.toJSON();
+                
+                        let editorfilter = SQueryEditor.getFilter();
+                        editorfilter.fromJSON(filterjson);                
+                        SQueryEditor.clearSearchResults();                
+                        await SQueryEditor.refreshUI();               
+                    }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Edit Name",
@@ -201,6 +269,8 @@ export class SQueryManagerUI {
                 editorfilter.fromJSON(filterjson);
                 SQueryEditor.clearSearchResults();                
                 await SQueryEditor.refreshUI();                
+                SQueryEditor.search();
+
             });
 
             SQueryManagerUI._table.on("rowDblClick", function(e, row){
@@ -239,30 +309,19 @@ export class SQueryManagerUI {
             text = text.replace(/&quot;/g, '"');
             prop.id =  SQueryManagerUI._manager.getSQueryID(i);;
             prop.description = text;
-            prop.prop = SQueryManagerUI._manager.getIsProp(i);
+            prop.prop = SQueryManagerUI._manager.getSQuery(i).getProp();
             await SQueryManagerUI._table.addRow(prop);
         }     
     }
 
-
-    static async _handleTableSelection(data, select, isolate) {
-
-        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
-
+    static async _updateEditor(id) {
+        
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(id);
         let filterjson = SQuery.toJSON();
-
         let editorfilter = SQueryEditor.getFilter();
         editorfilter.fromJSON(filterjson);
         await SQueryEditor.refreshUI();
-        await SQueryEditor.search();
-        if (select) {
-            if (isolate) {
-                SQueryEditor.isolateAll();
-            }
-            else {
-                SQueryEditor.selectAll();
-            }
-        }
+
     }
 
     static async _handleSQueryNameEdit(row) {
