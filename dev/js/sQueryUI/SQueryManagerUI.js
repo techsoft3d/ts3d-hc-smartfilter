@@ -367,7 +367,7 @@ export class SQueryManagerUI {
                 let neworder = [];
                 for (let i=0;i<rows.length;i++) {
                     let data = rows[i].getData();
-                    neworder.push({filter:SQueryManagerUI._manager.getSQueryByID(data.id)});
+                    neworder.push(SQueryManagerUI._manager.getSQueryByID(data.id));
                 }
                 SQueryManagerUI._manager.setSQueries(neworder);
             });
