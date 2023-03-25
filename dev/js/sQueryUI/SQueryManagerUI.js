@@ -257,15 +257,15 @@ export class SQueryManagerUI {
                 selectable:0,
                 movableRows: true,
                 layout: "fitColumns",
-                rowContextMenu: rowMenu,
+                rowContextMenu: rowMenu,             
                 columns: [                                   
                     {
-                        title: "Name", field: "description", formatter:"textarea", editor:"input",editable: SQueryManagerUI.editCheck,tooltip:SQueryManagerUI.formatTooltip
+                        title: "Name", headerSort : false,field: "description", formatter:"textarea", editor:"input",editable: SQueryManagerUI.editCheck,tooltip:SQueryManagerUI.formatTooltip
                     },  
                     {
                         title: "ID", field: "id", width: 20, visible: false
                     },
-                    {title:"Action", field:"action", editor:"list", width:70,formatter:function(cell, formatterParams, onRendered){
+                    {title:"Action",  headerSort : false,field:"action", editor:"list", width:70,formatter:function(cell, formatterParams, onRendered){
                         //cell - the cell component
                         //formatterParams - parameters set for the column
                         //onRendered - function to call when the formatter has been rendered
@@ -329,7 +329,7 @@ export class SQueryManagerUI {
                     }
                     }},
 
-                    {title:"Prop", field:"prop", width:70,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
+                    {title:"Prop", headerSort : false, field:"prop", width:70,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
                     editorParams:{
                        
                         tristate:false,
