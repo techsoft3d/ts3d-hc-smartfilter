@@ -619,8 +619,8 @@ export class SQuery {
                 if (!conditions[i].SQuery) {
                     if (!conditions[i].SQueryID) {
                         let f=  this._manager.getSQueryByName(conditions[i].text);
-                        conditions[i].SQueryID = f.filter._id;
-                        conditions[i].SQuery = f.filter;
+                        conditions[i].SQueryID = f._id;
+                        conditions[i].SQuery = f;
                     }
                     else {
                         conditions[i].SQuery = this._manager.getSQueryByID(conditions[i].SQueryID);

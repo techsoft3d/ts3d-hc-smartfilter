@@ -10,12 +10,12 @@ export class SQueryManager {
     }
 
     addSQuery(SQuery) {
-        this._SQuerys.push({filter:SQuery});
+        this._SQuerys.push(SQuery);
     }
 
     executeSQueries() {
         for (let i = 0; i < this._SQuerys.length; i++) {
-            this._SQuerys[i].filter.performAction();
+            this._SQuerys[i].performAction();
         }
     }
 
@@ -38,15 +38,15 @@ export class SQueryManager {
 
     getSQueryByName(name) {
        for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter.getName() == name)
+            if (this._SQuerys[i].getName() == name)
                 return this._SQuerys[i];
         }
     }
 
     getSQueryByID(id) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id)
-                return this._SQuerys[i].filter;
+            if (this._SQuerys[i]._id == id)
+                return this._SQuerys[i];
         }
     }
     getSQueryNum() {
@@ -54,29 +54,29 @@ export class SQueryManager {
     }
 
     getSQuery(pos) {
-        return this._SQuerys[pos].filter;                
+        return this._SQuerys[pos];                
     }
 
     getSQueryID(pos) {
-        return this._SQuerys[pos].filter._id;                
+        return this._SQuerys[pos]._id;                
     }
    
     removeSQuery(id) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id) {
+            if (this._SQuerys[i]._id == id) {
                 return this._SQuerys.splice(i, 1);
             }
         }
     }
 
     updateSQuery(pos, SQuery) {
-        this._SQuerys[pos].filter = SQuery;
+        this._SQuerys[pos] = SQuery;
     }
 
     updateSQueryIsProp(id,isProp) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id) {
-                this._SQuerys[i].filter.setProp(isProp);
+            if (this._SQuerys[i]._id == id) {
+                this._SQuerys[i].setProp(isProp);
             }
         }
     }
@@ -84,7 +84,7 @@ export class SQueryManager {
     toJSON() {
         let json = [];
         for (let i = 0; i < this._SQuerys.length; i++) {
-            json.push({filter:this._SQuerys[i].filter.toJSON()});
+            json.push(this._SQuerys[i].toJSON());
         }
         return json;
     }
@@ -93,7 +93,7 @@ export class SQueryManager {
         this._SQuerys = [];
         for (let i = 0; i < json.length; i++) {
             let sf = new SQuery(this);
-            sf.fromJSON(json[i].filter);
+            sf.fromJSON(json[i]);
             this.addSQuery(sf);
         }
         return json;
@@ -103,8 +103,8 @@ export class SQueryManager {
     {
         let properties = [];
         for (let i = 0; i < this._SQuerys.length; i++) {
-            if (this._SQuerys[i].filter.getProp()) {
-                let SQuery = this._SQuerys[i].filter;
+            if (this._SQuerys[i].getProp()) {
+                let SQuery = this._SQuerys[i];
 
                 let stop = false;
                 if (this._keepSearchingChildren != undefined ? !this._keepSearchingChildren : !SQuery._keepSearchingChildren) {

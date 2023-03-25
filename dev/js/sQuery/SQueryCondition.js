@@ -128,7 +128,7 @@ export class SQueryCondition {
 
             let f = manager.getSQueryByName(this.text);
             if (f) {
-                this.SQueryID =  f.filter._id;
+                this.SQueryID =  f._id;
             }
         }
 

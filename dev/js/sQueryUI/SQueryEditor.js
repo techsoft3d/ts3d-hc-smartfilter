@@ -645,7 +645,7 @@ export class SQueryEditor {
         else if (condition.propertyName == "SQuery") {
             let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
-                sortedStrings.push(SQuerys[i].filter.getName());
+                sortedStrings.push(SQuerys[i].getName());
             }
         }        
         else {
