@@ -79,7 +79,7 @@ export class SQueryEditor {
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(128,128,128))\'>Grey</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';        
         html += '</ul>';
@@ -174,7 +174,7 @@ export class SQueryEditor {
     }
 
 
-    static async search() {
+    static async search(doAction = false) {
 
         SQueryEditor.updateFilterFromUI();
       
@@ -188,6 +188,9 @@ export class SQueryEditor {
             SQueryEditor._founditems.push(item);
         }    
         SQueryEditor._generateSearchResults();
+        if (doAction) {
+            SQueryEditor._mainFilter.performAction(nodeids);
+        }
     }
 
 

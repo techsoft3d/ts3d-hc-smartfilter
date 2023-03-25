@@ -13,6 +13,16 @@ export class SQueryManager {
         this._SQuerys.push({filter:SQuery});
     }
 
+    executeSQueries() {
+        for (let i = 0; i < this._SQuerys.length; i++) {
+            this._SQuerys[i].filter.performAction();
+        }
+    }
+
+    setSQueries(SQuerys) {
+        this._SQuerys = SQuerys;
+    }
+
     setKeepSearchingChildren(keepSearchingChildren) {
         this._keepSearchingChildren = keepSearchingChildren;
     }

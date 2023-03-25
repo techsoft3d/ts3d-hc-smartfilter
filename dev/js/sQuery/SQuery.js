@@ -9,6 +9,7 @@ export class SQuery {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._action = "";
         this._keepSearchingChildren = false;
         this._prop = false;
         this._id = this._generateGUID();
@@ -17,6 +18,50 @@ export class SQuery {
             this._startnode = startnode;
         else
             this._startnode =  this._viewer.model.getRootNode();
+    }
+
+
+    getAction() {
+        return this._action;
+    }
+
+    setAction(action) {
+        this._action = action;
+    }
+
+    async performAction(nodeids_in) {
+
+        if (this._action == "") {
+            return;
+        }
+        let nodeids;
+        if (nodeids_in)  {
+            nodeids = nodeids_in;
+        }
+        else {
+            nodeids = await this.apply();
+        }
+
+        switch (this._action) {
+            case "red":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
+            break;
+            case "green":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
+            break;
+            case "blue":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
+            break;
+            case "yellow":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
+            break;
+            case "grey":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
+            break;
+            case "Transparent":
+                await this._viewer.model.setNodesOpacity(nodeids, 0.7);
+            break;
+        }
     }
 
     setKeepSearchingChildren(keepSearchingChildren) {
@@ -104,6 +149,14 @@ export class SQuery {
             this._prop = json.prop;
         }
 
+        if (json.action == undefined) {
+            this._action = "";
+        }
+        else {
+            this._action = json.action;
+        }
+
+
         if (json.keepSearchingChildren == undefined) {
             this._keepSearchingChildren = false;
         }
@@ -127,7 +180,7 @@ export class SQuery {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
+        return {action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {

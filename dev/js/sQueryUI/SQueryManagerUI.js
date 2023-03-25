@@ -17,10 +17,11 @@ export class SQueryManagerUI {
 
         if (SQueryManagerUI._showButtonRow) {
 
-            $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerAddCurrentFilter" type="button" style="left:0px;top:2px">Add</button>');
+            $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerAddCurrentFilter" type="button" style="top:2px">Add</button>');
+            $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerExecute" type="button" style="top:2px;margin-left:2px;">Execute</button>');
             if (showImportExportButtons) {
                 $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerExport" type="button" style="position:absolute;right:0px;top:2px">Export</button>');
-                $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerUpload" type="button" style="position:absolute;right:58px;top:2px">Load</button><input style="display:none" type="file" id="inputupload">');
+                $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerUpload" type="button" style="position:absolute;right:52px;top:2px">Load</button><input style="display:none" type="file" id="inputupload">');
 
                 $("#SQueryManagerExport").click(function () { SQueryManagerUI.exportToFile("squeryfilters.json"); });
 
@@ -40,6 +41,7 @@ export class SQueryManagerUI {
             }
 
             $("#SQueryManagerAddCurrentFilter").click(function () { SQueryManagerUI._addCurrentFilter(); });
+            $("#SQueryManagerExecute").click(function () { SQueryManagerUI._executeAllFilters(); });
         }
 
         $("#" + this._uidiv).append('<div id="' + SQueryManagerUI._uidiv + 'Tabulator" class = "SQueryManagerTabulator"></div>');
@@ -72,6 +74,10 @@ export class SQueryManagerUI {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
+    }
+
+    static async _executeAllFilters() {
+        SQueryManagerUI._manager.executeSQueries();
     }
 
     static async _addCurrentFilter() {
@@ -181,11 +187,11 @@ export class SQueryManagerUI {
                     }
                 },
                 {
-                    label: "<i class='fas fa-user'></i> White",
+                    label: "<i class='fas fa-user'></i> Grey",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(255,255,255));
+                        SQueryEditor.colorize(new Communicator.Color(128,128,128));
                     }
                 },
                 {
@@ -244,19 +250,12 @@ export class SQueryManagerUI {
                     }
                 },
             ];
-
-            var editCheck = function(cell){
-                //cell - the cell component for the editable cell
-            
-                //get row data
-                var data = cell.getRow().getData();
-            
-                return data.age > 18; // only allow the name cell to be edited if the age is over 18
-            }
+           
 
             SQueryManagerUI._table = new Tabulator("#" + SQueryManagerUI._uidiv + "Tabulator", {
                 data: [],                             
                 selectable:0,
+                movableRows: true,
                 layout: "fitColumns",
                 rowContextMenu: rowMenu,
                 columns: [                                   
@@ -266,6 +265,70 @@ export class SQueryManagerUI {
                     {
                         title: "ID", field: "id", width: 20, visible: false
                     },
+                    {title:"Action", field:"action", editor:"list", width:70,formatter:function(cell, formatterParams, onRendered){
+                        //cell - the cell component
+                        //formatterParams - parameters set for the column
+                        //onRendered - function to call when the formatter has been rendered
+                        
+                        if (cell.getValue() == undefined) {
+                            return cell.getValue();
+                        }
+                        else {
+                            switch(cell.getValue()) {
+                                case "red":
+                                    return '<div style="background:red;color:red;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                                break;
+                                case "green":
+                                    return '<div style="background:green;color:green;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                                break;
+                                case "blue":
+                                    return '<div style="background:blue;color:blue;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                                break;
+                                case "yellow":
+                                    return '<div style="background:yellow;color:yellow;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                                break;
+                                case "grey":
+                                    return '<div style="background:grey;color:grey;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                                break;
+                                default:
+                                    return cell.getValue();
+                            }
+                        }
+                    },
+                     editorParams:{values:["","red", "green", "blue", "yellow", "grey", "Transparent"],
+                
+                    itemFormatter:function (label, value, item, element){
+                        //label - the text lable for the item
+                        //value - the value for the item
+                        //item - the original value object for the item
+                        //element - the DOM element for the item
+                
+                        //return the initial label as a bold line and then second line in regular font weight containing the value of the custom "subtitle" prop set on the value item object.
+                        switch(value) {
+                            case "red":
+                                return '<span style="background:red;color:red">XXXXXXXXX</span>';
+                            break;
+                            case "green":
+                                return '<span style="background:green;color:green">XXXXXXXXX</span>';
+                            break;
+                            case "blue":
+                                return '<span style="background:blue;color:blue">XXXXXXXXX</span>';
+                            break;
+                            case "yellow":
+                                return '<span style="background:yellow;color:yellow">XXXXXXXXX</span>';
+                            break;
+                            case "grey":
+                                return '<span style="background:grey;color:grey">XXXXXXXXX</span>';
+                            break;
+                            case "":
+                                return 'None';
+                            break;
+                            default:
+                                return value;
+                        };
+                    }
+                    }},
+
                     {title:"Prop", field:"prop", width:70,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
                     editorParams:{
                        
@@ -273,24 +336,40 @@ export class SQueryManagerUI {
                       
                     }},
 
+
                 ],
             });
 
             SQueryManagerUI._table.on("rowClick", async function (e, row) {
                 let data = row.getData();
                 let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
+
                 let filterjson = SQuery.toJSON();
-        
                 let editorfilter = SQueryEditor.getFilter();
                 editorfilter.fromJSON(filterjson);
                 SQueryEditor.clearSearchResults();                
                 await SQueryEditor.refreshUI();                
-                SQueryEditor.search();
-
+                if (SQuery.getAction() == "") {
+                    await SQueryEditor.search();
+                }       
+                else {
+                    await SQueryEditor.search(true);
+                }         
             });
 
             SQueryManagerUI._table.on("rowDblClick", function(e, row){
                 SQueryManagerUI._editable = true;                
+            });
+
+            SQueryManagerUI._table.on("rowMoved", function(row){
+
+                let rows = SQueryManagerUI._table.getRows();
+                let neworder = [];
+                for (let i=0;i<rows.length;i++) {
+                    let data = rows[i].getData();
+                    neworder.push({filter:SQueryManagerUI._manager.getSQueryByID(data.id)});
+                }
+                SQueryManagerUI._manager.setSQueries(neworder);
             });
         
 
@@ -299,14 +378,19 @@ export class SQueryManagerUI {
                     SQueryManagerUI._handleSQueryNameEdit(cell.getRow());
                     SQueryManagerUI._editable = false;
                 }
-                else
-                {
+                else if (cell.getField() == "prop") {                
                     SQueryManagerUI._handleSQueryIsPropEdit(cell.getRow());
                 }
+                else {
+                    SQueryManagerUI._handleSQueryIsActionEdit(cell.getRow());
+
+                }
+                SQueryManagerUI._table.redraw();
             });
         }
-        else
+        else {
             await SQueryManagerUI._table.clearData();
+        }
 
         for (let i=0;i<SQueryManagerUI._manager.getSQueryNum();i++) {
             let filter = SQueryManagerUI._manager.getSQuery(i);
@@ -325,6 +409,7 @@ export class SQueryManagerUI {
             text = text.replace(/&quot;/g, '"');
             prop.id =  SQueryManagerUI._manager.getSQueryID(i);;
             prop.description = text;
+            prop.action = filter.getAction();
             prop.prop = SQueryManagerUI._manager.getSQuery(i).getProp();
             await SQueryManagerUI._table.addRow(prop);
         }     
@@ -358,6 +443,16 @@ export class SQueryManagerUI {
     static async _handleSQueryIsPropEdit(row) {
         let data = row.getData();
         SQueryManagerUI._manager.updateSQueryIsProp(data.id,data.prop);
+        if (SQueryManagerUI._updatedCallback) {
+            SQueryManagerUI._updatedCallback();
+        }
+    }
+
+
+    static async _handleSQueryIsActionEdit(row) {
+        let data = row.getData();
+        let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
+        SQuery.setAction(data.action);
         if (SQueryManagerUI._updatedCallback) {
             SQueryManagerUI._updatedCallback();
         }
