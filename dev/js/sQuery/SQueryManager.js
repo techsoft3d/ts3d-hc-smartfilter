@@ -7,6 +7,16 @@ export class SQueryManager {
         this._SQuerys = [];
         this._modelHash = [];
         this._keepSearchingChildren = false;
+        this._searchVisible = false;
+    }
+
+
+    setSearchVisible(onoff) {
+        this._searchVisible = onoff;        
+    }
+
+    getSearchVisible() {
+        return this._searchVisible;
     }
 
     addSQuery(SQuery) {

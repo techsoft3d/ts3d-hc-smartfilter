@@ -70,6 +70,9 @@ export class SQueryEditor {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'>Search Children</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';        
+        html +='<li >---</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
@@ -96,7 +99,6 @@ export class SQueryEditor {
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
                 html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
-                html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchChildren">'
                 html += '</div>';
             }
             else {
@@ -405,11 +407,26 @@ export class SQueryEditor {
 
     }
 
-    static _setSearchChildren() {
-        let searchChildren = $("#" + SQueryEditor._maindiv + "_searchChildren")[0].checked;
-        SQueryEditor._manager.setKeepSearchingChildren(searchChildren);
-
+    static _setSearchChildren(el) {
+        
+        SQueryEditor._manager.setKeepSearchingChildren(!SQueryEditor._manager.getKeepSearchingChildren());
+        let text = "Search Children";
+        if (SQueryEditor._manager.getKeepSearchingChildren()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
     }
+
+    static _setSearchVisible(el) {
+        
+        SQueryEditor._manager.setSearchVisible(!SQueryEditor._manager.getSearchVisible());
+        let text = "Search Visible";
+        if (SQueryEditor._manager.getSearchVisible()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
+    }
+
 
     static _limitSelectionShow() {
       

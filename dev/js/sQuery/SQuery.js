@@ -48,7 +48,7 @@ export class SQuery {
         }
         else {
             for (let i = 0; i < nodeidst.length; i++) {
-                if (this._viewer.model.getNodeVisibility(nodeidst[i])) {
+                if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
                     nodeids.push(nodeidst[i]);
                 }
             }
@@ -684,6 +684,9 @@ export class SQuery {
     }
  
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
+        if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
+            return;
+        }
         let nl = this._viewer.model.getNodeName(id);
         if (id != startid) {
             if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
