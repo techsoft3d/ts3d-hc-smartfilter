@@ -62,8 +62,18 @@ export class SQuery {
                 await this._viewer.model.setNodesOpacity(nodeids, 0.7);
             break;
             case "Isolate":
-                await this._viewer.view.isolateNodes(nodeids,0);
+                await this._viewer.view.isolateNodes(nodeids,0, false);
             break;
+            case "Hide":
+                await this._viewer.model.setNodesVisibility(nodeids,false);
+            break;
+            case "Select":
+                let selections = [];
+                for (let i = 0; i < nodeids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
+                }
+                await this._viewer.selectionManager.add(selections);
+            break;        
         }
     }
 

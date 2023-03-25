@@ -13,9 +13,9 @@ export class SQueryManager {
         this._SQuerys.push(SQuery);
     }
 
-    executeSQueries() {
+    async executeSQueries() {
         for (let i = 0; i < this._SQuerys.length; i++) {
-            this._SQuerys[i].performAction();
+            await this._SQuerys[i].performAction();
         }
     }
 
