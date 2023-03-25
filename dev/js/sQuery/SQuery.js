@@ -29,17 +29,29 @@ export class SQuery {
         this._action = action;
     }
 
-    async performAction(nodeids_in) {
+    async performAction(nodeids_in, ignoreVisibility = true) {
 
         if (this._action == "") {
             return;
         }
-        let nodeids;
+        let nodeidst;
         if (nodeids_in)  {
-            nodeids = nodeids_in;
+            nodeidst = nodeids_in;
         }
         else {
-            nodeids = await this.apply();
+            nodeidst = await this.apply();
+        }
+
+        let nodeids = [];
+        if (ignoreVisibility || this._action == "Isolate") {
+            nodeids = nodeidst;
+        }
+        else {
+            for (let i = 0; i < nodeidst.length; i++) {
+                if (this._viewer.model.getNodeVisibility(nodeidst[i])) {
+                    nodeids.push(nodeidst[i]);
+                }
+            }
         }
 
         switch (this._action) {
@@ -64,6 +76,9 @@ export class SQuery {
             case "Isolate":
                 await this._viewer.view.isolateNodes(nodeids,0, false);
             break;
+            case "Show":
+                await this._viewer.model.setNodesVisibility(nodeids,true);
+            break;            
             case "Hide":
                 await this._viewer.model.setNodesVisibility(nodeids,false);
             break;
