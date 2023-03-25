@@ -1,5 +1,9 @@
 # SQuerys
 
+
+## Version Update (0.8.6)
+* Ability to specify & execute Query Actions
+
 ## Version Update (0.8.4)
 * Callback for search results
 

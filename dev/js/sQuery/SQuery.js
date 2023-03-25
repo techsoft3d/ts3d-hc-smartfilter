@@ -61,6 +61,9 @@ export class SQuery {
             case "Transparent":
                 await this._viewer.model.setNodesOpacity(nodeids, 0.7);
             break;
+            case "Isolate":
+                await this._viewer.view.isolateNodes(nodeids,0);
+            break;
         }
     }
 

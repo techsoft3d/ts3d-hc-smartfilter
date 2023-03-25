@@ -295,7 +295,7 @@ export class SQueryManagerUI {
                             }
                         }
                     },
-                     editorParams:{values:["","red", "green", "blue", "yellow", "grey", "Transparent"],
+                     editorParams:{values:["","Isolate","red", "green", "blue", "yellow", "grey", "Transparent"],
                 
                     itemFormatter:function (label, value, item, element){
                         //label - the text lable for the item
