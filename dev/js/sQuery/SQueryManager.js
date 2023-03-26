@@ -430,7 +430,7 @@ export class SQueryManager {
         }
     }
 
-    getAllProperties() {
+    getAllProperties(hideIFCProperites = false) {
 
         let propsnames = [];
         let hasType = false;
@@ -468,10 +468,15 @@ export class SQueryManager {
         if (hasType) {
             propsnames.unshift("TYPE");
         }
-        propsnames.unshift("IFC GlobalId");
+        if (!hideIFCProperites) {
+            propsnames.unshift("IFC GlobalId");
+        }
         propsnames.unshift("---");
-        propsnames.unshift("Rel:IFC SpaceBoundary");
-        propsnames.unshift("Rel:IFC ContainedIn");
+        
+        if (!hideIFCProperites) {
+            propsnames.unshift("Rel:IFC SpaceBoundary");
+            propsnames.unshift("Rel:IFC ContainedIn");
+        }
         propsnames.unshift("Rel:Node Children");
         propsnames.unshift("Rel:Node Parent");
 

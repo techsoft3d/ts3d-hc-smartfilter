@@ -4,6 +4,7 @@ export class SQueryEditor {
     static _showLimitOption = true;
     static _showFirstRow = true;
     static _showPropertyStats = true;
+    static _hideIFCProperties = false;
     static _searchResultsCallback = null;
 
     static _htmlEncode(html) {
@@ -44,7 +45,10 @@ export class SQueryEditor {
            
         }).observe($("#" + SQueryEditor._maindiv)[0]);
 
-        
+    }
+
+    static setHideIFCProperties(onoff) {
+        SQueryEditor._hideIFCProperties = onoff;
     }
 
     static setChainSkip(skip) {
@@ -617,7 +621,7 @@ export class SQueryEditor {
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
-        let sortedStrings = SQueryEditor._manager.getAllProperties();
+        let sortedStrings = SQueryEditor._manager.getAllProperties(SQueryEditor._hideIFCProperties);
 
         if (SQueryEditor._showPropertyStats) {
             for (let i = 0; i < sortedStrings.length; i++) {
