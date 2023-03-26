@@ -1,6 +1,11 @@
 # SQuerys
 
 
+## Version Update (0.9.0)
+* More flexible related property search
+* Ability to search directly for IFC Globalid
+* Various other improvements and fixes
+
 ## Version Update (0.8.6)
 * Ability to specify & execute Query Actions
 
