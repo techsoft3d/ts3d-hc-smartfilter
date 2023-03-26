@@ -24,6 +24,9 @@ export class SQueryManager {
     }
 
     async executeSQueries() {
+        await this._viewer.model.reset();
+        await this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
+                                    
         for (let i = 0; i < this._SQuerys.length; i++) {
             await this._SQuerys[i].performAction(null,false);
         }
