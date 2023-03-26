@@ -1,5 +1,14 @@
 # SQuerys
 
+
+## Version Update (0.9.0)
+* More flexible related property search
+* Ability to search directly for IFC Globalid
+* Various other improvements and fixes
+
+## Version Update (0.8.6)
+* Ability to specify & execute Query Actions
+
 ## Version Update (0.8.4)
 * Callback for search results
 
@@ -35,7 +44,7 @@
 
 ![alt text](https://github.com/techsoft3d/ts3d-hc-squery/blob/master/readme_images/image1.png?raw=true)
 ## Advanced Search for HOOPS Communicator
-This library provides adanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
+This library provides advanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 

@@ -4,6 +4,7 @@ export class SQueryEditor {
     static _showLimitOption = true;
     static _showFirstRow = true;
     static _showPropertyStats = true;
+    static _hideIFCProperties = false;
     static _searchResultsCallback = null;
 
     static _htmlEncode(html) {
@@ -44,7 +45,10 @@ export class SQueryEditor {
            
         }).observe($("#" + SQueryEditor._maindiv)[0]);
 
-        
+    }
+
+    static setHideIFCProperties(onoff) {
+        SQueryEditor._hideIFCProperties = onoff;
     }
 
     static setChainSkip(skip) {
@@ -70,16 +74,22 @@ export class SQueryEditor {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'>Search Children</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';        
+        html +='<li >---</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';        
         html +='<li >---</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,255))\'>White</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(128,128,128))\'>Grey</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';        
         html += '</ul>';
         return html;
     }
@@ -94,7 +104,6 @@ export class SQueryEditor {
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
                 html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
-                html += '<label style="position:relative;left:5px;">Search Children:</label><input onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren()\' style="position:relative;left:2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchChildren">'
                 html += '</div>';
             }
             else {
@@ -172,7 +181,7 @@ export class SQueryEditor {
     }
 
 
-    static async search() {
+    static async search(doAction = false) {
 
         SQueryEditor.updateFilterFromUI();
       
@@ -186,6 +195,9 @@ export class SQueryEditor {
             SQueryEditor._founditems.push(item);
         }    
         SQueryEditor._generateSearchResults();
+        if (doAction) {
+            SQueryEditor._mainFilter.performAction(nodeids);
+        }
     }
 
 
@@ -206,6 +218,19 @@ export class SQueryEditor {
 
     }
 
+    static async _updateSearch() {
+        if (SQueryEditor._founditems || SQueryEditor._mainFilter.getNumConditions()) {
+            await SQueryEditor.search();
+        }
+    }
+
+    static resetModel() {                                    
+        this._viewer.model.reset();
+        this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
+        this._viewer.selectionManager.clear();
+    }
+
+
     static makeVisible(onoff) {        
                             
         let selections = [];
@@ -215,13 +240,26 @@ export class SQueryEditor {
         SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
     }
 
-    static colorize(color) {        
-                            
+    static async colorize(color) {        
+                   
+        await SQueryEditor._updateSearch();
+
         let selections = [];
         for (let i = 0; i < SQueryEditor._founditems.length; i++) {
             selections.push(parseInt(SQueryEditor._founditems[i].id));
         }
         SQueryEditor._viewer.model.setNodesFaceColor(selections, color);
+    }
+
+    static async setOpacity(opacity) {        
+                   
+        await SQueryEditor._updateSearch();
+
+        let selections = [];
+        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
+            selections.push(parseInt(SQueryEditor._founditems[i].id));
+        }
+        SQueryEditor._viewer.model.setNodesOpacity(selections, opacity);
     }
 
 
@@ -265,8 +303,15 @@ export class SQueryEditor {
             }
             else {
                 condition.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
-                condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum(condition.propertyName);
+                condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
 
+                let relSet = false;
+                if (condition.propertyType == hcSQuery.SQueryPropertyType.relationship) {
+                    relSet = true;
+                    condition.relationship = hcSQuery.SQueryCondition.convertStringToRelationshipType($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
+                    condition.propertyType = hcSQuery.SQueryPropertyType.nodeName;
+                    condition.propertyName = "Node Name";
+                }
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
                     if (!condition.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
                         condition.text = SQueryEditor._htmlEncode($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value);
@@ -276,7 +321,9 @@ export class SQueryEditor {
 
                     }
                 }
-                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                if (!relSet) {
+                    condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                }
                 if (SQueryEditor._showPropertyStats && condition.propertyName.endsWith(")")) {
                     let lastindex = condition.propertyName.lastIndexOf("(") - 1;
                     condition.propertyName = condition.propertyName.substring(0, lastindex);
@@ -381,12 +428,26 @@ export class SQueryEditor {
 
     }
 
-    static _setSearchChildren() {
-        let searchChildren = $("#" + SQueryEditor._maindiv + "_searchChildren")[0].checked;
-
-        SQueryEditor._mainFilter.setKeepSearchingChildren(searchChildren);
-
+    static _setSearchChildren(el) {
+        
+        SQueryEditor._manager.setKeepSearchingChildren(!SQueryEditor._manager.getKeepSearchingChildren());
+        let text = "Search Children";
+        if (SQueryEditor._manager.getKeepSearchingChildren()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
     }
+
+    static _setSearchVisible(el) {
+        
+        SQueryEditor._manager.setSearchVisible(!SQueryEditor._manager.getSearchVisible());
+        let text = "Search Visible";
+        if (SQueryEditor._manager.getSearchVisible()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
+    }
+
 
     static _limitSelectionShow() {
       
@@ -495,12 +556,12 @@ export class SQueryEditor {
                 }
             }
             else {
-                return '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (condition.and ? "and":"or") + '</span>';
+                return '<span style="top:5px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (condition.and ? "and":"or") + '</span>';
             }
         }
         else {
 
-            let html = '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
+            let html = '<span style="top:5px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
             html += '<select class="SQuerySearchSelect" onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' id="' +  
             SQueryEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
@@ -560,7 +621,7 @@ export class SQueryEditor {
         let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
-        let sortedStrings = SQueryEditor._manager.getAllProperties();
+        let sortedStrings = SQueryEditor._manager.getAllProperties(SQueryEditor._hideIFCProperties);
 
         if (SQueryEditor._showPropertyStats) {
             for (let i = 0; i < sortedStrings.length; i++) {
@@ -622,7 +683,7 @@ export class SQueryEditor {
         else if (condition.propertyName == "SQuery") {
             let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
-                sortedStrings.push(SQuerys[i].filter.getName());
+                sortedStrings.push(SQuerys[i].getName());
             }
         }        
         else {
@@ -687,6 +748,10 @@ export class SQueryEditor {
                 html += '</div>';
             }
             else {
+                if (condition.relationship) {
+                    html += '<div class="SQueryRelationshipTag" style="left:64px;position:relative">Relationship:' + hcSQuery.SQueryCondition.convertEnumRelationshipTypeToString(condition.relationship) + '</div>';
+                }
+
                 html += '<div style="height:30px;margin-top:-3px">';
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();

@@ -22,11 +22,25 @@ const SQueryPropertyType = {
     relationship:5,
     property:6,
     SQuery:7,
-    nodeParent:8,
-    nodeChildren:9
+    numChildren:8,
+    ifcglobalid:9
+
 };
 
 export {SQueryPropertyType};
+
+
+const SQueryRelationshipType = {
+    none:0,
+    containedIn:1,
+    spaceBoundary:2,
+    nodeParent:3,
+    nodeChildren:4
+};
+
+export {SQueryRelationshipType};
+
+
 
 export class SQueryCondition {
 
@@ -96,19 +110,52 @@ export class SQueryCondition {
                 return SQueryPropertyType.nodeType;
             case "Node Color":
                 return SQueryPropertyType.nodeColor;
-            case "Rel:ContainedIn":
-            case "Rel:SpaceBoundary":
-                return SQueryPropertyType.relationship;
+            case "Rel:IFC ContainedIn":
+            case "Rel:IFC SpaceBoundary":
+            case "Rel:Node Parent":
+            case "Rel:Node Children":
+                    return SQueryPropertyType.relationship;
             case "SQuery":
                  return SQueryPropertyType.SQuery;
-            case "Node Parent":
-                 return SQueryPropertyType.nodeParent;
-            case "Node Children":
-                return SQueryPropertyType.nodeChildren;        
+            case "# Children":
+                return SQueryPropertyType.numChildren;        
+            case "IFC GlobalId":
+                 return SQueryPropertyType.ifcglobalid;                        
             default:
                 return SQueryPropertyType.property;
         }
     }
+
+    static convertStringToRelationshipType(c) {
+
+        switch (c) {
+            case "Rel:IFC ContainedIn":
+                return SQueryRelationshipType.containedIn;
+            case "Rel:IFC SpaceBoundary":
+                return SQueryRelationshipType.spaceBoundary;
+            case "Rel:Node Parent":
+                return SQueryRelationshipType.nodeParent;
+            case "Rel:Node Children":
+                return SQueryRelationshipType.nodeChildren;                
+            default:
+                return false;
+        }
+    }
+
+    
+    static convertEnumRelationshipTypeToString(c) {
+
+        switch(c) {
+            case SQueryRelationshipType.containedIn:
+                return "IFC ContainedIn";
+            case SQueryRelationshipType.spaceBoundary:
+                return "IFC SpaceBoundary";
+            case SQueryRelationshipType.nodeParent:
+                return "Node Parent";
+            case SQueryRelationshipType.nodeChildren:
+                return "Node Children";
+        }
+    };
 
     constructor() {
         this.and = true;
@@ -118,7 +165,7 @@ export class SQueryCondition {
         this.text =  "";
         this.childFilter = null;
         this.SQueryID = null;
-
+        this.relationship = false;
     }
 
     toJSON(manager) {
@@ -128,7 +175,7 @@ export class SQueryCondition {
 
             let f = manager.getSQueryByName(this.text);
             if (f) {
-                this.SQueryID =  f.filter._id;
+                this.SQueryID =  f._id;
             }
         }
 
@@ -139,7 +186,8 @@ export class SQueryCondition {
             propertyName: JSON.parse(JSON.stringify(this.propertyName)),
             text: this.text,
             childFilter: this.childFilter,
-            SQueryID: this.SQueryID
+            SQueryID: this.SQueryID,
+            relationship: this.relationship
         };
     }
 
@@ -151,8 +199,10 @@ export class SQueryCondition {
         this.text = def.text;
         this.childFilter = def.childFilter;
         this.SQueryID = def.SQueryID;
+        this.relationship = def.relationship != undefined ? def.relationship : false;
 
     }
+
 
     setSQueryID(id) {
         this.squeryFitlerID = id;

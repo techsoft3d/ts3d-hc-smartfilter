@@ -6,12 +6,43 @@ export class SQueryManager {
         this._viewer = viewer;
         this._SQuerys = [];
         this._modelHash = [];
-
+        this._keepSearchingChildren = false;
+        this._searchVisible = false;
     }
 
-    addSQuery(SQuery,isProp) {
-        let filter = {filter:SQuery, isProp:isProp};
-        this._SQuerys.push({filter:SQuery, isProp:isProp});
+
+    setSearchVisible(onoff) {
+        this._searchVisible = onoff;        
+    }
+
+    getSearchVisible() {
+        return this._searchVisible;
+    }
+
+    addSQuery(SQuery) {
+        this._SQuerys.push(SQuery);
+    }
+
+    async executeSQueries() {
+        await this._viewer.model.reset();
+        await this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
+        await this._viewer.selectionManager.clear();
+                     
+        for (let i = 0; i < this._SQuerys.length; i++) {
+            await this._SQuerys[i].performAction(null,false);
+        }
+    }
+
+    setSQueries(SQuerys) {
+        this._SQuerys = SQuerys;
+    }
+
+    setKeepSearchingChildren(keepSearchingChildren) {
+        this._keepSearchingChildren = keepSearchingChildren;
+    }
+
+    getKeepSearchingChildren() {
+        return this._keepSearchingChildren;
     }
 
     getSQuerys() {
@@ -21,15 +52,15 @@ export class SQueryManager {
 
     getSQueryByName(name) {
        for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter.getName() == name)
+            if (this._SQuerys[i].getName() == name)
                 return this._SQuerys[i];
         }
     }
 
     getSQueryByID(id) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id)
-                return this._SQuerys[i].filter;
+            if (this._SQuerys[i]._id == id)
+                return this._SQuerys[i];
         }
     }
     getSQueryNum() {
@@ -37,33 +68,29 @@ export class SQueryManager {
     }
 
     getSQuery(pos) {
-        return this._SQuerys[pos].filter;                
+        return this._SQuerys[pos];                
     }
 
     getSQueryID(pos) {
-        return this._SQuerys[pos].filter._id;                
+        return this._SQuerys[pos]._id;                
     }
-
-    getIsProp(pos) {
-        return this._SQuerys[pos].isProp;                
-    }
-
+   
     removeSQuery(id) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id) {
+            if (this._SQuerys[i]._id == id) {
                 return this._SQuerys.splice(i, 1);
             }
         }
     }
 
     updateSQuery(pos, SQuery) {
-        this._SQuerys[pos].filter = SQuery;
+        this._SQuerys[pos] = SQuery;
     }
 
     updateSQueryIsProp(id,isProp) {
         for (let i=0;i<this._SQuerys.length;i++) {
-            if (this._SQuerys[i].filter._id == id) {
-                this._SQuerys[i].isProp = isProp;
+            if (this._SQuerys[i]._id == id) {
+                this._SQuerys[i].setProp(isProp);
             }
         }
     }
@@ -71,7 +98,7 @@ export class SQueryManager {
     toJSON() {
         let json = [];
         for (let i = 0; i < this._SQuerys.length; i++) {
-            json.push({filter:this._SQuerys[i].filter.toJSON(), isProp:this._SQuerys[i].isProp});
+            json.push(this._SQuerys[i].toJSON());
         }
         return json;
     }
@@ -80,8 +107,8 @@ export class SQueryManager {
         this._SQuerys = [];
         for (let i = 0; i < json.length; i++) {
             let sf = new SQuery(this);
-            sf.fromJSON(json[i].filter);
-            this.addSQuery(sf,json[i].isProp);
+            sf.fromJSON(json[i]);
+            this.addSQuery(sf);
         }
         return json;
     }
@@ -90,11 +117,11 @@ export class SQueryManager {
     {
         let properties = [];
         for (let i = 0; i < this._SQuerys.length; i++) {
-            if (this._SQuerys[i].isProp) {
-                let SQuery = this._SQuerys[i].filter;
+            if (this._SQuerys[i].getProp()) {
+                let SQuery = this._SQuerys[i];
 
                 let stop = false;
-                if (!SQuery._keepSearchingChildren) {
+                if (this._keepSearchingChildren != undefined ? !this._keepSearchingChildren : !SQuery._keepSearchingChildren) {
                     let tnodeid = nodeid;
                     while (1) {
                         tnodeid = this._viewer.model.getNodeParent(tnodeid);
@@ -403,7 +430,7 @@ export class SQueryManager {
         }
     }
 
-    getAllProperties() {
+    getAllProperties(hideIFCProperites = false) {
 
         let propsnames = [];
         let hasType = false;
@@ -438,16 +465,27 @@ export class SQueryManager {
         }
 
         propsnames.sort();
-        propsnames.unshift("---");
-        propsnames.unshift("SQuery");
-
-        if (hasLayer) {
-            propsnames.unshift("LAYER");
-        }
-
-
         if (hasType) {
             propsnames.unshift("TYPE");
+        }
+        if (!hideIFCProperites) {
+            propsnames.unshift("IFC GlobalId");
+        }
+        propsnames.unshift("---");
+        
+        if (!hideIFCProperites) {
+            propsnames.unshift("Rel:IFC SpaceBoundary");
+            propsnames.unshift("Rel:IFC ContainedIn");
+        }
+        propsnames.unshift("Rel:Node Children");
+        propsnames.unshift("Rel:Node Parent");
+
+        propsnames.unshift("SQuery");
+
+        propsnames.unshift("# Children");
+    
+        if (hasLayer) {
+            propsnames.unshift("LAYER");
         }
 
         if (hasSurfaceArea) {
@@ -458,17 +496,11 @@ export class SQueryManager {
             propsnames.unshift("Volume");
         }
        
-        propsnames.unshift("Rel:SpaceBoundary");
-        propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
-        propsnames.unshift("Node Type");
-        propsnames.unshift("Node Children");
+        propsnames.unshift("Node Type");       
         propsnames.unshift("Node Chain");
-        propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
-
-
         return propsnames;
     }
 

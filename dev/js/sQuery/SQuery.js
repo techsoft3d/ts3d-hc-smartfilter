@@ -1,5 +1,6 @@
 import { SQueryCondition } from './SQueryCondition.js';
 import { SQueryConditionType } from './SQueryCondition.js';
+import { SQueryRelationshipType } from './SQueryCondition.js';
 import { SQueryPropertyType } from './SQueryCondition.js';
 
 export class SQuery {
@@ -9,13 +10,87 @@ export class SQuery {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
+        this._action = "";
         this._keepSearchingChildren = false;
+        this._prop = false;
         this._id = this._generateGUID();
             
         if (startnode)
             this._startnode = startnode;
         else
             this._startnode =  this._viewer.model.getRootNode();
+    }
+
+
+    getAction() {
+        return this._action;
+    }
+
+    setAction(action) {
+        this._action = action;
+    }
+
+    async performAction(nodeids_in, ignoreVisibility = true) {
+
+        if (this._action == "") {
+            return;
+        }
+        let nodeidst;
+        if (nodeids_in)  {
+            nodeidst = nodeids_in;
+        }
+        else {
+            nodeidst = await this.apply();
+        }
+
+        let nodeids = [];
+        if (ignoreVisibility || this._action == "Isolate") {
+            nodeids = nodeidst;
+        }
+        else {
+            for (let i = 0; i < nodeidst.length; i++) {
+                if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
+                    nodeids.push(nodeidst[i]);
+                }
+            }
+        }
+
+        switch (this._action) {
+            case "red":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
+            break;
+            case "green":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
+            break;
+            case "blue":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
+            break;
+            case "yellow":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
+            break;
+            case "grey":
+                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
+            break;
+            case "Transparent":
+                await this._viewer.model.setNodesOpacity(nodeids, 0.7);
+            break;
+            case "Isolate":
+                await this._viewer.view.isolateNodes(nodeids,0, false);
+            break;
+            case "Show":
+                await this._viewer.model.setNodesVisibility(nodeids,true);
+            break;            
+            case "Hide":
+                await this._viewer.model.setNodesVisibility(nodeids,false);
+            break;
+            case "Select":
+                let selections = [];
+                for (let i = 0; i < nodeids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
+                }
+                await this._viewer.selectionManager.add(selections);
+            break;        
+        }
     }
 
     setKeepSearchingChildren(keepSearchingChildren) {
@@ -28,6 +103,14 @@ export class SQuery {
 
     updateConditions(conditions) {
         this._conditions = conditions;
+    }
+
+    setProp (isProp) {
+        this._prop = isProp;
+    }
+
+    getProp () {
+        return this._prop;
     }
 
     setName(name) {
@@ -87,6 +170,22 @@ export class SQuery {
             }
         }
         this._name = json.name;
+
+        if (json.prop == undefined) {
+            this._prop = false;
+        }
+        else {
+            this._prop = json.prop;
+        }
+
+        if (json.action == undefined) {
+            this._action = "";
+        }
+        else {
+            this._action = json.action;
+        }
+
+
         if (json.keepSearchingChildren == undefined) {
             this._keepSearchingChildren = false;
         }
@@ -110,7 +209,7 @@ export class SQuery {
             }            
             newconditions.push(fjson);
         }
-        return {conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren};        
+        return {action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {
@@ -227,7 +326,19 @@ export class SQuery {
             }
             else
             {
+                if (this._conditions[i].relationship) {
+                    text += "Rel:" + SQueryCondition.convertEnumRelationshipTypeToString(this._conditions[i].relationship) + "(";
+                }
+                if(this._conditions[i].propertyType == SQueryPropertyType.SQuery) {
+                    text += "("
+                }
                 text += this._conditions[i].propertyName + " " + SQueryCondition.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
+                if(this._conditions[i].propertyType == SQueryPropertyType.SQuery) {
+                    text += ")"
+                }
+                if (this._conditions[i].relationship) {
+                    text +=  ")";
+                }
             }
         }
         text = text.replace(/&quot;/g, '"');
@@ -248,19 +359,60 @@ export class SQuery {
             this._manager._spaceBoundaryHash[id] = elements;
         }
 
+       
         if (elements.length > 0) {
+
             let offset = this._viewer.model.getNodeIdOffset(id);
-            let nameaggregate = "";
+            
+            let conditions = [];
+            conditions.push(condition);            
             for (let i = 0; i < elements.length; i++) {
-                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
+                if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    return true;
+                }
             }
-            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
-            if (res)
-                return true;
         }
         return false;
 
     }
+
+    async _checkNodeParentCondition(id, condition) {
+       
+        let parentid = this._viewer.model.getNodeParent(id);
+        let offset = this._viewer.model.getNodeIdOffset(id);
+        let conditions = [];
+        conditions.push(condition);
+        let savrel = condition.relationship;
+        condition.relationship = false;
+        if (await this._testNodeAgainstConditions(parentid + offset, conditions, "")) {
+            condition.relationship = savrel;
+            return true;
+        }
+        condition.relationship = savrel;
+        return false;
+    }
+
+    async _checkNodeChildrenCondition(id, condition) {
+
+        let elements = this._viewer.model.getNodeChildren(id);
+        if (elements.length > 0) {
+
+            let offset = this._viewer.model.getNodeIdOffset(id);            
+            let conditions = [];
+            conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
+            for (let i = 0; i < elements.length; i++) {
+                if (await this._testNodeAgainstConditions(elements[i] + offset, conditions, "")) {
+                    condition.relationship = savrel;
+                    return true;
+                }
+            }
+            condition.relationship = savrel;
+        }
+        return false;
+    }
+
 
     async _checkContainedInCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
@@ -276,15 +428,21 @@ export class SQuery {
             this._manager._containedInSpatialStructureHash[id] = elements;
         }
 
+
         if (elements.length > 0) {
-            let offset = this._viewer.model.getNodeIdOffset(id);
-            let nameaggregate = "";
+
+            let offset = this._viewer.model.getNodeIdOffset(id);            
+            let conditions = [];
+            conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
             for (let i = 0; i < elements.length; i++) {
-                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
+                if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    condition.relationship = savrel;
+                    return true;
+                }
             }
-            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
-            if (res)
-                return true;
+            condition.relationship = savrel;
         }
         return false;
     }
@@ -312,7 +470,7 @@ export class SQuery {
             else if (condition.propertyType == SQueryPropertyType.nodeId) {
                 searchAgainstNumber = id;
             }
-            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+            else if (condition.propertyType == SQueryPropertyType.numChildren) {
                 searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
             }
             else {
@@ -404,15 +562,12 @@ export class SQuery {
 
                 }
             }
-            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+            else if (condition.propertyType == SQueryPropertyType.numChildren) {
                 let children = this._viewer.model.getNodeChildren(id);
                 for (let i = 0; i < children.length; i++) {
                     searchAgainst += this._viewer.model.getNodeName(children[i]);
                 }
-            }
-            else if (condition.propertyType == SQueryPropertyType.nodeParent) {
-                searchAgainst = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(id));                
-            }
+            }          
             else if (condition.propertyType == SQueryPropertyType.nodeType) {
                 searchAgainst = Communicator.NodeType[this._viewer.model.getNodeType(id)];
             }
@@ -435,6 +590,9 @@ export class SQuery {
 
             else if (condition.propertyType == SQueryPropertyType.nodeId) {
                 searchAgainst = id.toString();
+            }
+            else if ( condition.propertyType == SQueryPropertyType.ifcglobalid) {
+                searchAgainst = hwv.model.getGenericIdFromBimId(id,id.toString());
             }
             else
             {   
@@ -533,12 +691,18 @@ export class SQuery {
         for (let i = 0; i < conditions.length; i++) {
             
             let res;
-            if (conditions[i].propertyType == SQueryPropertyType.relationship) {
-                if (conditions[i].propertyName == "Rel:SpaceBoundary") {
+            if (conditions[i].relationship) {
+                if (conditions[i].relationship == SQueryRelationshipType.spaceBoundary) {
                     res = await this._checkSpaceBoundaryCondition(id, conditions[i]);
                 }
-                else if (conditions[i].propertyName == "Rel:ContainedIn") {
+                else if (conditions[i].relationship == SQueryRelationshipType.containedIn) {
                     res = await this._checkContainedInCondition(id, conditions[i]);
+                }
+                else if (conditions[i].relationship == SQueryRelationshipType.nodeParent) {
+                    res = await this._checkNodeParentCondition(id, conditions[i]);
+                }
+                else if (conditions[i].relationship == SQueryRelationshipType.nodeChildren) {
+                    res = await this._checkNodeChildrenCondition(id, conditions[i]);
                 }
             }
             else if (conditions[i].propertyType == SQueryPropertyType.SQuery) {
@@ -546,8 +710,8 @@ export class SQuery {
                 if (!conditions[i].SQuery) {
                     if (!conditions[i].SQueryID) {
                         let f=  this._manager.getSQueryByName(conditions[i].text);
-                        conditions[i].SQueryID = f.filter._id;
-                        conditions[i].SQuery = f.filter;
+                        conditions[i].SQueryID = f._id;
+                        conditions[i].SQuery = f;
                     }
                     else {
                         conditions[i].SQuery = this._manager.getSQueryByID(conditions[i].SQueryID);
@@ -586,11 +750,14 @@ export class SQuery {
     }
  
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
+        if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
+            return;
+        }
         let nl = this._viewer.model.getNodeName(id);
         if (id != startid) {
             if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);
-                if (!this._keepSearchingChildren) {
+                if (this._manager.getKeepSearchingChildren() != undefined ?  !this._manager.getKeepSearchingChildren() :  !this._keepSearchingChildren) {
                     return;
                 }
             }
