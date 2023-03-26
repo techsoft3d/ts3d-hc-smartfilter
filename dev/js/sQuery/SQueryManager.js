@@ -465,8 +465,15 @@ export class SQueryManager {
 
         propsnames.sort();
         propsnames.unshift("---");
+        propsnames.unshift("Rel:IFC SpaceBoundary");
+        propsnames.unshift("Rel:IFC ContainedIn");
+        propsnames.unshift("Rel:Node Children");
+        propsnames.unshift("Rel:Node Parent");
+
         propsnames.unshift("SQuery");
 
+        propsnames.unshift("# Children");
+    
         if (hasLayer) {
             propsnames.unshift("LAYER");
         }
@@ -484,17 +491,11 @@ export class SQueryManager {
             propsnames.unshift("Volume");
         }
        
-        propsnames.unshift("Rel:SpaceBoundary");
-        propsnames.unshift("Rel:ContainedIn");
         propsnames.unshift("Node Color");
-        propsnames.unshift("Node Type");
-        propsnames.unshift("Node Children");
+        propsnames.unshift("Node Type");       
         propsnames.unshift("Node Chain");
-        propsnames.unshift("Node Parent");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
-
-
         return propsnames;
     }
 

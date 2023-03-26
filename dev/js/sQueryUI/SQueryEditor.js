@@ -544,12 +544,12 @@ export class SQueryEditor {
                 }
             }
             else {
-                return '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (condition.and ? "and":"or") + '</span>';
+                return '<span style="top:5px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">' + (condition.and ? "and":"or") + '</span>';
             }
         }
         else {
 
-            let html = '<span style="top:7px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
+            let html = '<span style="top:5px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
             html += '<select class="SQuerySearchSelect" onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' id="' +  
             SQueryEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
@@ -737,7 +737,7 @@ export class SQueryEditor {
             }
             else {
                 if (condition.relationship) {
-                    html += '<div style="height:10px;margin-top:-3px">Relationship:' + hcSQuery.SQueryCondition.convertEnumRelationshipTypeToString(condition.relationship) + '</div>';
+                    html += '<div class="SQueryRelationshipTag" style="left:64px;position:relative">Relationship:' + hcSQuery.SQueryCondition.convertEnumRelationshipTypeToString(condition.relationship) + '</div>';
                 }
 
                 html += '<div style="height:30px;margin-top:-3px">';

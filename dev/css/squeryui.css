@@ -30,6 +30,14 @@
   .SQuerySearchItemselectedIndirect {
     background-color:rgb(255,255,128); 
   }
+
+
+  .SQueryRelationshipTag {
+    background-color: rgb(133 133 133);
+    color: white;
+    font-size: 12px;
+    margin-top:0px;
+  }
   
   
   .SQueryEditorDivider {

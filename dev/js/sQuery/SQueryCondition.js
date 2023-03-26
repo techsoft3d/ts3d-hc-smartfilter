@@ -22,8 +22,7 @@ const SQueryPropertyType = {
     relationship:5,
     property:6,
     SQuery:7,
-    nodeParent:8,
-    nodeChildren:9
+    numChildren:8
 };
 
 export {SQueryPropertyType};
@@ -109,15 +108,15 @@ export class SQueryCondition {
                 return SQueryPropertyType.nodeType;
             case "Node Color":
                 return SQueryPropertyType.nodeColor;
-            case "Rel:ContainedIn":
-            case "Rel:SpaceBoundary":
-                return SQueryPropertyType.relationship;
+            case "Rel:IFC ContainedIn":
+            case "Rel:IFC SpaceBoundary":
+            case "Rel:Node Parent":
+            case "Rel:Node Children":
+                    return SQueryPropertyType.relationship;
             case "SQuery":
                  return SQueryPropertyType.SQuery;
-            case "Node Parent":
-                 return SQueryPropertyType.nodeParent;
-            case "Node Children":
-                return SQueryPropertyType.nodeChildren;        
+            case "# Children":
+                return SQueryPropertyType.numChildren;        
             default:
                 return SQueryPropertyType.property;
         }
@@ -126,15 +125,14 @@ export class SQueryCondition {
     static convertStringToRelationshipType(c) {
 
         switch (c) {
-            case "Rel:ContainedIn":
+            case "Rel:IFC ContainedIn":
                 return SQueryRelationshipType.containedIn;
-            case "Rel:SpaceBoundary":
+            case "Rel:IFC SpaceBoundary":
                 return SQueryRelationshipType.spaceBoundary;
-            case "Node Parent":
+            case "Rel:Node Parent":
                 return SQueryRelationshipType.nodeParent;
-            case "Node Children":
-                return SQueryRelationshipType.nodeChildren;
-                ;
+            case "Rel:Node Children":
+                return SQueryRelationshipType.nodeChildren;                
             default:
                 return false;
         }
@@ -145,9 +143,9 @@ export class SQueryCondition {
 
         switch(c) {
             case SQueryRelationshipType.containedIn:
-                return "ContainedIn";
+                return "IFC ContainedIn";
             case SQueryRelationshipType.spaceBoundary:
-                return "SpaceBoundary";
+                return "IFC SpaceBoundary";
             case SQueryRelationshipType.nodeParent:
                 return "Node Parent";
             case SQueryRelationshipType.nodeChildren:

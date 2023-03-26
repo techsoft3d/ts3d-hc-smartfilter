@@ -376,6 +376,44 @@ export class SQuery {
 
     }
 
+    async _checkNodeParentCondition(id, condition) {
+       
+        let parentid = this._viewer.model.getNodeParent(id);
+        let offset = this._viewer.model.getNodeIdOffset(id);
+        let conditions = [];
+        conditions.push(condition);
+        let savrel = condition.relationship;
+        condition.relationship = false;
+        if (await this._testNodeAgainstConditions(parentid + offset, conditions, "")) {
+            condition.relationship = savrel;
+            return true;
+        }
+        condition.relationship = savrel;
+        return false;
+    }
+
+    async _checkNodeChildrenCondition(id, condition) {
+
+        let elements = this._viewer.model.getNodeChildren(id);
+        if (elements.length > 0) {
+
+            let offset = this._viewer.model.getNodeIdOffset(id);            
+            let conditions = [];
+            conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
+            for (let i = 0; i < elements.length; i++) {
+                if (await this._testNodeAgainstConditions(elements[i] + offset, conditions, "")) {
+                    condition.relationship = savrel;
+                    return true;
+                }
+            }
+            condition.relationship = savrel;
+        }
+        return false;
+    }
+
+
     async _checkContainedInCondition(id, condition) {
         let bimid = this._viewer.model.getBimIdFromNode(id);
 
@@ -432,7 +470,7 @@ export class SQuery {
             else if (condition.propertyType == SQueryPropertyType.nodeId) {
                 searchAgainstNumber = id;
             }
-            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+            else if (condition.propertyType == SQueryPropertyType.numChildren) {
                 searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
             }
             else {
@@ -524,15 +562,12 @@ export class SQuery {
 
                 }
             }
-            else if (condition.propertyType == SQueryPropertyType.nodeChildren) {
+            else if (condition.propertyType == SQueryPropertyType.numChildren) {
                 let children = this._viewer.model.getNodeChildren(id);
                 for (let i = 0; i < children.length; i++) {
                     searchAgainst += this._viewer.model.getNodeName(children[i]);
                 }
-            }
-            else if (condition.propertyType == SQueryPropertyType.nodeParent) {
-                searchAgainst = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(id));                
-            }
+            }          
             else if (condition.propertyType == SQueryPropertyType.nodeType) {
                 searchAgainst = Communicator.NodeType[this._viewer.model.getNodeType(id)];
             }
@@ -657,8 +692,14 @@ export class SQuery {
                 if (conditions[i].relationship == SQueryRelationshipType.spaceBoundary) {
                     res = await this._checkSpaceBoundaryCondition(id, conditions[i]);
                 }
-                if (conditions[i].relationship == SQueryRelationshipType.containedIn) {
+                else if (conditions[i].relationship == SQueryRelationshipType.containedIn) {
                     res = await this._checkContainedInCondition(id, conditions[i]);
+                }
+                else if (conditions[i].relationship == SQueryRelationshipType.nodeParent) {
+                    res = await this._checkNodeParentCondition(id, conditions[i]);
+                }
+                else if (conditions[i].relationship == SQueryRelationshipType.nodeChildren) {
+                    res = await this._checkNodeChildrenCondition(id, conditions[i]);
                 }
             }
             else if (conditions[i].propertyType == SQueryPropertyType.SQuery) {
