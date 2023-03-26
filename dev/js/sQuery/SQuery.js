@@ -362,15 +362,18 @@ export class SQuery {
        
         if (elements.length > 0) {
 
-            let offset = this._viewer.model.getNodeIdOffset(id);
-            
+            let offset = this._viewer.model.getNodeIdOffset(id);            
             let conditions = [];
             conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
             for (let i = 0; i < elements.length; i++) {
                 if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    condition.relationship = savrel;
                     return true;
                 }
             }
+            condition.relationship = savrel;
         }
         return false;
 
