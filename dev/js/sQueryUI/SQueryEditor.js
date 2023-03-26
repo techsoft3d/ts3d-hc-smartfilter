@@ -293,8 +293,12 @@ export class SQueryEditor {
                 condition.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
                 condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
 
+                let relSet = false;
                 if (condition.propertyType == hcSQuery.SQueryPropertyType.relationship) {
-                      condition.relationship = hcSQuery.SQueryCondition.convertStringToRelationshipType($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
+                    relSet = true;
+                    condition.relationship = hcSQuery.SQueryCondition.convertStringToRelationshipType($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
+                    condition.propertyType = hcSQuery.SQueryPropertyType.nodeName;
+                    condition.propertyName = "Node Name";
                 }
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
                     if (!condition.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
@@ -305,7 +309,9 @@ export class SQueryEditor {
 
                     }
                 }
-                condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                if (!relSet) {
+                    condition.propertyName = $("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value;                
+                }
                 if (SQueryEditor._showPropertyStats && condition.propertyName.endsWith(")")) {
                     let lastindex = condition.propertyName.lastIndexOf("(") - 1;
                     condition.propertyName = condition.propertyName.substring(0, lastindex);

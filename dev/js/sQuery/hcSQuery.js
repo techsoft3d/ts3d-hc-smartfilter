@@ -3,6 +3,7 @@ export { SQueryCondition } from './SQueryCondition.js';
 export { SQueryManager } from './SQueryManager.js';
 export { SQueryConditionType } from './SQueryCondition.js';
 export { SQueryPropertyType } from './SQueryCondition.js';
+export { SQueryRelationshipType } from './SQueryCondition.js';
 
 
 export function getVersion() {

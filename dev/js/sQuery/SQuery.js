@@ -1,5 +1,6 @@
 import { SQueryCondition } from './SQueryCondition.js';
 import { SQueryConditionType } from './SQueryCondition.js';
+import { SQueryRelationshipType } from './SQueryCondition.js';
 import { SQueryPropertyType } from './SQueryCondition.js';
 
 export class SQuery {
@@ -325,7 +326,19 @@ export class SQuery {
             }
             else
             {
+                if (this._conditions[i].relationship) {
+                    text += "Rel:" + SQueryCondition.convertEnumRelationshipTypeToString(this._conditions[i].relationship) + "(";
+                }
+                if(this._conditions[i].propertyType == SQueryPropertyType.SQuery) {
+                    text += "("
+                }
                 text += this._conditions[i].propertyName + " " + SQueryCondition.convertEnumConditionToString(this._conditions[i].conditionType) + " " + this._conditions[i].text;
+                if(this._conditions[i].propertyType == SQueryPropertyType.SQuery) {
+                    text += ")"
+                }
+                if (this._conditions[i].relationship) {
+                    text +=  ")";
+                }
             }
         }
         text = text.replace(/&quot;/g, '"');
@@ -346,16 +359,13 @@ export class SQuery {
             this._manager._spaceBoundaryHash[id] = elements;
         }
 
+       
         if (elements.length > 0) {
 
             let offset = this._viewer.model.getNodeIdOffset(id);
-
-            let newcondition = new SQueryCondition();
-            newcondition.propertyName = "Node Name";
-            newcondition.text = condition.text;
             
             let conditions = [];
-            conditions.push(newcondition);            
+            conditions.push(condition);            
             for (let i = 0; i < elements.length; i++) {
                 if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
                     return true;
@@ -383,19 +393,18 @@ export class SQuery {
 
         if (elements.length > 0) {
 
-            let offset = this._viewer.model.getNodeIdOffset(id);
-
-            let newcondition = new SQueryCondition();
-            newcondition.propertyName = "Node Name";
-            newcondition.text = condition.text;
-            
+            let offset = this._viewer.model.getNodeIdOffset(id);            
             let conditions = [];
-            conditions.push(newcondition);            
+            conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
             for (let i = 0; i < elements.length; i++) {
                 if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    condition.relationship = savrel;
                     return true;
                 }
             }
+            condition.relationship = savrel;
         }
         return false;
     }
@@ -644,11 +653,11 @@ export class SQuery {
         for (let i = 0; i < conditions.length; i++) {
             
             let res;
-            if (conditions[i].propertyType == SQueryPropertyType.relationship) {
-                if (conditions[i].propertyName == "Rel:SpaceBoundary") {
+            if (conditions[i].relationship) {
+                if (conditions[i].relationship == SQueryRelationshipType.spaceBoundary) {
                     res = await this._checkSpaceBoundaryCondition(id, conditions[i]);
                 }
-                else if (conditions[i].propertyName == "Rel:ContainedIn") {
+                if (conditions[i].relationship == SQueryRelationshipType.containedIn) {
                     res = await this._checkContainedInCondition(id, conditions[i]);
                 }
             }
