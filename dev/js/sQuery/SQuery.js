@@ -591,6 +591,9 @@ export class SQuery {
             else if (condition.propertyType == SQueryPropertyType.nodeId) {
                 searchAgainst = id.toString();
             }
+            else if ( condition.propertyType == SQueryPropertyType.ifcglobalid) {
+                searchAgainst = hwv.model.getGenericIdFromBimId(id,id.toString());
+            }
             else
             {   
                 if (this._manager._propertyHash[id] == undefined || this._manager._propertyHash[id][condition.propertyName] == undefined) {                

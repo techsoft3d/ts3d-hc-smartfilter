@@ -26,7 +26,8 @@ export class SQueryManager {
     async executeSQueries() {
         await this._viewer.model.reset();
         await this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
-                                    
+        await this._viewer.selectionManager.clear();
+                     
         for (let i = 0; i < this._SQuerys.length; i++) {
             await this._SQuerys[i].performAction(null,false);
         }
@@ -464,6 +465,10 @@ export class SQueryManager {
         }
 
         propsnames.sort();
+        if (hasType) {
+            propsnames.unshift("TYPE");
+        }
+        propsnames.unshift("IFC GlobalId");
         propsnames.unshift("---");
         propsnames.unshift("Rel:IFC SpaceBoundary");
         propsnames.unshift("Rel:IFC ContainedIn");
@@ -476,11 +481,6 @@ export class SQueryManager {
     
         if (hasLayer) {
             propsnames.unshift("LAYER");
-        }
-
-
-        if (hasType) {
-            propsnames.unshift("TYPE");
         }
 
         if (hasSurfaceArea) {

@@ -22,7 +22,9 @@ const SQueryPropertyType = {
     relationship:5,
     property:6,
     SQuery:7,
-    numChildren:8
+    numChildren:8,
+    ifcglobalid:9
+
 };
 
 export {SQueryPropertyType};
@@ -117,6 +119,8 @@ export class SQueryCondition {
                  return SQueryPropertyType.SQuery;
             case "# Children":
                 return SQueryPropertyType.numChildren;        
+            case "IFC GlobalId":
+                 return SQueryPropertyType.ifcglobalid;                        
             default:
                 return SQueryPropertyType.property;
         }

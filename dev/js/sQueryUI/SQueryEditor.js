@@ -77,6 +77,7 @@ export class SQueryEditor {
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';        
         html +='<li >---</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
@@ -218,6 +219,13 @@ export class SQueryEditor {
             await SQueryEditor.search();
         }
     }
+
+    static resetModel() {                                    
+        this._viewer.model.reset();
+        this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
+        this._viewer.selectionManager.clear();
+    }
+
 
     static makeVisible(onoff) {        
                             
