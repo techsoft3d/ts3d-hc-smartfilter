@@ -28,6 +28,19 @@ const SQueryPropertyType = {
 
 export {SQueryPropertyType};
 
+
+const SQueryRelationshipType = {
+    none:0,
+    containedIn:1,
+    spaceBoundary:2,
+    nodeParent:3,
+    nodeChildren:4
+};
+
+export {SQueryRelationshipType};
+
+
+
 export class SQueryCondition {
 
 
@@ -110,6 +123,38 @@ export class SQueryCondition {
         }
     }
 
+    static convertStringToRelationshipType(c) {
+
+        switch (c) {
+            case "Rel:ContainedIn":
+                return SQueryRelationshipType.containedIn;
+            case "Rel:SpaceBoundary":
+                return SQueryRelationshipType.spaceBoundary;
+            case "Node Parent":
+                return SQueryRelationshipType.nodeParent;
+            case "Node Children":
+                return SQueryRelationshipType.nodeChildren;
+                ;
+            default:
+                return false;
+        }
+    }
+
+    
+    static convertEnumRelationshipTypeToString(c) {
+
+        switch(c) {
+            case SQueryRelationshipType.containedIn:
+                return "ContainedIn";
+            case SQueryRelationshipType.spaceBoundary:
+                return "SpaceBoundary";
+            case SQueryRelationshipType.nodeParent:
+                return "Node Parent";
+            case SQueryRelationshipType.nodeChildren:
+                return "Node Children";
+        }
+    };
+
     constructor() {
         this.and = true;
         this.conditionType = SQueryConditionType.contains;
@@ -118,7 +163,7 @@ export class SQueryCondition {
         this.text =  "";
         this.childFilter = null;
         this.SQueryID = null;
-
+        this.relationship = false;
     }
 
     toJSON(manager) {
@@ -139,7 +184,8 @@ export class SQueryCondition {
             propertyName: JSON.parse(JSON.stringify(this.propertyName)),
             text: this.text,
             childFilter: this.childFilter,
-            SQueryID: this.SQueryID
+            SQueryID: this.SQueryID,
+            relationship: this.relationship
         };
     }
 
@@ -151,8 +197,10 @@ export class SQueryCondition {
         this.text = def.text;
         this.childFilter = def.childFilter;
         this.SQueryID = def.SQueryID;
+        this.relationship = def.relationship != undefined ? def.relationship : false;
 
     }
+
 
     setSQueryID(id) {
         this.squeryFitlerID = id;

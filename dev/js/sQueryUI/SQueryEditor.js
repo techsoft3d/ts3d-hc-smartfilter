@@ -293,6 +293,9 @@ export class SQueryEditor {
                 condition.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
                 condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
 
+                if (condition.propertyType == hcSQuery.SQueryPropertyType.relationship) {
+                      condition.relationship = hcSQuery.SQueryCondition.convertStringToRelationshipType($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
+                }
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
                     if (!condition.propertyType == hcSQuery.SQueryPropertyType.SQuery) {
                         condition.text = SQueryEditor._htmlEncode($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0].value);
@@ -727,6 +730,10 @@ export class SQueryEditor {
                 html += '</div>';
             }
             else {
+                if (condition.relationship) {
+                    html += '<div style="height:10px;margin-top:-3px">Relationship:' + hcSQuery.SQueryCondition.convertEnumRelationshipTypeToString(condition.relationship) + '</div>';
+                }
+
                 html += '<div style="height:30px;margin-top:-3px">';
                 html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();
