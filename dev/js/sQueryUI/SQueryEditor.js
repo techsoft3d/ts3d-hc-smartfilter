@@ -291,7 +291,7 @@ export class SQueryEditor {
             }
             else {
                 condition.conditionType = hcSQuery.SQueryCondition.convertStringConditionToEnum($("#" + SQueryEditor._maindiv + "_propertyChoiceSelect" + i + "-" + SQuery.tempId)[0].value);
-                condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum(condition.propertyName);
+                condition.propertyType = hcSQuery.SQueryCondition.convertStringPropertyTypeToEnum($("#" + SQueryEditor._maindiv + "_propertyTypeSelect" + i + "-" + SQuery.tempId)[0].value);
 
                 if ($("#" + SQueryEditor._maindiv + "_modeltreesearchtext" + i + "-" + SQuery.tempId)[0] != undefined) {
                     if (!condition.propertyType == hcSQuery.SQueryPropertyType.SQuery) {

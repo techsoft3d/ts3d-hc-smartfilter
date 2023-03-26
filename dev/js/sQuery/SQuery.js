@@ -347,14 +347,20 @@ export class SQuery {
         }
 
         if (elements.length > 0) {
+
             let offset = this._viewer.model.getNodeIdOffset(id);
-            let nameaggregate = "";
+
+            let newcondition = new SQueryCondition();
+            newcondition.propertyName = "Node Name";
+            newcondition.text = condition.text;
+            
+            let conditions = [];
+            conditions.push(newcondition);            
             for (let i = 0; i < elements.length; i++) {
-                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
+                if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    return true;
+                }
             }
-            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
-            if (res)
-                return true;
         }
         return false;
 
@@ -374,15 +380,22 @@ export class SQuery {
             this._manager._containedInSpatialStructureHash[id] = elements;
         }
 
+
         if (elements.length > 0) {
+
             let offset = this._viewer.model.getNodeIdOffset(id);
-            let nameaggregate = "";
+
+            let newcondition = new SQueryCondition();
+            newcondition.propertyName = "Node Name";
+            newcondition.text = condition.text;
+            
+            let conditions = [];
+            conditions.push(newcondition);            
             for (let i = 0; i < elements.length; i++) {
-                nameaggregate += this._viewer.model.getNodeName(parseInt(elements[i]) + offset);
+                if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    return true;
+                }
             }
-            let res = await this._checkCondition(parseInt(elements[i]) + offset, condition, nameaggregate);
-            if (res)
-                return true;
         }
         return false;
     }
