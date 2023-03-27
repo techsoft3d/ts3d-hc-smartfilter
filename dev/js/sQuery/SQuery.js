@@ -14,6 +14,7 @@ export class SQuery {
         this._keepSearchingChildren = false;
         this._prop = false;
         this._id = this._generateGUID();
+        this._searchCounter = 0;
             
         if (startnode)
             this._startnode = startnode;
@@ -30,6 +31,7 @@ export class SQuery {
         this._action = action;
     }
 
+    
     async performAction(nodeids_in, ignoreVisibility = true) {
 
         if (this._action == "") {
@@ -228,6 +230,7 @@ export class SQuery {
     }
 
     async apply() {
+        this._searchCounter = 0;
   //      let t1 = new Date();
         let conditions = this._conditions;
         let limitlist = this._limitselectionlist;
@@ -362,15 +365,18 @@ export class SQuery {
        
         if (elements.length > 0) {
 
-            let offset = this._viewer.model.getNodeIdOffset(id);
-            
+            let offset = this._viewer.model.getNodeIdOffset(id);            
             let conditions = [];
             conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
             for (let i = 0; i < elements.length; i++) {
                 if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
+                    condition.relationship = savrel;
                     return true;
                 }
             }
+            condition.relationship = savrel;
         }
         return false;
 
@@ -404,6 +410,40 @@ export class SQuery {
             condition.relationship = false;
             for (let i = 0; i < elements.length; i++) {
                 if (await this._testNodeAgainstConditions(elements[i] + offset, conditions, "")) {
+                    condition.relationship = savrel;
+                    return true;
+                }
+            }
+            condition.relationship = savrel;
+        }
+        return false;
+    }
+
+
+    async _checkAggregateCondition(id, condition) {
+        let bimid = this._viewer.model.getBimIdFromNode(id);
+
+        let elements;
+        if (this._manager._aggregateHash[id])
+        {
+            elements = this._manager._aggregateHash[id];
+        }
+        else
+        {
+            elements = this._viewer.model.getBimIdRelatingElements(id, bimid, Communicator.RelationshipType.Aggregates);
+            this._manager._aggregateHash[id] = elements;
+        }
+
+
+        if (elements.length > 0) {
+
+            let offset = this._viewer.model.getNodeIdOffset(id);            
+            let conditions = [];
+            conditions.push(condition);            
+            let savrel = condition.relationship;
+            condition.relationship = false;
+            for (let i = 0; i < elements.length; i++) {
+                if (await this._testNodeAgainstConditions(parseInt(elements[i]) + offset, conditions, "")) {
                     condition.relationship = savrel;
                     return true;
                 }
@@ -698,6 +738,9 @@ export class SQuery {
                 else if (conditions[i].relationship == SQueryRelationshipType.containedIn) {
                     res = await this._checkContainedInCondition(id, conditions[i]);
                 }
+                else if (conditions[i].relationship == SQueryRelationshipType.aggregate) {
+                    res = await this._checkAggregateCondition(id, conditions[i]);
+                }
                 else if (conditions[i].relationship == SQueryRelationshipType.nodeParent) {
                     res = await this._checkNodeParentCondition(id, conditions[i]);
                 }
@@ -750,6 +793,10 @@ export class SQuery {
     }
  
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
+        this._searchCounter++;
+        if (this._searchCounter % 1500 == 0) {
+            await new Promise(r => setTimeout(r, 1));
+        }
         if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
             return;
         }

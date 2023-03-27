@@ -32,10 +32,11 @@ export {SQueryPropertyType};
 
 const SQueryRelationshipType = {
     none:0,
-    containedIn:1,
-    spaceBoundary:2,
-    nodeParent:3,
-    nodeChildren:4
+    nodeParent:1,
+    nodeChildren:2,
+    containedIn:3,
+    spaceBoundary:4,
+    aggregate:5
 };
 
 export {SQueryRelationshipType};
@@ -112,7 +113,9 @@ export class SQueryCondition {
                 return SQueryPropertyType.nodeColor;
             case "Rel:IFC ContainedIn":
             case "Rel:IFC SpaceBoundary":
+            case "Rel:IFC Aggregate":
             case "Rel:Node Parent":
+            case "Rel:Node Children":
             case "Rel:Node Children":
                     return SQueryPropertyType.relationship;
             case "SQuery":
@@ -133,6 +136,8 @@ export class SQueryCondition {
                 return SQueryRelationshipType.containedIn;
             case "Rel:IFC SpaceBoundary":
                 return SQueryRelationshipType.spaceBoundary;
+            case "Rel:IFC Aggregate":
+                    return SQueryRelationshipType.aggregate;
             case "Rel:Node Parent":
                 return SQueryRelationshipType.nodeParent;
             case "Rel:Node Children":
@@ -150,6 +155,8 @@ export class SQueryCondition {
                 return "IFC ContainedIn";
             case SQueryRelationshipType.spaceBoundary:
                 return "IFC SpaceBoundary";
+            case SQueryRelationshipType.aggregate:
+                return "IFC Aggregate";
             case SQueryRelationshipType.nodeParent:
                 return "Node Parent";
             case SQueryRelationshipType.nodeChildren:

@@ -1,5 +1,9 @@
 # SQuerys
 
+## Version Update (0.9.2)
+* Support for aggregate related property
+* ensure search does not stall viewer
+* indicator when search is running
 
 ## Version Update (0.9.0)
 * More flexible related property search

@@ -236,6 +236,7 @@ export class SQueryManager {
         }
         let spaceBoundaryItems = [];
         let containedInItems = [];
+        let aggregateInItems = [];
 
 
         if (related) {
@@ -253,27 +254,40 @@ export class SQueryManager {
                 else {
                     containedInItems[parseInt(item.i)] = [];
                 }
+
+                if (item.g) {
+                    aggregateInItems[parseInt(item.i)] = item.g;
+                }
+                else {
+                    aggregateInItems[parseInt(item.i)] = [];
+                }
+
             }            
         }
 
-        return {ids:ids, props:rprops, relatedSpaceBoundary:spaceBoundaryItems, relatedContainedIn:containedInItems};
+        return {ids:ids, props:rprops, relatedSpaceBoundary:spaceBoundaryItems, relatedContainedIn:containedInItems,relatedAggregateIn:aggregateInItems};
     }
 
 
     gatherRelatedDataHashesRecursive(nodeid, la) {
 
         let bimid = this._viewer.model.getBimIdFromNode(nodeid);
+        let lao = {i:nodeid};
 
         let elements = this._viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
-
-        let lao = {i:nodeid};
         let elements2 = this._viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+        let elements3 = this._viewer.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.Aggregates);
+
         if (elements && elements.length > 0) {
             lao.e = elements;
         }
         if (elements2 && elements2.length > 0) {
             lao.f = elements2;
         }
+        if (elements3 && elements3.length > 0) {
+            lao.g = elements3;
+        }
+
         la.push(lao);
         let children = this._viewer.model.getNodeChildren(nodeid);
         for (let i = 0; i < children.length; i++) {
@@ -363,6 +377,7 @@ export class SQueryManager {
         this._allPropertiesHash = [];
         this._allPropertiesHashNum = [];
         this._containedInSpatialStructureHash = [];
+        this._aggregateHash = [];
         this._spaceBoundaryHash = [];
         let layernames = this._viewer.model.getLayers();
 
@@ -393,6 +408,7 @@ export class SQueryManager {
                         res = temp.props;
                         ids = temp.ids;
                         this._containedInSpatialStructureHash = temp.relatedContainedIn;
+                        this._aggregateHash = temp.relatedAggregateIn;
                         this._spaceBoundaryHash = temp.relatedSpaceBoundary;
                     }
                     model.properties = res;
@@ -468,14 +484,15 @@ export class SQueryManager {
         if (hasType) {
             propsnames.unshift("TYPE");
         }
-        if (!hideIFCProperites) {
-            propsnames.unshift("IFC GlobalId");
-        }
+    
         propsnames.unshift("---");
         
         if (!hideIFCProperites) {
+            propsnames.unshift("IFC GlobalId");
             propsnames.unshift("Rel:IFC SpaceBoundary");
+            propsnames.unshift("Rel:IFC Aggregate");
             propsnames.unshift("Rel:IFC ContainedIn");
+            propsnames.unshift("---");
         }
         propsnames.unshift("Rel:Node Children");
         propsnames.unshift("Rel:Node Parent");
