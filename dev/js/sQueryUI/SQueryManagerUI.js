@@ -17,8 +17,8 @@ export class SQueryManagerUI {
 
         if (SQueryManagerUI._showButtonRow) {
 
-            $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerAddCurrentFilter" type="button" style="top:2px">Add</button>');
-            $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerExecute" type="button" style="top:2px;margin-left:2px;">Execute</button>');
+            $("#" + SQueryManagerUI._uidiv).append('<button title = "Add search to SQuery Manager" class="SQuerySearchButton" id="SQueryManagerAddCurrentFilter" type="button" style="top:2px">Add</button>');
+            $("#" + SQueryManagerUI._uidiv).append('<button title = "Execute all queries" class="SQuerySearchButton" id="SQueryManagerExecute" type="button" style="top:2px;margin-left:2px;">Execute</button>');
             if (showImportExportButtons) {
                 $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerExport" type="button" style="position:absolute;right:0px;top:2px">Export</button>');
                 $("#" + SQueryManagerUI._uidiv).append('<button class="SQuerySearchButton" id="SQueryManagerUpload" type="button" style="position:absolute;right:52px;top:2px">Load</button><input style="display:none" type="file" id="inputupload">');

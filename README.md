@@ -1,7 +1,8 @@
 # SQuerys
 
-## Version Update (0.9.3)
+## Version Update (0.9.4)
 * Bounding search
+* Various UI improvements
 
 ## Version Update (0.9.2)
 * Support for aggregate related property

@@ -31,6 +31,7 @@ export class SQueryEditor {
      
         $(document).on('keyup keydown', function(e){
             
+            SQueryEditor.shiftPressed = e.shiftKey;
             SQueryEditor.ctrlPressed = e.ctrlKey;
         } );
 
@@ -104,7 +105,7 @@ export class SQueryEditor {
             html+='<div id = "SQueryEditorFirstRow">';
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button title = "Select nodes current search is limited to" id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input title = "Limit search to currently selected entities" onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '</div>';
             }
             else {
@@ -669,11 +670,57 @@ export class SQueryEditor {
         return html;
     }
 
+
+    static async _updateBoundingDatalist(el) {
+        let nodeids = [];
+        let r = hcSQueryUI.SQueryEditor._viewer.selectionManager.getResults();
+        for (let i = 0; i < r.length; i++) {
+            nodeids.push(r[i].getNodeId());
+        }
+
+        if (nodeids.length > 0) {
+            let lbounds = await hcSQueryUI.SQueryEditor._viewer.model.getNodesBounding(nodeids);
+            let text = ("bounds:" + lbounds.min.x + " " + lbounds.min.y + " " + lbounds.min.z + " " + lbounds.max.x + " " + lbounds.max.y + " " + lbounds.max.z);
+            $(el).next().html('<option value="' + text + '"></option>')
+        }
+        else {
+            $(el).next().html('<option value=""></option>')
+        }
+        
+    }
+
+    static async _updateColorDatalist(el) {
+
+        if (hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast()) {
+            let nodeid = hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast().getNodeId();
+            let children = hcSQueryUI.SQueryEditor._viewer.model.getNodeChildren(nodeid);
+            if (children.length > 0)
+                nodeid = children[0];
+            let colors = await hcSQueryUI.SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
+            $(el).next().html('<option value="' + colors[0].r + " " + colors[0].g + " " + colors[0].b + '"></option>');
+        }
+        else {
+            $(el).next().html('<option value=""></option>')
+        }        
+    }
+
     static async _generateInput(condition,filterpos,SQuery) {
       
 
-        let html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+        let html = "";
+        if (condition.propertyName == "Bounding") {            
+            html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
+        }
+        else if (condition.propertyName == "Node Color") {
+                html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+                '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';    
+        }
+        else {
+            html = '<input type="search" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+            '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
+
+        }
         html += '<datalist id="datalist' + filterpos + "-" + SQuery.tempId +'">\n';
         let sortedStrings = [];
         if (condition.propertyName == "Node Type") {
@@ -682,17 +729,7 @@ export class SQueryEditor {
                     sortedStrings.push(Communicator.NodeType[property]);
             }
 
-        }
-        else if (condition.propertyName == "Node Color") {
-            if (SQueryEditor._viewer.selectionManager.getLast()) {
-                let nodeid = SQueryEditor._viewer.selectionManager.getLast().getNodeId();
-                let children = SQueryEditor._viewer.model.getNodeChildren(nodeid);
-                if (children.length > 0)
-                    nodeid = children[0];
-                let colors = await SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
-                sortedStrings.push(colors[0].r + " " + colors[0].g + " " + colors[0].b);
-            }
-        }        
+        }      
         else if (condition.propertyName == "SQuery") {
             let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
@@ -718,7 +755,7 @@ export class SQueryEditor {
     }
 
     static _generateTrashBin() {
-        let text = '<div class="icon-trash" style="float: left;">'
+        let text = '<div title = "Delete condition" class="icon-trash" style="float: left;">'
         text += '<div class="trash-lid"></div>'
         text += '<div class="trash-container"></div>'
         text += '<div class="trash-line-1"></div>'
@@ -794,12 +831,10 @@ export class SQueryEditor {
                 html += '</div>';
             }        
         }
-        html += '<button class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
+        html += '<button title = "Add new condition" class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
         if (!SQueryIn)
         {
-            html += '<button class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
-            html += '<button class="SQuerySearchButton" type="button" style="left:6px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Set condition group</button>';
-
+            html += '<button title="Add new condition group: hold down Shift to convert existing conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQueryUI.SQueryEditor.shiftPressed ? hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
         }
         else
         {           
