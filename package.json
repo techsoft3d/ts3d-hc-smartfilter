@@ -1,6 +1,6 @@
 {
   "name": "ts3d-hc-squery",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "",
   "main": "./server/app.js",
   "author": "Guido Hoffmann",
