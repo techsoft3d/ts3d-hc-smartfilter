@@ -69,6 +69,10 @@
     margin: 0;
   }
 
+  .SQuerySearchButton:hover {
+    background: rgb(219, 219, 219);
+  }
+
   .SQuerySearchButtonImportant {
     border-width: 1px;
     font-family: monospace;
@@ -76,6 +80,10 @@
     background:dodgerblue;
     color:white;
     margin: 0;
+  }
+
+  .SQuerySearchButtonImportant:hover {
+    background:rgb(0, 127, 254);
   }
 
   

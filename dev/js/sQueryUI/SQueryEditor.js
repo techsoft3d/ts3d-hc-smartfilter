@@ -31,6 +31,7 @@ export class SQueryEditor {
      
         $(document).on('keyup keydown', function(e){
             
+            SQueryEditor.shiftPressed = e.shiftKey;
             SQueryEditor.ctrlPressed = e.ctrlKey;
         } );
 
@@ -833,9 +834,7 @@ export class SQueryEditor {
         html += '<button class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
         if (!SQueryIn)
         {
-            html += '<button class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
-            html += '<button class="SQuerySearchButton" type="button" style="left:6px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Set condition group</button>';
-
+            html += '<button title="Add Condition Group: Hold Down Shift to convert conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQueryUI.SQueryEditor.shiftPressed ? hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
         }
         else
         {           
