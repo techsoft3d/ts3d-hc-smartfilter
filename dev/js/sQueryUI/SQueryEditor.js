@@ -105,7 +105,7 @@ export class SQueryEditor {
             html+='<div id = "SQueryEditorFirstRow">';
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button title = "Select nodes current search is limited to" id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input title = "Limit search to currently selected entities" onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '</div>';
             }
             else {
@@ -755,7 +755,7 @@ export class SQueryEditor {
     }
 
     static _generateTrashBin() {
-        let text = '<div class="icon-trash" style="float: left;">'
+        let text = '<div title = "Delete condition" class="icon-trash" style="float: left;">'
         text += '<div class="trash-lid"></div>'
         text += '<div class="trash-container"></div>'
         text += '<div class="trash-line-1"></div>'
@@ -831,10 +831,10 @@ export class SQueryEditor {
                 html += '</div>';
             }        
         }
-        html += '<button class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
+        html += '<button title = "Add new condition" class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
         if (!SQueryIn)
         {
-            html += '<button title="Add Condition Group: Hold Down Shift to convert conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQueryUI.SQueryEditor.shiftPressed ? hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
+            html += '<button title="Add new condition group: hold down Shift to convert existing conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQueryUI.SQueryEditor.shiftPressed ? hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
         }
         else
         {           
