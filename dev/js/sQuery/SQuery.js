@@ -31,6 +31,7 @@ export class SQuery {
         this._action = action;
     }
 
+    
     async performAction(nodeids_in, ignoreVisibility = true) {
 
         if (this._action == "") {
@@ -793,7 +794,7 @@ export class SQuery {
  
     async _gatherMatchingNodesRecursive(conditions, id, matchingnodes, startid, chaintext) {
         this._searchCounter++;
-        if (this._searchCounter % 500 == 0) {
+        if (this._searchCounter % 1500 == 0) {
             await new Promise(r => setTimeout(r, 1));
         }
         if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
