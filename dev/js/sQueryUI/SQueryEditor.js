@@ -709,15 +709,15 @@ export class SQueryEditor {
 
         let html = "";
         if (condition.propertyName == "Bounding") {            
-            html = '<input onfocus="hcSQueryUI.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+            html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
         }
         else if (condition.propertyName == "Node Color") {
-                html = '<input onfocus="hcSQueryUI.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+                html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
                 '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';    
         }
         else {
-            html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+            html = '<input type="search" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
 
         }
