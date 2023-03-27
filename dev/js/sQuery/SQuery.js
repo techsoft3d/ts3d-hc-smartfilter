@@ -230,6 +230,7 @@ export class SQuery {
     }
 
     async apply() {
+        this._selectionBounds = null;
         this._searchCounter = 0;
   //      let t1 = new Date();
         let conditions = this._conditions;
@@ -542,16 +543,27 @@ export class SQuery {
                 searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
             }
             else if (condition.propertyType == SQueryPropertyType.bounding) {
-                let bounds
+                let bounds;
                 try {
                     bounds = await this._viewer.model.getNodesBounding([id]);
                 }
                 catch (e) {
                     return false;
+                }               
+
+                if (condition.text.indexOf("bounds:") != -1) {
+                    let bounds2 = condition.text.replace("bounds:", "").split(" ");
+
+                    if (bounds.min.x >= parseFloat(bounds2[0]) && bounds.min.y >=  parseFloat(bounds2[1]) && bounds.min.z >= parseFloat(bounds2[2]) &&
+                        bounds.max.x <= parseFloat(bounds2[3]) && bounds.max.y <= parseFloat(bounds2[4]) && bounds.max.z <= parseFloat(bounds2[5])) {
+                        return true;
+                    }
+                    return false;
                 }
+
                 let xyz = condition.text.split(",");
                 let res = 0;
-                for (let i=0;i<xyz.length;i++) {
+                for (let i = 0; i < xyz.length; i++) {
                     if (xyz[i].indexOf("x") != -1) {
                         let text;
                         if (xyz[i].indexOf(">") != -1) {

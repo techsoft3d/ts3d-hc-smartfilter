@@ -669,11 +669,57 @@ export class SQueryEditor {
         return html;
     }
 
+
+    static async _updateBoundingDatalist(el) {
+        let nodeids = [];
+        let r = hcSQueryUI.SQueryEditor._viewer.selectionManager.getResults();
+        for (let i = 0; i < r.length; i++) {
+            nodeids.push(r[i].getNodeId());
+        }
+
+        if (nodeids.length > 0) {
+            let lbounds = await hcSQueryUI.SQueryEditor._viewer.model.getNodesBounding(nodeids);
+            let text = ("bounds:" + lbounds.min.x + " " + lbounds.min.y + " " + lbounds.min.z + " " + lbounds.max.x + " " + lbounds.max.y + " " + lbounds.max.z);
+            $(el).next().html('<option value="' + text + '"></option>')
+        }
+        else {
+            $(el).next().html('<option value=""></option>')
+        }
+        
+    }
+
+    static async _updateColorDatalist(el) {
+
+        if (hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast()) {
+            let nodeid = hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast().getNodeId();
+            let children = hcSQueryUI.SQueryEditor._viewer.model.getNodeChildren(nodeid);
+            if (children.length > 0)
+                nodeid = children[0];
+            let colors = await hcSQueryUI.SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
+            $(el).next().html('<option value="' + colors[0].r + " " + colors[0].g + " " + colors[0].b + '"></option>');
+        }
+        else {
+            $(el).next().html('<option value=""></option>')
+        }        
+    }
+
     static async _generateInput(condition,filterpos,SQuery) {
       
 
-        let html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+        let html = "";
+        if (condition.propertyName == "Bounding") {            
+            html = '<input onfocus="hcSQueryUI.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
+        }
+        else if (condition.propertyName == "Node Color") {
+                html = '<input onfocus="hcSQueryUI.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+                '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';    
+        }
+        else {
+            html = '<input class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+            '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
+
+        }
         html += '<datalist id="datalist' + filterpos + "-" + SQuery.tempId +'">\n';
         let sortedStrings = [];
         if (condition.propertyName == "Node Type") {
@@ -682,17 +728,7 @@ export class SQueryEditor {
                     sortedStrings.push(Communicator.NodeType[property]);
             }
 
-        }
-        else if (condition.propertyName == "Node Color") {
-            if (SQueryEditor._viewer.selectionManager.getLast()) {
-                let nodeid = SQueryEditor._viewer.selectionManager.getLast().getNodeId();
-                let children = SQueryEditor._viewer.model.getNodeChildren(nodeid);
-                if (children.length > 0)
-                    nodeid = children[0];
-                let colors = await SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
-                sortedStrings.push(colors[0].r + " " + colors[0].g + " " + colors[0].b);
-            }
-        }        
+        }      
         else if (condition.propertyName == "SQuery") {
             let SQuerys = SQueryEditor._manager.getSQuerys();
             for (let i=0;i<SQuerys.length;i++) {
