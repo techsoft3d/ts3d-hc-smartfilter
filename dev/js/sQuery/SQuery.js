@@ -487,6 +487,34 @@ export class SQuery {
         return false;
     }
 
+    _evaluateComparison(expression) {
+        const regex = /^\s*(-?\d+(?:\.\d+)?)\s*([<>]=?)\s*(-?\d+(?:\.\d+)?)\s*$/;
+        const match = expression.match(regex);
+      
+        if (!match) {
+         return false;
+        }
+      
+        const num1 = parseFloat(match[1]);
+        const operator = match[2];
+        const num2 = parseFloat(match[3]);
+      
+        switch (operator) {
+          case '<':
+            return num1 < num2;
+          case '>':
+            return num1 > num2;
+          case '<=':
+            return num1 <= num2;
+          case '>=':
+            return num1 >= num2;
+          default:
+            return false;
+        }
+      }
+      
+
+
     async _checkCondition(id, condition, chaintext) {
         if (condition.conditionType != SQueryConditionType.contains) {
             if (condition.conditionType == SQueryConditionType.exists) {
@@ -512,6 +540,61 @@ export class SQuery {
             }
             else if (condition.propertyType == SQueryPropertyType.numChildren) {
                 searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
+            }
+            else if (condition.propertyType == SQueryPropertyType.bounding) {
+                let bounds
+                try {
+                    bounds = await this._viewer.model.getNodesBounding([id]);
+                }
+                catch (e) {
+                    return false;
+                }
+                let xyz = condition.text.split(",");
+                let res = 0;
+                for (let i=0;i<xyz.length;i++) {
+                    if (xyz[i].indexOf("x") != -1) {
+                        let text;
+                        if (xyz[i].indexOf(">") != -1) {
+                          text = xyz[i].replace("x", bounds.min.x.toString());
+                        }
+                        else {
+                            text = xyz[i].replace("x", bounds.max.x.toString());
+                        }
+                        if (this._evaluateComparison(text)) {
+                            res++;
+                        }
+                    }
+                    else if (xyz[i].indexOf("y") != -1) {
+                        let text;
+                        if (xyz[i].indexOf(">") != -1) {
+                          text = xyz[i].replace("y", bounds.min.y.toString());
+                        }
+                        else {
+                            text = xyz[i].replace("y", bounds.max.y.toString());
+
+                        }
+                        if (this._evaluateComparison(text)) {
+                            res++;
+                        }
+                    } else if (xyz[i].indexOf("z") != -1) {
+                        let text;
+                        if (xyz[i].indexOf(">") != -1) {
+                          text = xyz[i].replace("z", bounds.min.z.toString());
+                        }
+                        else {
+                            text = xyz[i].replace("z", bounds.max.z.toString());
+
+                        }
+                        if (this._evaluateComparison(text)) {
+                            res++;
+                        }
+                    }                                                                    
+                }
+                if (res && res == xyz.length) {
+                    return true;
+                }
+                return false;
+            
             }
             else {
                 let temp;

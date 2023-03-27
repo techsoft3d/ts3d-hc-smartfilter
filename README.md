@@ -1,5 +1,8 @@
 # SQuerys
 
+## Version Update (0.9.3)
+* Bounding search
+
 ## Version Update (0.9.2)
 * Support for aggregate related property
 * ensure search does not stall viewer

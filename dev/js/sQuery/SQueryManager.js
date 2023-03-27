@@ -498,7 +498,7 @@ export class SQueryManager {
         propsnames.unshift("Rel:Node Parent");
 
         propsnames.unshift("SQuery");
-
+        propsnames.unshift("Bounding");
         propsnames.unshift("# Children");
     
         if (hasLayer) {
