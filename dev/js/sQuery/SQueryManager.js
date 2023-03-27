@@ -450,7 +450,7 @@ export class SQueryManager {
 
         let propsnames = [];
         let hasType = false;
-        if (this._allPropertiesHash["TYPE"])
+        if (!hideIFCProperites && this._allPropertiesHash["TYPE"])
         {
             hasType = true;
         }
@@ -475,16 +475,13 @@ export class SQueryManager {
 
 
         for (let i in this._allPropertiesHash) {
-            if (i != "TYPE" && i != "LAYER" && i != "Surface Area" && i != "Volume") {
+            if ((i != "TYPE" || hideIFCProperites) && i != "LAYER" && i != "Surface Area" && i != "Volume") {
                 propsnames.push(i);                
             }
         }
 
         propsnames.sort();
-        if (hasType) {
-            propsnames.unshift("TYPE");
-        }
-    
+       
         propsnames.unshift("---");
         
         if (!hideIFCProperites) {
@@ -492,6 +489,9 @@ export class SQueryManager {
             propsnames.unshift("Rel:IFC SpaceBoundary");
             propsnames.unshift("Rel:IFC Aggregate");
             propsnames.unshift("Rel:IFC ContainedIn");
+            if (hasType) {
+                propsnames.unshift("TYPE");
+            }    
             propsnames.unshift("---");
         }
         propsnames.unshift("Rel:Node Children");
