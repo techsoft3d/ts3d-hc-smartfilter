@@ -1,6 +1,6 @@
 # SQuerys
 
-## Version Update (0.9.4)
+## Version Update (0.9.5)
 * Bounding search
 * Various UI improvements
 
