@@ -101,6 +101,7 @@ export class SQueryEditor {
         let html = "";
         html += '<div class = "SQueryMain" id="' + SQueryEditor._maindiv + '_main">';
         if (SQueryEditor._showFirstRow) {
+            html+='<div id = "SQueryEditorFirstRow">';
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
                 html += '<button id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
@@ -115,6 +116,7 @@ export class SQueryEditor {
             html += '<button class="SQuerySearchButton" type="button" style="right:92px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
             html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
             html += '<hr class="SQueryEditorDivider">';
+            html += '</div>';
         }
 
         html += '<div id="' + SQueryEditor._maindiv + '_conditions" class="SQuerySearchtoolsConditions">';
@@ -185,7 +187,15 @@ export class SQueryEditor {
 
         SQueryEditor.updateFilterFromUI();
       
+        SQueryEditor.clearSearchResults();
+        $("#SQueryEditorFirstRow").css("opacity", 0.5);
+        $("#SQueryEditorFirstRow").css("pointer-events", "none");
+        $("#" + SQueryEditor._maindiv + "_searchitems").append("Searching...");
         let nodeids = await SQueryEditor._mainFilter.apply();
+        $("#SQueryEditorFirstRow").css("opacity", "");
+        $("#SQueryEditorFirstRow").css("pointer-events", "");
+
+
 
         let startnode = SQueryEditor._mainFilter.getStartNode();
         SQueryEditor._founditems = [];

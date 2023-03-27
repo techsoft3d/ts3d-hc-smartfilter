@@ -12,15 +12,17 @@ async function extractProperties() {
     let la = [];
     let totals = 0;
     let totalc = 0;
+    let totala = 0;
 
     function gatherRelatedDataHashesRecursive(nodeid) {
 
         let bimid = hwv.model.getBimIdFromNode(nodeid);
+        let lao = {i:nodeid};
 
-        let elements = hwv.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
-
-        let lao = { i: nodeid };      
+        let elements  = hwv.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.SpaceBoundary);
         let elements2 = hwv.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.ContainedInSpatialStructure);
+        let elements3 = hwv.model.getBimIdRelatingElements(nodeid, bimid, Communicator.RelationshipType.Aggregates);
+
         if (elements && elements.length > 0) {
             lao.e = elements;
             totals++;
@@ -29,6 +31,11 @@ async function extractProperties() {
             lao.f = elements2;
             totalc++;
         }
+        if (elements3 && elements3.length > 0) {
+            lao.g = elements3;
+            totala++;
+        }
+
         la.push(lao);
         let children = hwv.model.getNodeChildren(nodeid);
         for (let i = 0; i < children.length; i++) {
@@ -70,7 +77,7 @@ async function extractProperties() {
 
         gatherRelatedDataHashesRecursive(hwv.model.getRootNode());
        
-        return {allprops: allpropsarray, nodeprops: nodeproparray, related: la, totals: totals, totalc: totalc};
+        return {allprops: allpropsarray, nodeprops: nodeproparray, related: la, totals: totals, totalc: totalc,totala:totala};
     }
 
 
@@ -170,7 +177,7 @@ exports.generatePropData = async function (infile, outfile) {
     await imageservice.start();
     let t1 = new Date();
    let res = await imageservice.generateImage(infile, { callback: extractProperties, callbackParam: null, evaluate: true, cacheID: "xxx" });
-    console.log(res.allprops.length + " " + res.nodeprops.length + " " + res.related.length + " " + res.totals + " " + res.totalc);
+    console.log(res.allprops.length + " " + res.nodeprops.length + " " + res.related.length + " " + res.totals + " " + res.totalc + " " + res.totala);
     let t2 = new Date();
     console.log("Time in seconds: " + (t2 - t1) / 1000);
     if (outfile) {

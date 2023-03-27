@@ -1,19 +1,21 @@
 var myLayout;
-
+var mySQueryManager;
 
 async function msready() {
 
 
     // let res = await fetch('models2/props.json');
     // let json = await res.json();
-    // hcSQuery.SQuery.addModel("hospital",hwv.model.getRootNode(),json);
+    // mySQueryManager = new hcSQuery.SQueryManager(hwv);
+    // mySQueryManager.addModel("hospital",hwv.model.getRootNode(),json);
 
-    let manager = new hcSQuery.SQueryManager(hwv);
 
-    hcSQueryUI.SQueryEditor.initialize("searchtools", manager);
+    mySQueryManager = new hcSQuery.SQueryManager(hwv);
+
+    hcSQueryUI.SQueryEditor.initialize("searchtools", mySQueryManager);
     hcSQueryUI.SQueryEditor.display();
-    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",manager, true);
-    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",manager);
+    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",mySQueryManager, true);
+    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",mySQueryManager);
 
 }
 
