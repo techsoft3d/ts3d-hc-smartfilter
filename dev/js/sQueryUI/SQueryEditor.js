@@ -599,6 +599,9 @@ export class SQueryEditor {
         if (condition.propertyName == "SQuery") {
             choices =  ["=", "\u2260"];
         }
+        else if (condition.propertyName == "Bounding") {
+            choices =  ["evaluate"];
+        }
         else {
             choices =  ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
         }

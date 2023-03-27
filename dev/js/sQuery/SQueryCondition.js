@@ -7,7 +7,8 @@ const SQueryConditionType = {
     equals:5,
     unequal:6,
     greaterOrEqualDate:7,
-    lessOrEqualDate:8
+    lessOrEqualDate:8,
+    evaluate:9
 
 };
 
@@ -23,7 +24,8 @@ const SQueryPropertyType = {
     property:6,
     SQuery:7,
     numChildren:8,
-    ifcglobalid:9
+    ifcglobalid:9,
+    bounding:10
 
 };
 
@@ -65,6 +67,8 @@ export class SQueryCondition {
                 return "<=(Date)";
             case SQueryConditionType.equals:
                 return "=";
+            case SQueryConditionType.evaluate:
+                return "evaluate";                
             case SQueryConditionType.unequal:
                 return "\u2260";
         }
@@ -91,6 +95,8 @@ export class SQueryCondition {
                 return SQueryConditionType.greaterOrEqualDate;
             case "<=(Date)":
                 return SQueryConditionType.lessOrEqualDate;
+            case "evaluate":
+                return SQueryConditionType.evaluate;                
                     
         }
     }
@@ -124,6 +130,8 @@ export class SQueryCondition {
                 return SQueryPropertyType.numChildren;        
             case "IFC GlobalId":
                  return SQueryPropertyType.ifcglobalid;                        
+            case "Bounding":
+                return SQueryPropertyType.bounding;                        
             default:
                 return SQueryPropertyType.property;
         }
