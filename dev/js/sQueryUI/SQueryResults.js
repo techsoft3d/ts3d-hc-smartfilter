@@ -13,7 +13,8 @@ export class SQueryResults {
         html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:20px;top:-8px">';
         html += '<div style="position:absolute; left:0px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
         html += SQueryResults._generateDropdown();
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select All</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
         html += '</div>';
 
         html += '<div id="' + SQueryResults._maindiv + '_searchitems" class="SQuerySearchItems">';        
@@ -38,6 +39,74 @@ export class SQueryResults {
             }
         });
         
+    }
+
+    static _findCategoryFromSearch() {
+
+        let query = SQueryEditor._mainFilter;
+        let searchresults = SQueryEditor._founditems;
+        SQueryResults._categoryHash = [];
+        for (let i=0;i<query.getNumConditions();i++) {
+            let condition = query.getCondition(i);
+            if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
+                for (let j = 0; j < searchresults.length; j++) {
+                    if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
+                        SQueryResults._categoryHash[searchresults[j].name] = [];
+                    }
+                    SQueryResults._categoryHash[searchresults[j].name].push(searchresults[j].id);
+                }
+                return "Node Name";
+            }
+            else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
+                let propname = condition.propertyName;
+                for (let j = 0; j < searchresults.length; j++) {
+                    let id = searchresults[j].id;
+                    if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
+                        if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = [];
+                        }
+                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].push(searchresults[j].id);
+                    }
+                }
+                return propname;
+            }
+        }
+    }
+
+    static toggleView() {
+
+        let category = SQueryResults._findCategoryFromSearch();
+
+        $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_found").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
+        
+        SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+                selectable:1,
+                layout: "fitColumns",
+                columns: [                                   
+                    {
+                        title: category, field: "name"
+                    },
+                    {
+                        title: "#", field: "num",width:30
+                    },
+                    {
+                        title: "ID", field: "id", width: 20, visible: false
+                    },
+
+                ],
+            });    
+
+
+        SQueryResults._table.on("tableBuilt", function () {
+
+            let tdata = [];
+            for (let i in SQueryResults._categoryHash) {
+                tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
+            }
+            SQueryResults._table.setData(tdata);
+        });
     }
     
 
@@ -118,7 +187,7 @@ export class SQueryResults {
 
     static _generateDropdown() {
         let html = "";
-        html += '<button id="SQueryResultsDropdown" style="right:82px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
+        html += '<button id="SQueryResultsDropdown" style="right:56px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul  id="SQueryResultsDropdownContent" style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
