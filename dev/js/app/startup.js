@@ -55,14 +55,14 @@ function createUILayout() {
                                 type: 'component',
                                 componentName: 'Search',
                                 isClosable: true,
-                                height: 40,
+                                height: 50,
                                 componentState: { label: 'C' }
                             },
                             {
                                 type: 'component',
                                 componentName: 'SQueries',
                                 isClosable: true,
-                                height: 40,
+                                height: 30,
                                 componentState: { label: 'C' }
                             },
                             {

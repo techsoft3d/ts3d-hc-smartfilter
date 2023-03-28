@@ -271,6 +271,7 @@
   font-size:12px;
   list-style-type:none;
   user-select:none;
+  z-index:1000000;
 }
 
 .SQueryDropdow-content li {

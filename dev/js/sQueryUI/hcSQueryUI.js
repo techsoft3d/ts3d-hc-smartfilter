@@ -1,6 +1,7 @@
 export { SQueryEditor } from './SQueryEditor.js';
 export { SQueryManagerUI } from './SQueryManagerUI.js';
 export { SQueryPropertiesUI } from './SQueryPropertiesUI.js';
+export { SQueryResults } from './SQueryResults.js';
 
 
 
