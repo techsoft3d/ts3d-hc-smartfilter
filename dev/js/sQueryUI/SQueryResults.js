@@ -6,6 +6,7 @@ export class SQueryResults {
         SQueryResults._maindiv = maindiv;
         SQueryResults._manager = manager;      
         SQueryResults._viewer = manager._viewer;
+        SQueryResults._isPropertyView = false;
     }
 
     static async display() {
@@ -14,7 +15,7 @@ export class SQueryResults {
         html += '<div style="position:absolute; left:0px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
         html += SQueryResults._generateDropdown();
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
-        html += '<button class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
+        html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
         html += '</div>';
 
         html += '<div id="' + SQueryResults._maindiv + '_searchitems" class="SQuerySearchItems">';        
@@ -74,43 +75,64 @@ export class SQueryResults {
     }
 
     static toggleView() {
+        SQueryResults._isPropertyView = !SQueryResults._isPropertyView;
+        if (SQueryResults._isPropertyView) {
+            let category = SQueryResults._findCategoryFromSearch();
+            $("#SQueryToggleViewButton").html("Item View");
 
-        let category = SQueryResults._findCategoryFromSearch();
+            $("#" + SQueryResults._maindiv + "_searchitems").empty();
+            $("#" + SQueryResults._maindiv + "_found").empty();
+            $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
 
-        $("#" + SQueryResults._maindiv + "_searchitems").empty();
-        $("#" + SQueryResults._maindiv + "_found").empty();
-        $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
-        
-        SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
-                selectable:1,
+            SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+                selectable: 0,
                 layout: "fitColumns",
-                columns: [                                   
+                columns: [
                     {
                         title: category, field: "name"
                     },
                     {
-                        title: "#", field: "num",width:30
+                        title: "#", field: "num", width: 30
                     },
                     {
                         title: "ID", field: "id", width: 20, visible: false
                     },
 
                 ],
-            });    
+            });
+
+            SQueryResults._table.on("rowClick", async function (e, row) {
+                let data = row.getData();
+
+                let ids = SQueryResults._categoryHash[data.id];
+                SQueryResults._viewer.selectionManager.clear();
+                let selections = [];
+                for (let i = 0; i < ids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+                }
+                SQueryResults._viewer.selectionManager.add(selections);
+
+            });
 
 
-        SQueryResults._table.on("tableBuilt", function () {
+            SQueryResults._table.on("tableBuilt", function () {
 
-            let tdata = [];
-            for (let i in SQueryResults._categoryHash) {
-                tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
-            }
-            SQueryResults._table.setData(tdata);
-        });
+                let tdata = [];
+                for (let i in SQueryResults._categoryHash) {
+                    tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
+                }
+                SQueryResults._table.setData(tdata);
+            });
+        }
+        else {
+            SQueryResults.generateSearchResults(SQueryEditor._founditems);
+        }
     }
     
 
     static generateSearchResults(founditems) {
+        $("#SQueryToggleViewButton").html("Property View");
+        SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_found").empty();
         if (founditems == undefined)
