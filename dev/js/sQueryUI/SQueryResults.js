@@ -47,82 +47,184 @@ export class SQueryResults {
         let query = SQueryEditor._mainFilter;
         let searchresults = SQueryEditor._founditems;
         SQueryResults._categoryHash = [];
-        for (let i=0;i<query.getNumConditions();i++) {
-            let condition = query.getCondition(i);
-            if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
+
+        if (SQueryResults._tableProperty) {
+            if (SQueryResults._tableProperty == "Node Name") {
                 for (let j = 0; j < searchresults.length; j++) {
                     if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
                         SQueryResults._categoryHash[searchresults[j].name] = [];
                     }
                     SQueryResults._categoryHash[searchresults[j].name].push(searchresults[j].id);
                 }
-                return "Node Name";
             }
-            else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
-                let propname = condition.propertyName;
+            else {
+                let propname = SQueryResults._tableProperty
                 for (let j = 0; j < searchresults.length; j++) {
                     let id = searchresults[j].id;
-                    if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
-                        if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = [];
+                    if (SQueryResults._manager._propertyHash[id][propname] != undefined) {
+                        if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] == undefined) {
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = [];
                         }
-                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].push(searchresults[j].id);
+                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].push(searchresults[j].id);
                     }
                 }
-                return propname;
             }
         }
+        else {
+
+            for (let i = 0; i < query.getNumConditions(); i++) {
+                let condition = query.getCondition(i);
+                if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
+                            SQueryResults._categoryHash[searchresults[j].name] = [];
+                        }
+                        SQueryResults._categoryHash[searchresults[j].name].push(searchresults[j].id);
+                    }
+                    SQueryResults._tableProperty = "Node Name";
+                    return;
+                }
+                else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
+                    let propname = condition.propertyName;
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let id = searchresults[j].id;
+                        if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
+                            if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
+                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = [];
+                            }
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].push(searchresults[j].id);
+                        }
+                    }
+                    SQueryResults._tableProperty = propname;
+                    return;
+                }
+            }
+        }
+    }
+
+
+    static getAllProperties() {
+
+        let searchresults = SQueryEditor._founditems;
+        let propsnames = [];
+        let thash = [];
+        for (let i in SQueryResults._manager._allPropertiesHash) {
+            propsnames.push(i);
+        }
+
+        for (let j = 0; j < searchresults.length; j++) {
+            let id = searchresults[j].id;
+            for (let k in SQueryResults._manager._propertyHash[id]) {
+                thash[k] = true;
+            }
+        }
+
+        let propnames2 = [];
+        for (let i = 0; i < propsnames.length; i++) {
+            if (thash[propsnames[i]] != undefined) {
+                propnames2.push(propsnames[i]);
+            }
+        }
+
+        propnames2.sort();
+        propnames2.unshift("Node Name");
+        return propnames2;
+    }
+
+    static _propertySelected() {
+        SQueryResults._tableProperty = $("#SQueryPropSelect")[0].value;
+        SQueryResults._generatePropertyView();
+
+    }
+
+    static _generatePropertyView() {
+
+        let sortedStrings = SQueryResults.getAllProperties();
+
+        let found = false;
+        if (SQueryResults._tableProperty)  {            
+            for (let i=0;i<sortedStrings.length;i++) {
+                if (sortedStrings[i] == SQueryResults._tableProperty) {
+                    found = true;
+                    break;
+                }
+            }           
+        }
+        if (!found) {
+            SQueryResults._tableProperty = null;
+        }
+        
+        SQueryResults._findCategoryFromSearch();
+
+    
+        $("#SQueryToggleViewButton").html("Item View");
+
+        $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_found").empty();
+
+
+        let html = '<div style="height:25px;">Prop Select:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
+
+       
+        for (let i = 0; i < sortedStrings.length;i++) {
+            if (SQueryResults._tableProperty == sortedStrings[i])
+                html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
+            else
+                html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></div>';
+
+        $("#" + SQueryResults._maindiv + "_searchitems").append(html);
+
+        $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
+
+        SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+            selectable: 0,
+            layout: "fitColumns",
+            columns: [
+                {
+                    title: SQueryResults._tableProperty, field: "name"
+                },
+                {
+                    title: "#", field: "num", width: 30
+                },
+                {
+                    title: "ID", field: "id", width: 20, visible: false
+                },
+
+            ],
+        });
+
+        SQueryResults._table.on("rowClick", async function (e, row) {
+            let data = row.getData();
+
+            let ids = SQueryResults._categoryHash[data.id];
+            SQueryResults._viewer.selectionManager.clear();
+            let selections = [];
+            for (let i = 0; i < ids.length; i++) {
+                selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+            }
+            SQueryResults._viewer.selectionManager.add(selections);
+
+        });
+
+
+        SQueryResults._table.on("tableBuilt", function () {
+
+            let tdata = [];
+            for (let i in SQueryResults._categoryHash) {
+                tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
+            }
+            SQueryResults._table.setData(tdata);
+        });
+
+
     }
 
     static toggleView() {
         SQueryResults._isPropertyView = !SQueryResults._isPropertyView;
         if (SQueryResults._isPropertyView) {
-            let category = SQueryResults._findCategoryFromSearch();
-            $("#SQueryToggleViewButton").html("Item View");
-
-            $("#" + SQueryResults._maindiv + "_searchitems").empty();
-            $("#" + SQueryResults._maindiv + "_found").empty();
-            $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
-
-            SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
-                selectable: 0,
-                layout: "fitColumns",
-                columns: [
-                    {
-                        title: category, field: "name"
-                    },
-                    {
-                        title: "#", field: "num", width: 30
-                    },
-                    {
-                        title: "ID", field: "id", width: 20, visible: false
-                    },
-
-                ],
-            });
-
-            SQueryResults._table.on("rowClick", async function (e, row) {
-                let data = row.getData();
-
-                let ids = SQueryResults._categoryHash[data.id];
-                SQueryResults._viewer.selectionManager.clear();
-                let selections = [];
-                for (let i = 0; i < ids.length; i++) {
-                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
-                }
-                SQueryResults._viewer.selectionManager.add(selections);
-
-            });
-
-
-            SQueryResults._table.on("tableBuilt", function () {
-
-                let tdata = [];
-                for (let i in SQueryResults._categoryHash) {
-                    tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
-                }
-                SQueryResults._table.setData(tdata);
-            });
+            SQueryResults._generatePropertyView();
         }
         else {
             SQueryResults.generateSearchResults(SQueryEditor._founditems);
