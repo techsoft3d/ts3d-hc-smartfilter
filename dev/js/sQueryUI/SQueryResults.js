@@ -52,9 +52,9 @@ export class SQueryResults {
             if (SQueryResults._tableProperty == "Node Name") {
                 for (let j = 0; j < searchresults.length; j++) {
                     if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                        SQueryResults._categoryHash[searchresults[j].name] = [];
+                        SQueryResults._categoryHash[searchresults[j].name] = {ids:[]};
                     }
-                    SQueryResults._categoryHash[searchresults[j].name].push(searchresults[j].id);
+                    SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
             else {
@@ -63,9 +63,9 @@ export class SQueryResults {
                     let id = searchresults[j].id;
                     if (SQueryResults._manager._propertyHash[id][propname] != undefined) {
                         if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] == undefined) {
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = [];
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = {ids:[]};
                         }
-                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].push(searchresults[j].id);
+                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].ids.push(searchresults[j].id);
                     }
                 }
             }
@@ -77,9 +77,9 @@ export class SQueryResults {
                 if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
                     for (let j = 0; j < searchresults.length; j++) {
                         if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                            SQueryResults._categoryHash[searchresults[j].name] = [];
+                            SQueryResults._categoryHash[searchresults[j].name] = {ids:[]};
                         }
-                        SQueryResults._categoryHash[searchresults[j].name].push(searchresults[j].id);
+                        SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                     }
                     SQueryResults._tableProperty = "Node Name";
                     return;
@@ -90,9 +90,9 @@ export class SQueryResults {
                         let id = searchresults[j].id;
                         if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
                             if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
-                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = [];
+                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = {ids:[]};
                             }
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].push(searchresults[j].id);
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].ids.push(searchresults[j].id);
                         }
                     }
                     SQueryResults._tableProperty = propname;
@@ -136,26 +136,41 @@ export class SQueryResults {
         SQueryResults._generatePropertyView();
 
     }
+    static _applyColors() {
+        for (let i in SQueryResults._categoryHash) {
+            SQueryEditor._viewer.model.setNodesFaceColor(SQueryResults._categoryHash[i].ids, SQueryResults._categoryHash[i].color);
+        }
+    }
 
-    static _generatePropertyView() {
+    static _assignColors() {
+        for (let i in SQueryResults._categoryHash) {
+            let color = new Communicator.Color(Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),Math.floor(Math.random() * 256));
+            SQueryResults._categoryHash[i].color = color;
+        }
+        SQueryResults._generatePropertyView(true)
+
+    }
+
+    static _generatePropertyView(redrawOnly = false) {
 
         let sortedStrings = SQueryResults.getAllProperties();
 
-        let found = false;
-        if (SQueryResults._tableProperty)  {            
-            for (let i=0;i<sortedStrings.length;i++) {
-                if (sortedStrings[i] == SQueryResults._tableProperty) {
-                    found = true;
-                    break;
+        if (!redrawOnly) {
+            let found = false;
+            if (SQueryResults._tableProperty) {
+                for (let i = 0; i < sortedStrings.length; i++) {
+                    if (sortedStrings[i] == SQueryResults._tableProperty) {
+                        found = true;
+                        break;
+                    }
                 }
-            }           
-        }
-        if (!found) {
-            SQueryResults._tableProperty = null;
-        }
-        
-        SQueryResults._findCategoryFromSearch();
+            }
+            if (!found) {
+                SQueryResults._tableProperty = null;
+            }
 
+            SQueryResults._findCategoryFromSearch();
+        }
     
         $("#SQueryToggleViewButton").html("Item View");
 
@@ -172,7 +187,10 @@ export class SQueryResults {
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
-        html += '</select></div>';
+        html += '</select>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
+        html += '</div>';
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
 
@@ -188,6 +206,7 @@ export class SQueryResults {
                 {
                     title: "#", field: "num", width: 30
                 },
+                {title:"Color",field:"color",  headerSort : false,field:"color", editor:"list", width:70,formatter:"color"},
                 {
                     title: "ID", field: "id", width: 20, visible: false
                 },
@@ -198,7 +217,7 @@ export class SQueryResults {
         SQueryResults._table.on("rowClick", async function (e, row) {
             let data = row.getData();
 
-            let ids = SQueryResults._categoryHash[data.id];
+            let ids = SQueryResults._categoryHash[data.id].ids;
             SQueryResults._viewer.selectionManager.clear();
             let selections = [];
             for (let i = 0; i < ids.length; i++) {
@@ -213,7 +232,8 @@ export class SQueryResults {
 
             let tdata = [];
             for (let i in SQueryResults._categoryHash) {
-                tdata.push({ name: i, num: SQueryResults._categoryHash[i].length, id: i });
+                let color = SQueryResults._categoryHash[i].color;
+                tdata.push({ name: i, num: SQueryResults._categoryHash[i].ids.length,color:color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i });
             }
             SQueryResults._table.setData(tdata);
         });
