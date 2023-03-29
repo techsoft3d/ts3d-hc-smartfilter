@@ -214,9 +214,10 @@ export class SQueryResults {
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
 
-        $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
+        $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
 
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+            rowHeight:15,
             selectable: 0,
             layout: "fitColumns",
             columns: [
