@@ -13,6 +13,7 @@ export class SQuery {
         this._action = "";
         this._keepSearchingChildren = false;
         this._prop = false;
+        this._autoColors = null;
         this._id = this._generateGUID();
         this._searchCounter = 0;
             
@@ -31,6 +32,14 @@ export class SQuery {
         this._action = action;
     }
 
+
+    setAutoColors(autoColors) {
+        this._autoColors = autoColors;
+    }
+
+    getAutoColors() {
+        return this._autoColors;
+    }
     
     async performAction(nodeids_in, ignoreVisibility = true) {
 
@@ -171,6 +180,7 @@ export class SQuery {
                 this._conditions[i].childFilter = newfilter;
             }
         }
+        
         this._name = json.name;
 
         if (json.prop == undefined) {
@@ -197,6 +207,13 @@ export class SQuery {
         if (json.id) {
             this._id = json.id;
         }
+
+        if (json.autoColors) {
+            this._autoColors = [];
+            for (let i=0;i<json.autoColors.length;i++) {
+                this._autoColors[json.autoColors[i].name] = new Communicator.Color(json.autoColors[i].r, json.autoColors[i].g, json.autoColors[i].b);
+            }
+        }
     }
 
     toJSON() {
@@ -211,7 +228,17 @@ export class SQuery {
             }            
             newconditions.push(fjson);
         }
-        return {action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
+
+        let autocolors = null;
+        if (this._autoColors) {
+            autocolors = [];
+            for (let key in this._autoColors) {
+                let color = this._autoColors[key];
+                autocolors.push({name:key, r:color.r, g:color.g, b:color.b});
+            }
+
+        }
+        return {autoColors: autocolors,action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {

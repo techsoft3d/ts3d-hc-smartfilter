@@ -137,8 +137,14 @@ export class SQueryResults {
 
     }
     static _applyColors() {
+        let autoColors = SQueryEditor._mainFilter.getAutoColors();
+        if (!autoColors) {
+            return;
+        }
         for (let i in SQueryResults._categoryHash) {
-            SQueryEditor._viewer.model.setNodesFaceColor(SQueryResults._categoryHash[i].ids, SQueryResults._categoryHash[i].color);
+            if (autoColors[i]) {
+                SQueryEditor._viewer.model.setNodesFaceColor(SQueryResults._categoryHash[i].ids, autoColors[i]);
+            }
         }
     }
 
@@ -147,6 +153,15 @@ export class SQueryResults {
             let color = new Communicator.Color(Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),Math.floor(Math.random() * 256));
             SQueryResults._categoryHash[i].color = color;
         }
+
+        let autoColors = [];
+        for (let i in SQueryResults._categoryHash) {
+            autoColors[i] = SQueryResults._categoryHash[i].color;
+        }
+
+
+        SQueryEditor._mainFilter.setAutoColors(autoColors);
+
         SQueryResults._generatePropertyView(true)
 
     }
@@ -231,8 +246,17 @@ export class SQueryResults {
         SQueryResults._table.on("tableBuilt", function () {
 
             let tdata = [];
+            let autoColors = SQueryEditor._mainFilter.getAutoColors();
+            if (autoColors) {
+                for (let i in SQueryResults._categoryHash) {
+                    if (!autoColors[i]) {
+                        autoColors[i] = SQueryResults._categoryHash[i].color;
+                    }                
+                }
+            }
+
             for (let i in SQueryResults._categoryHash) {
-                let color = SQueryResults._categoryHash[i].color;
+                let color = autoColors ? autoColors[i] : null;
                 tdata.push({ name: i, num: SQueryResults._categoryHash[i].ids.length,color:color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i });
             }
             SQueryResults._table.setData(tdata);
