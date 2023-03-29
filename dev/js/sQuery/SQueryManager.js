@@ -6,7 +6,7 @@ export class SQueryManager {
         this._viewer = viewer;
         this._SQuerys = [];
         this._modelHash = [];
-        this._keepSearchingChildren = false;
+        this._keepSearchingChildren = true;
         this._searchVisible = false;
     }
 

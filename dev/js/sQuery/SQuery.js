@@ -13,9 +13,10 @@ export class SQuery {
         this._action = "";
         this._keepSearchingChildren = false;
         this._prop = false;
+        this._autoColors = null;
         this._id = this._generateGUID();
         this._searchCounter = 0;
-            
+        this._autoColorsProperty = null;            
         if (startnode)
             this._startnode = startnode;
         else
@@ -31,6 +32,19 @@ export class SQuery {
         this._action = action;
     }
 
+
+    setAutoColors(autoColors, property) {
+        this._autoColors = autoColors;
+        this._autoColorsProperty = property;
+    }
+
+    getAutoColors() {
+        return this._autoColors;
+    }
+
+    getAutoColorProperty() {
+        return this._autoColorsProperty;
+    }
     
     async performAction(nodeids_in, ignoreVisibility = true) {
 
@@ -84,6 +98,9 @@ export class SQuery {
             break;            
             case "Hide":
                 await this._viewer.model.setNodesVisibility(nodeids,false);
+            break;
+            case "Auto Color":
+                await this.autoColorAction(nodeids);
             break;
             case "Select":
                 let selections = [];
@@ -171,6 +188,7 @@ export class SQuery {
                 this._conditions[i].childFilter = newfilter;
             }
         }
+        
         this._name = json.name;
 
         if (json.prop == undefined) {
@@ -197,6 +215,14 @@ export class SQuery {
         if (json.id) {
             this._id = json.id;
         }
+
+        if (json.autoColors) {
+            this._autoColorsProperty = json.autoColorsProperty;
+            this._autoColors = [];
+            for (let i=0;i<json.autoColors.length;i++) {
+                this._autoColors[json.autoColors[i].name] = new Communicator.Color(json.autoColors[i].r, json.autoColors[i].g, json.autoColors[i].b);
+            }
+        }
     }
 
     toJSON() {
@@ -211,7 +237,18 @@ export class SQuery {
             }            
             newconditions.push(fjson);
         }
-        return {action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
+
+        let autocolors = null;
+        if (this._autoColors) {
+            autocolors = [];
+            for (let key in this._autoColors) {
+                let color = this._autoColors[key];
+                autocolors.push({name:key, r:color.r, g:color.g, b:color.b});
+            }
+           
+        }
+
+        return {autoColorsProperty: this._autoColorsProperty,autoColors: autocolors,action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {
@@ -918,4 +955,41 @@ export class SQuery {
         });
     }
 
+    async autoColorAction(searchresults) {
+        if (this._autoColors) {
+            let categoryHash = [];
+            let selectedProperty = this._autoColorsProperty;
+
+            if (selectedProperty) {
+                if (selectedProperty == "Node Name") {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let name = this._viewer.model.getNodeName(searchresults[j]);
+                        if (categoryHash[name] == undefined) {
+                            categoryHash[name] = { ids: [] };
+                        }
+                        categoryHash[name].ids.push(searchresults[j]);
+                    }
+                }
+                else {
+                    let propname = selectedProperty;
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let id = searchresults[j];
+                        if (this._manager._propertyHash[id][propname] != undefined) {
+                            if (categoryHash[this._manager._propertyHash[id][propname]] == undefined) {
+                                categoryHash[this._manager._propertyHash[id][propname]] = { ids: [] };
+                            }
+                            categoryHash[this._manager._propertyHash[id][propname]].ids.push(searchresults[j]);
+                        }
+                    }
+                }
+            }
+
+            for (let i in categoryHash) {
+                if (this._autoColors[i]) {
+                    await this._viewer.model.setNodesFaceColor(categoryHash[i].ids, this._autoColors[i]);
+                }
+            }
+
+        }
+    }
 }
