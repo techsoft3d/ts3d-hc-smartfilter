@@ -11,8 +11,8 @@ export class SQueryResults {
 
     static async display() {
         let html = "";
-        html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:20px;top:-8px">';
-        html += '<div style="position:absolute; left:0px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
+        html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
+        html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
         html += SQueryResults._generateDropdown();
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
         html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
@@ -199,7 +199,7 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_found").empty();
 
 
-        let html = '<div style="height:25px;">Prop Select:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
+        let html = '<div style="height:25px;"><span style="top:4px;position:relative">Prop Select:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
 
        
         for (let i = 0; i < sortedStrings.length;i++) {
@@ -208,7 +208,7 @@ export class SQueryResults {
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
-        html += '</select>';
+        html += '</select></span>';
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
         html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
         html += '</div>';
@@ -329,7 +329,12 @@ export class SQueryResults {
         if (founditems == undefined)
             return;
 
-        $("#" + SQueryResults._maindiv + "_found").append("Found:" + founditems.length);
+        if (founditems.length == 1) {
+            $("#" + SQueryResults._maindiv + "_found").append(founditems.length + " item found");
+        }
+        else {
+            $("#" + SQueryResults._maindiv + "_found").append(founditems.length + " items found");
+        }
 
         let html = "";
         let y = 0;
