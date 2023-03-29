@@ -1,5 +1,10 @@
 # SQuerys
 
+
+## Version Update (0.9.8)
+* Support for property view in results
+* Auto Color option
+
 ## Version Update (0.9.5)
 * Bounding search
 * Various UI improvements

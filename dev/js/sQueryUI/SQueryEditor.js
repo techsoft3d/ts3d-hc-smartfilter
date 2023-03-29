@@ -81,7 +81,7 @@ export class SQueryEditor {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'>Search Children</li>';        
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';              
         html += '</ul>';
         return html;
