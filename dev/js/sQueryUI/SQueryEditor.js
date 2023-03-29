@@ -240,8 +240,6 @@ export class SQueryEditor {
 
     static async colorize(color) {        
                    
-        await SQueryEditor._updateSearch();
-
         let selections = [];
         for (let i = 0; i < SQueryEditor._founditems.length; i++) {
             selections.push(parseInt(SQueryEditor._founditems[i].id));
@@ -251,8 +249,6 @@ export class SQueryEditor {
 
     static async setOpacity(opacity) {        
                    
-        await SQueryEditor._updateSearch();
-
         let selections = [];
         for (let i = 0; i < SQueryEditor._founditems.length; i++) {
             selections.push(parseInt(SQueryEditor._founditems[i].id));

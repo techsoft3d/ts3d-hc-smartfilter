@@ -255,6 +255,7 @@ export class SQueryManagerUI {
             SQueryManagerUI._table = new Tabulator("#" + SQueryManagerUI._uidiv + "Tabulator", {
                 data: [],                             
                 selectable:0,
+                rowHeight:17,
                 movableRows: true,
                 layout: "fitColumns",
                 rowContextMenu: rowMenu,             
@@ -329,7 +330,7 @@ export class SQueryManagerUI {
                     }
                     }},
 
-                    {title:"Prop", headerSort : false, field:"prop", width:70,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
+                    {title:"Prop", headerSort : false, field:"prop", width:50,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
                     editorParams:{
                        
                         tristate:false,
