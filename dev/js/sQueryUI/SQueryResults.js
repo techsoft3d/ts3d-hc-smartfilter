@@ -195,11 +195,11 @@ export class SQueryResults {
         $("#SQueryToggleViewButton").html("Item View");
 
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
-        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","hidden");
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
 
 
-        let html = '<div style="height:25px;"><span style="top:4px;position:relative">Prop Select:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
+        let html = '<div style="height:25px;"><span style="top:-20px;position:relative">Prop:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
 
        
         for (let i = 0; i < sortedStrings.length;i++) {
@@ -208,6 +208,8 @@ export class SQueryResults {
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
+        html += '</select></span>';
+        html += '<span style="top:0px;left:0px;position:absolute">Prop2:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
         html += '</select></span>';
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
         html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
