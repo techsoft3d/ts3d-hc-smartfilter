@@ -243,7 +243,9 @@ export class SQuery {
             autocolors = [];
             for (let key in this._autoColors) {
                 let color = this._autoColors[key];
-                autocolors.push({name:key, r:color.r, g:color.g, b:color.b});
+                if (color) {
+                    autocolors.push({name:key, r:color.r, g:color.g, b:color.b});
+                }
             }
            
         }

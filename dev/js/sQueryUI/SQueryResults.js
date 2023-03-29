@@ -229,7 +229,7 @@ export class SQueryResults {
                     title: "#", field: "num", width: 30
                 },
                 {title:"Color",field:"color",  headerSort : false,field:"color", editor:"list", width:70,
-                formatter:"color",   editorParams:{values:["red", "green", "blue", "yellow", "brown", "grey"]}},
+                formatter:"color",   editorParams:{values:["red", "green", "blue", "yellow", "brown", "orange","grey", "black", "white"]}},
                 {
                     title: "ID", field: "id", width: 20, visible: false
                 },
@@ -298,6 +298,12 @@ export class SQueryResults {
                 return new Communicator.Color(255, 255, 0);
             case "brown":
                 return new Communicator.Color(150, 75, 0);
+            case "black":
+                return new Communicator.Color(0, 0, 0);
+            case "white":
+                return new Communicator.Color(255, 255, 255);
+            case "orange":
+                return new Communicator.Color(255, 165, 0);                                    
             case "grey":
                 return new Communicator.Color(128, 128, 128);
         }
