@@ -133,6 +133,7 @@ export class SQueryResults {
 
     static _propertySelected() {
         SQueryResults._tableProperty = $("#SQueryPropSelect")[0].value;
+        SQueryEditor._mainFilter.setAutoColors(null,null);
         SQueryResults._generatePropertyView();
 
     }
@@ -160,13 +161,17 @@ export class SQueryResults {
         }
 
 
-        SQueryEditor._mainFilter.setAutoColors(autoColors);
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
 
         SQueryResults._generatePropertyView(true)
 
     }
 
     static _generatePropertyView(redrawOnly = false) {
+
+        if (SQueryEditor._mainFilter.getAutoColorProperty()) {
+            SQueryResults._tableProperty = SQueryEditor._mainFilter.getAutoColorProperty();
+        }
 
         let sortedStrings = SQueryResults.getAllProperties();
 

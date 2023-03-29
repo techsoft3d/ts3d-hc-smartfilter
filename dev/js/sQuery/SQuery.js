@@ -16,7 +16,7 @@ export class SQuery {
         this._autoColors = null;
         this._id = this._generateGUID();
         this._searchCounter = 0;
-            
+        this._autoColorsProperty = null;            
         if (startnode)
             this._startnode = startnode;
         else
@@ -33,12 +33,17 @@ export class SQuery {
     }
 
 
-    setAutoColors(autoColors) {
+    setAutoColors(autoColors, property) {
         this._autoColors = autoColors;
+        this._autoColorsProperty = property;
     }
 
     getAutoColors() {
         return this._autoColors;
+    }
+
+    getAutoColorProperty() {
+        return this._autoColorsProperty;
     }
     
     async performAction(nodeids_in, ignoreVisibility = true) {
@@ -209,6 +214,7 @@ export class SQuery {
         }
 
         if (json.autoColors) {
+            this._autoColorsProperty = json.autoColorsProperty;
             this._autoColors = [];
             for (let i=0;i<json.autoColors.length;i++) {
                 this._autoColors[json.autoColors[i].name] = new Communicator.Color(json.autoColors[i].r, json.autoColors[i].g, json.autoColors[i].b);
@@ -230,15 +236,17 @@ export class SQuery {
         }
 
         let autocolors = null;
+        let autoColorsProperty = "";
         if (this._autoColors) {
             autocolors = [];
             for (let key in this._autoColors) {
                 let color = this._autoColors[key];
                 autocolors.push({name:key, r:color.r, g:color.g, b:color.b});
             }
-
+           
         }
-        return {autoColors: autocolors,action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
+
+        return {autoColorsProperty: this._autoColorsProperty,autoColors: autocolors,action:this._action,conditions:newconditions, name:this._name, id:this._id, keepSearchingChildren: this._keepSearchingChildren, prop:this._prop};        
     }
 
     limitToNodes(nodeids) {
