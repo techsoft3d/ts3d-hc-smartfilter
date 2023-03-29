@@ -195,6 +195,7 @@ export class SQueryResults {
         $("#SQueryToggleViewButton").html("Item View");
 
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","hidden");
         $("#" + SQueryResults._maindiv + "_found").empty();
 
 
@@ -227,7 +228,8 @@ export class SQueryResults {
                 {
                     title: "#", field: "num", width: 30
                 },
-                {title:"Color",field:"color",  headerSort : false,field:"color", editor:"list", width:70,formatter:"color"},
+                {title:"Color",field:"color",  headerSort : false,field:"color", editor:"list", width:70,
+                formatter:"color",   editorParams:{values:["red", "green", "blue", "yellow", "brown", "grey"]}},
                 {
                     title: "ID", field: "id", width: 20, visible: false
                 },
@@ -268,7 +270,37 @@ export class SQueryResults {
             SQueryResults._table.setData(tdata);
         });
 
+        SQueryResults._table.on("cellEdited", function (cell) {
+            if (cell.getField() == "color") {
+                let autoColors = SQueryEditor._mainFilter.getAutoColors();
+                if (!autoColors) {
+                    autoColors = [];
+                    SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+                }
+                let data = cell.getRow().getData();
+                autoColors[data.name] = SQueryResults._convertColor(data.color);
+            }
+            SQueryManagerUI._table.redraw();
+        });
 
+
+    }
+
+    static _convertColor(color) {
+        switch (color) {
+            case "red":
+                return new Communicator.Color(255, 0, 0);
+            case "green":
+                return new Communicator.Color(0, 255, 0);
+            case "blue":
+                return new Communicator.Color(0, 0, 255);
+            case "yellow":
+                return new Communicator.Color(255, 255, 0);
+            case "brown":
+                return new Communicator.Color(150, 75, 0);
+            case "grey":
+                return new Communicator.Color(128, 128, 128);
+        }
     }
 
     static toggleView() {
@@ -286,6 +318,7 @@ export class SQueryResults {
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","auto");
         $("#" + SQueryResults._maindiv + "_found").empty();
         if (founditems == undefined)
             return;
