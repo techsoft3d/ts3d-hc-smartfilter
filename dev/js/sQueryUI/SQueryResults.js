@@ -58,6 +58,15 @@ export class SQueryResults {
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
+            else if (SQueryResults._tableProperty == "Node Parent") {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
+                        if (SQueryResults._categoryHash[nodename] == undefined) {
+                            SQueryResults._categoryHash[nodename] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                    }
+            }            
             else if (SQueryResults._tableProperty == "Node Type") {
                 for (let j = 0; j < searchresults.length; j++) {
                     let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
@@ -92,6 +101,17 @@ export class SQueryResults {
                         SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                     }
                     SQueryResults._tableProperty = "Node Name";
+                    return;
+                }
+                else if (condition.relationship == hcSQuery.SQueryRelationshipType.nodeParent) {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
+                        if (SQueryResults._categoryHash[nodename] == undefined) {
+                            SQueryResults._categoryHash[nodename] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                    }
+                    SQueryResults._tableProperty = "Node Parent";
                     return;
                 }
                 else if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeType) {
@@ -175,6 +195,7 @@ export class SQueryResults {
         propnames2.sort();
         propnames2.unshift("Node Name");
         propnames2.unshift("Node Type");
+        propnames2.unshift("Node Parent");
         return propnames2;
     }
 
