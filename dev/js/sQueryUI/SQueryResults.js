@@ -58,6 +58,15 @@ export class SQueryResults {
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
+            else if (SQueryResults._tableProperty == "Node Type") {
+                for (let j = 0; j < searchresults.length; j++) {
+                    let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
+                    if (SQueryResults._categoryHash[nodetype] == undefined) {
+                        SQueryResults._categoryHash[nodetype] = {ids:[]};
+                    }
+                    SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
+                }
+            }
             else {
                 let propname = SQueryResults._tableProperty
                 for (let j = 0; j < searchresults.length; j++) {
@@ -85,6 +94,17 @@ export class SQueryResults {
                     SQueryResults._tableProperty = "Node Name";
                     return;
                 }
+                else if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeType) {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
+                        if (SQueryResults._categoryHash[nodetype] == undefined) {
+                            SQueryResults._categoryHash[nodetype] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
+                    }
+                    SQueryResults._tableProperty = "Node Type";
+                    return;
+                }
                 else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
                     let propname = condition.propertyName;
                     for (let j = 0; j < searchresults.length; j++) {
@@ -100,6 +120,9 @@ export class SQueryResults {
                     return;
                 }
             }
+            SQueryResults._tableProperty = "Node Name";
+            SQueryResults._findCategoryFromSearch();
+
         }
     }
 
@@ -110,7 +133,7 @@ export class SQueryResults {
         amountStrings.push("--EMPTY--");
         for (let i = 0;i<items.length;i++) {
             let ltext = items[i].toLowerCase();
-            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1) {
+            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
                 continue;
             }
             let prop = SQueryResults._manager._allPropertiesHash[items[i]];
@@ -151,6 +174,7 @@ export class SQueryResults {
 
         propnames2.sort();
         propnames2.unshift("Node Name");
+        propnames2.unshift("Node Type");
         return propnames2;
     }
 
