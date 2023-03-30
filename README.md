@@ -1,6 +1,9 @@
 # SQuerys
 
 
+## Version Update (0.9.9)
+* Support for secondary quantity in results
+
 ## Version Update (0.9.8)
 * Support for property view in results
 * Auto Color option

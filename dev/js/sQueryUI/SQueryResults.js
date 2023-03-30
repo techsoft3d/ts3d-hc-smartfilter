@@ -8,6 +8,7 @@ export class SQueryResults {
         SQueryResults._viewer = manager._viewer;
         SQueryResults._isPropertyView = false;
         SQueryResults._tablePropertyAMT = "--EMPTY--";
+        SQueryResults._aggType = "sum";
     }
 
     static async display() {
@@ -206,7 +207,11 @@ export class SQueryResults {
 
     }
 
+    static _propertyAggTypeSelected() {
+        SQueryResults._aggType = $("#SQueryPropAggType")[0].value;
+        SQueryResults._generatePropertyView();
 
+    }
 
     static _propertyAMTSelected() {
         SQueryResults._tablePropertyAMT = $("#SQueryPropSelectAMT")[0].value;
@@ -298,6 +303,15 @@ export class SQueryResults {
                 html += '<option value="' + amountStrings[i] + '">' + amountStrings[i] + '</option>\n';
         }
         html += '</select></span>';
+        html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';       
+        let choices =  ["sum","avg"];
+        for (let i = 0; i < choices.length;i++) {
+            if (SQueryResults._aggType == choices[i])
+                html += '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>\n';
+            else
+                html += '<option value="' + choices[i] + '">' + choices[i] + '</option>\n';
+        }
+        html += '</select></span>';
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
         html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
         html += '</div>';
@@ -326,10 +340,10 @@ export class SQueryResults {
             let unit = SQueryResults._getAMTUnit();
             let unitTitle = "";
             if (unit) {
-                unitTitle = "Sum(" + unit + ")"
+                unitTitle = SQueryResults._aggType + "(" + unit + ")";
             }
             else {
-                unitTitle = "Sum"
+                unitTitle = SQueryResults._aggType;
             }
             tabulatorColumes.splice(1,0,{
                 title: unitTitle, field: "amt", width: 120
@@ -425,20 +439,45 @@ export class SQueryResults {
                 else if (j.indexOf("m") != -1) {
                     return "m";
                 }
+                else if (j.indexOf("inch³") != -1) {
+                    return "inch³";
+                }
+                else if (j.indexOf("inch²") != -1) {
+                    return "inch²";
+                }
                 break;
             }
         }
     }        
 
     static _calculateAMT(ids) {
-        let amount = 0;
-        for (let i=0;i<ids.length;i++) {
-            let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
-            if (res != undefined) {
-                amount += parseFloat(res);
+        if (SQueryResults._aggType == "sum") {
+            let amount = 0;
+            for (let i = 0; i < ids.length; i++) {
+                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
+                if (res != undefined) {
+                    amount += parseFloat(res);
+                }
             }
+            return amount;
         }
-        return amount;
+        else {
+            let numbers = [];
+            for (let i = 0; i < ids.length; i++) {
+                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
+                if (res != undefined) {
+                    numbers.push(parseFloat(res));
+                }
+            }
+
+            if (numbers.length === 0) {
+                return 0;
+            }
+              
+            const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            const avg = sum / numbers.length;
+            return avg;            
+        }
     }
 
     static _convertColor(color) {
