@@ -4,7 +4,7 @@ export class SQueryResults {
 
     static initialize(maindiv, manager) {
         SQueryResults._maindiv = maindiv;
-        SQueryResults._manager = manager;      
+        SQueryResults._manager = manager;
         SQueryResults._viewer = manager._viewer;
         SQueryResults._isPropertyView = false;
         SQueryResults._tablePropertyAMT = "--EMPTY--";
@@ -13,17 +13,17 @@ export class SQueryResults {
 
     static async display() {
         let html = "";
-        html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
-        html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
+        html += '<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
+        html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';
         html += SQueryResults._generateDropdown();
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
         html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
         html += '</div>';
 
-        html += '<div id="' + SQueryResults._maindiv + '_searchitems" class="SQuerySearchItems">';        
+        html += '<div id="' + SQueryResults._maindiv + '_searchitems" class="SQuerySearchItems">';
         html += '</div>';
-        html += '<div style="position:absolute; right:20px;bottom:0px; font-size:12px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
-        
+        html += '<div style="position:absolute; right:20px;bottom:0px; font-size:12px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';
+
         $("#" + SQueryResults._maindiv).empty();
         $("#" + SQueryResults._maindiv).append(html);
 
@@ -41,7 +41,7 @@ export class SQueryResults {
                 }
             }
         });
-        
+
     }
 
     static _findCategoryFromSearch() {
@@ -54,25 +54,25 @@ export class SQueryResults {
             if (SQueryResults._tableProperty == "Node Name") {
                 for (let j = 0; j < searchresults.length; j++) {
                     if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                        SQueryResults._categoryHash[searchresults[j].name] = {ids:[]};
+                        SQueryResults._categoryHash[searchresults[j].name] = { ids: [] };
                     }
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
             else if (SQueryResults._tableProperty == "Node Parent") {
-                    for (let j = 0; j < searchresults.length; j++) {
-                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
-                        if (SQueryResults._categoryHash[nodename] == undefined) {
-                            SQueryResults._categoryHash[nodename] = {ids:[]};
-                        }
-                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                for (let j = 0; j < searchresults.length; j++) {
+                    let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
+                    if (SQueryResults._categoryHash[nodename] == undefined) {
+                        SQueryResults._categoryHash[nodename] = { ids: [] };
                     }
-            }            
+                    SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                }
+            }
             else if (SQueryResults._tableProperty == "Node Type") {
                 for (let j = 0; j < searchresults.length; j++) {
                     let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
                     if (SQueryResults._categoryHash[nodetype] == undefined) {
-                        SQueryResults._categoryHash[nodetype] = {ids:[]};
+                        SQueryResults._categoryHash[nodetype] = { ids: [] };
                     }
                     SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
                 }
@@ -83,7 +83,7 @@ export class SQueryResults {
                     let id = searchresults[j].id;
                     if (SQueryResults._manager._propertyHash[id][propname] != undefined) {
                         if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] == undefined) {
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = {ids:[]};
+                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = { ids: [] };
                         }
                         SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].ids.push(searchresults[j].id);
                     }
@@ -97,7 +97,7 @@ export class SQueryResults {
                 if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
                     for (let j = 0; j < searchresults.length; j++) {
                         if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                            SQueryResults._categoryHash[searchresults[j].name] = {ids:[]};
+                            SQueryResults._categoryHash[searchresults[j].name] = { ids: [] };
                         }
                         SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                     }
@@ -108,7 +108,7 @@ export class SQueryResults {
                     for (let j = 0; j < searchresults.length; j++) {
                         let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
                         if (SQueryResults._categoryHash[nodename] == undefined) {
-                            SQueryResults._categoryHash[nodename] = {ids:[]};
+                            SQueryResults._categoryHash[nodename] = { ids: [] };
                         }
                         SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
                     }
@@ -119,7 +119,7 @@ export class SQueryResults {
                     for (let j = 0; j < searchresults.length; j++) {
                         let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
                         if (SQueryResults._categoryHash[nodetype] == undefined) {
-                            SQueryResults._categoryHash[nodetype] = {ids:[]};
+                            SQueryResults._categoryHash[nodetype] = { ids: [] };
                         }
                         SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
                     }
@@ -132,7 +132,7 @@ export class SQueryResults {
                         let id = searchresults[j].id;
                         if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
                             if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
-                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = {ids:[]};
+                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = { ids: [] };
                             }
                             SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].ids.push(searchresults[j].id);
                         }
@@ -152,7 +152,7 @@ export class SQueryResults {
 
         let amountStrings = [];
         amountStrings.push("--EMPTY--");
-        for (let i = 0;i<items.length;i++) {
+        for (let i = 0; i < items.length; i++) {
             let ltext = items[i].toLowerCase();
             if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
                 continue;
@@ -163,7 +163,7 @@ export class SQueryResults {
                     if (!isNaN(parseFloat(j))) {
                         amountStrings.push(items[i]);
                     }
-                    break;                   
+                    break;
                 }
             }
         }
@@ -194,15 +194,15 @@ export class SQueryResults {
         }
 
         propnames2.sort();
-        propnames2.unshift("Node Name");
-        propnames2.unshift("Node Type");
         propnames2.unshift("Node Parent");
+        propnames2.unshift("Node Type");
+        propnames2.unshift("Node Name");
         return propnames2;
     }
 
     static _propertySelected() {
         SQueryResults._tableProperty = $("#SQueryPropSelect")[0].value;
-        SQueryEditor._mainFilter.setAutoColors(null,null);
+        SQueryEditor._mainFilter.setAutoColors(null, null);
         SQueryResults._generatePropertyView();
 
     }
@@ -233,7 +233,7 @@ export class SQueryResults {
 
     static _assignColors() {
         for (let i in SQueryResults._categoryHash) {
-            let color = new Communicator.Color(Math.floor(Math.random() * 256),Math.floor(Math.random() * 256),Math.floor(Math.random() * 256));
+            let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
             SQueryResults._categoryHash[i].color = color;
         }
 
@@ -273,11 +273,11 @@ export class SQueryResults {
 
             SQueryResults._findCategoryFromSearch();
         }
-    
+
         $("#SQueryToggleViewButton").html("Item View");
 
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
-        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","inherit");
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
 
 
@@ -285,27 +285,27 @@ export class SQueryResults {
         let amountStrings = SQueryResults.getAmountStrings(sortedStrings);
 
 
-        let html = '<div style="height:25px;"><span style="top:-20px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';       
+        let html = '<div style="height:25px;"><span style="top:-20px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
 
-       
-        for (let i = 0; i < sortedStrings.length;i++) {
+
+        for (let i = 0; i < sortedStrings.length; i++) {
             if (SQueryResults._tableProperty == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:0px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';       
-        for (let i = 0; i < amountStrings.length;i++) {
+        html += '<span style="top:0px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';
+        for (let i = 0; i < amountStrings.length; i++) {
             if (SQueryResults._tablePropertyAMT == amountStrings[i])
                 html += '<option value="' + amountStrings[i] + '" selected>' + amountStrings[i] + '</option>\n';
             else
                 html += '<option value="' + amountStrings[i] + '">' + amountStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';       
-        let choices =  ["sum","avg","max","min", "med"];
-        for (let i = 0; i < choices.length;i++) {
+        html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';
+        let choices = ["sum", "avg", "max", "min", "med"];
+        for (let i = 0; i < choices.length; i++) {
             if (SQueryResults._aggType == choices[i])
                 html += '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>\n';
             else
@@ -345,17 +345,28 @@ export class SQueryResults {
             else {
                 unitTitle = SQueryResults._aggType;
             }
-            tabulatorColumes.splice(1,0,{
+            tabulatorColumes.splice(1, 0, {
                 title: unitTitle, field: "amt", width: 120
             });
         }
 
 
+        let rowMenu = [
+            {
+                label: "<i class='fas fa-user'></i> Expand",
+                action: async function (e, row) {
+                    let ids = SQueryResults._categoryHash[row.getData().id].ids;
+                    SQueryResults.generateExpandedResults(ids);
+                }
+            }
+        ];
+
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
-            rowHeight:15,
+            rowHeight: 15,
             selectable: 0,
             layout: "fitColumns",
-            columns:tabulatorColumes,
+            columns: tabulatorColumes,
+            rowContextMenu: rowMenu
         });
 
         SQueryResults._table.on("rowClick", async function (e, row) {
@@ -385,13 +396,13 @@ export class SQueryResults {
                 for (let i in SQueryResults._categoryHash) {
                     if (!autoColors[i]) {
                         autoColors[i] = SQueryResults._categoryHash[i].color;
-                    }                
+                    }
                 }
             }
 
             for (let i in SQueryResults._categoryHash) {
                 let color = autoColors ? autoColors[i] : null;
-                let data =  { name: i, num: SQueryResults._categoryHash[i].ids.length,color:color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
+                let data = { name: i, num: SQueryResults._categoryHash[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
                 if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
                     let amount = SQueryResults._calculateAMT(SQueryResults._categoryHash[i].ids);
                     data.amt = amount;
@@ -414,9 +425,76 @@ export class SQueryResults {
             }
             SQueryManagerUI._table.redraw();
         });
-
-
     }
+
+    static generateExpandedResults(nodeids) {
+        $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
+        $("#" + SQueryResults._maindiv + "_found").empty();
+
+        let html = '<div style="height:25px;">';
+        html += '</div>';
+
+        $("#" + SQueryResults._maindiv + "_searchitems").append(html);
+
+        $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
+
+
+        let tabulatorColumes = [{
+            title: "Name", field: "name"
+        },
+        {
+            title: SQueryResults._tableProperty, field: "prop1"
+        },
+        {
+            title: "ID", field: "id", width: 20, visible: false
+        }];
+
+        if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
+
+            let unit = SQueryResults._getAMTUnit();
+            let unitTitle = "";
+            if (unit) {
+                unitTitle = SQueryResults._tablePropertyAMT + "(" + unit + ")";
+            }
+            else {
+                unitTitle = SQueryResults._tablePropertyAMT;
+            }
+            tabulatorColumes.splice(2, 0, {
+                title: unitTitle, field: "prop2", width: 120
+            });
+        }
+
+        SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+            rowHeight: 15,
+            selectable: 0,
+            layout: "fitColumns",
+            columns: tabulatorColumes,
+        });
+
+        SQueryResults._table.on("rowClick", async function (e, row) {
+            let data = row.getData();          
+            SQueryResults._viewer.selectionManager.selectNode(parseInt(data.id), Communicator.SelectionMode.Set);        
+        });
+
+        SQueryResults._table.on("tableBuilt", function () {
+
+            let tdata = [];
+            for (let i=0;i<nodeids.length;i++) {
+                let name = SQueryResults._viewer.model.getNodeName(nodeids[i]);
+                let data = { name:name , id: nodeids[i], prop1:SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tableProperty]};
+                if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
+                    data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyAMT]);
+                }
+                tdata.push(data);
+            }
+
+            SQueryResults._table.setData(tdata);
+        });
+    }
+
+
+
     static _getAMTUnit() {
         let prop = SQueryResults._manager._allPropertiesHash[SQueryResults._tablePropertyAMT];
         if (prop != undefined) {
@@ -427,7 +505,7 @@ export class SQueryResults {
                 else if (j.indexOf("m²") != -1) {
                     return "m²";
                 }
-                else if(j.indexOf("mm³") != -1) {
+                else if (j.indexOf("mm³") != -1) {
                     return "mm³";
                 }
                 else if (j.indexOf("m³") != -1) {
@@ -448,7 +526,7 @@ export class SQueryResults {
                 break;
             }
         }
-    }        
+    }
 
     static _calculateAMT(ids) {
         if (SQueryResults._aggType == "sum") {
@@ -475,10 +553,10 @@ export class SQueryResults {
             }
 
             if (SQueryResults._aggType == "avg") {
-              
+
                 const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
                 const avg = sum / numbers.length;
-                return avg;            
+                return avg;
             }
             else if (SQueryResults._aggType == "max") {
                 return Math.max(...numbers);
@@ -489,10 +567,10 @@ export class SQueryResults {
             else if (SQueryResults._aggType == "med") {
                 numbers.sort((a, b) => a - b);
                 const middle = Math.floor(numbers.length / 2);
-              
+
                 return numbers.length % 2 === 0
-                  ? (numbers[middle - 1] + numbers[middle]) / 2
-                  : numbers[middle];
+                    ? (numbers[middle - 1] + numbers[middle]) / 2
+                    : numbers[middle];
             }
         }
     }
@@ -514,7 +592,7 @@ export class SQueryResults {
             case "white":
                 return new Communicator.Color(255, 255, 255);
             case "orange":
-                return new Communicator.Color(255, 165, 0);                                    
+                return new Communicator.Color(255, 165, 0);
             case "grey":
                 return new Communicator.Color(128, 128, 128);
         }
@@ -529,13 +607,13 @@ export class SQueryResults {
             SQueryResults.generateSearchResults(SQueryEditor._founditems);
         }
     }
-    
+
 
     static generateSearchResults(founditems) {
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
-        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","auto");
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "auto");
         $("#" + SQueryResults._maindiv + "_found").empty();
         if (founditems == undefined)
             return;
@@ -591,26 +669,25 @@ export class SQueryResults {
         SQueryResults.adjust();
     }
 
-    static adjust() 
-    {
+    static adjust() {
 
         let newheight = $("#" + SQueryEditor._maindiv).height() - ($("#" + SQueryResults._maindiv + "_searchitems").offset().top - $("#" + SQueryEditor._maindiv).parent().offset().top);
         $("#" + SQueryResults._maindiv + "_searchitems").css({ "height": newheight + "px" });
-        
 
-        let gap  = newheight + $("#" + SQueryEditor._maindiv + "_conditions").height() + 3;
+
+        let gap = newheight + $("#" + SQueryEditor._maindiv + "_conditions").height() + 3;
         if (SQueryEditor._showFirstRow) {
             gap += $("#" + SQueryEditor._maindiv + "_firstrow").height();
         }
     }
 
-    
+
     static _select(id) {
         if (!SQueryEditor.ctrlPressed)
             SQueryResults._viewer.selectionManager.selectNode(parseInt(id), Communicator.SelectionMode.Set);
         else
             SQueryResults._viewer.selectionManager.selectNode(parseInt(id), Communicator.SelectionMode.Toggle);
-       
+
         SQueryResults.generateSearchResults(SQueryEditor._founditems);
     }
 
@@ -618,19 +695,19 @@ export class SQueryResults {
         let html = "";
         html += '<button id="SQueryResultsDropdown" style="right:56px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul  id="SQueryResultsDropdownContent" style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';        
-        html +='<li >---</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(128,128,128))\'>Grey</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';        
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';
+        html += '<li >---</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';
         html += '</ul>';
         return html;
     }
