@@ -358,7 +358,19 @@ export class SQueryResults {
                     let ids = SQueryResults._categoryHash[row.getData().id].ids;
                     SQueryResults.generateExpandedResults(ids);
                 }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Expand All",
+                action: async function (e, row) {
+                    let searchresults = SQueryEditor._founditems;
+                    let ids = [];
+                    for (let i = 0; i < searchresults.length; i++) {
+                        ids.push(searchresults[i].id);
+                    }
+                    SQueryResults.generateExpandedResults(ids);
+                }
             }
+            
         ];
 
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
