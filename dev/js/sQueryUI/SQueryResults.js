@@ -285,7 +285,7 @@ export class SQueryResults {
         let amountStrings = SQueryResults.getAmountStrings(sortedStrings);
 
 
-        let html = '<div style="height:25px;"><span style="top:-20px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
+        let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
 
 
         for (let i = 0; i < sortedStrings.length; i++) {
@@ -295,7 +295,7 @@ export class SQueryResults {
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:0px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';
+        html += '<span style="top:4px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';
         for (let i = 0; i < amountStrings.length; i++) {
             if (SQueryResults._tablePropertyAMT == amountStrings[i])
                 html += '<option value="' + amountStrings[i] + '" selected>' + amountStrings[i] + '</option>\n';
@@ -303,7 +303,7 @@ export class SQueryResults {
                 html += '<option value="' + amountStrings[i] + '">' + amountStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';
+        html += '<span style="top:4px;left:186px;position:absolute"><span style="font-family:courier"></span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';
         let choices = ["sum", "avg", "max", "min", "med"];
         for (let i = 0; i < choices.length; i++) {
             if (SQueryResults._aggType == choices[i])
