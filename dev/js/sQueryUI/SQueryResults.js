@@ -328,11 +328,16 @@ export class SQueryResults {
 
             let ids = SQueryResults._categoryHash[data.id].ids;
             SQueryResults._viewer.selectionManager.clear();
-            let selections = [];
-            for (let i = 0; i < ids.length; i++) {
-                selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+            if (ids.length == 1) {
+                SQueryResults._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
             }
-            SQueryResults._viewer.selectionManager.add(selections);
+            else {
+                let selections = [];
+                for (let i = 0; i < ids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+                }
+                SQueryResults._viewer.selectionManager.add(selections);
+            }
 
         });
 

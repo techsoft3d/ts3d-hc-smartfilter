@@ -470,6 +470,8 @@ export class SQueryManagerUI {
         let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);
         sf.fromJSON(jfilter);
         SQuery.updateConditions(sf._conditions);
+        SQuery.setAutoColors(sf.getAutoColors(), sf.getAutoColorProperty());
+
         SQuery.setName("");
        
         row.update({description:SQuery.getName()});
