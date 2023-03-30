@@ -304,7 +304,7 @@ export class SQueryResults {
         }
         html += '</select></span>';
         html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';       
-        let choices =  ["sum","avg"];
+        let choices =  ["sum","avg","max","min", "med"];
         for (let i = 0; i < choices.length;i++) {
             if (SQueryResults._aggType == choices[i])
                 html += '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>\n';
@@ -473,10 +473,27 @@ export class SQueryResults {
             if (numbers.length === 0) {
                 return 0;
             }
+
+            if (SQueryResults._aggType == "avg") {
               
-            const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-            const avg = sum / numbers.length;
-            return avg;            
+                const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+                const avg = sum / numbers.length;
+                return avg;            
+            }
+            else if (SQueryResults._aggType == "max") {
+                return Math.max(...numbers);
+            }
+            else if (SQueryResults._aggType == "min") {
+                return Math.min(...numbers);
+            }
+            else if (SQueryResults._aggType == "med") {
+                numbers.sort((a, b) => a - b);
+                const middle = Math.floor(numbers.length / 2);
+              
+                return numbers.length % 2 === 0
+                  ? (numbers[middle - 1] + numbers[middle]) / 2
+                  : numbers[middle];
+            }
         }
     }
 
