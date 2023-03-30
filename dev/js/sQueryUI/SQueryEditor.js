@@ -530,6 +530,9 @@ export class SQueryEditor {
         else if (condition.propertyName == "Bounding") {
             choices =  ["evaluate"];
         }
+        else if (condition.propertyName == "COG") {
+            choices =  ["contains","evaluate", "exists"];
+        }
         else {
             choices =  ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
         }
