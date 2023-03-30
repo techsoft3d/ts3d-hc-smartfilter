@@ -7,12 +7,14 @@ export class SQueryResults {
         SQueryResults._manager = manager;      
         SQueryResults._viewer = manager._viewer;
         SQueryResults._isPropertyView = false;
+        SQueryResults._tablePropertyAMT = "--EMPTY--";
+        SQueryResults._aggType = "sum";
     }
 
     static async display() {
         let html = "";
-        html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:20px;top:-8px">';
-        html += '<div style="position:absolute; left:0px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
+        html +='<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
+        html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';  
         html += SQueryResults._generateDropdown();
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
         html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
@@ -57,6 +59,24 @@ export class SQueryResults {
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
+            else if (SQueryResults._tableProperty == "Node Parent") {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
+                        if (SQueryResults._categoryHash[nodename] == undefined) {
+                            SQueryResults._categoryHash[nodename] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                    }
+            }            
+            else if (SQueryResults._tableProperty == "Node Type") {
+                for (let j = 0; j < searchresults.length; j++) {
+                    let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
+                    if (SQueryResults._categoryHash[nodetype] == undefined) {
+                        SQueryResults._categoryHash[nodetype] = {ids:[]};
+                    }
+                    SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
+                }
+            }
             else {
                 let propname = SQueryResults._tableProperty
                 for (let j = 0; j < searchresults.length; j++) {
@@ -84,6 +104,28 @@ export class SQueryResults {
                     SQueryResults._tableProperty = "Node Name";
                     return;
                 }
+                else if (condition.relationship == hcSQuery.SQueryRelationshipType.nodeParent) {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
+                        if (SQueryResults._categoryHash[nodename] == undefined) {
+                            SQueryResults._categoryHash[nodename] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
+                    }
+                    SQueryResults._tableProperty = "Node Parent";
+                    return;
+                }
+                else if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeType) {
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
+                        if (SQueryResults._categoryHash[nodetype] == undefined) {
+                            SQueryResults._categoryHash[nodetype] = {ids:[]};
+                        }
+                        SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
+                    }
+                    SQueryResults._tableProperty = "Node Type";
+                    return;
+                }
                 else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
                     let propname = condition.propertyName;
                     for (let j = 0; j < searchresults.length; j++) {
@@ -99,9 +141,34 @@ export class SQueryResults {
                     return;
                 }
             }
+            SQueryResults._tableProperty = "Node Name";
+            SQueryResults._findCategoryFromSearch();
+
         }
     }
 
+
+    static getAmountStrings(items) {
+
+        let amountStrings = [];
+        amountStrings.push("--EMPTY--");
+        for (let i = 0;i<items.length;i++) {
+            let ltext = items[i].toLowerCase();
+            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+                continue;
+            }
+            let prop = SQueryResults._manager._allPropertiesHash[items[i]];
+            if (prop != undefined) {
+                for (let j in prop) {
+                    if (!isNaN(parseFloat(j))) {
+                        amountStrings.push(items[i]);
+                    }
+                    break;                   
+                }
+            }
+        }
+        return amountStrings;
+    }
 
     static getAllProperties() {
 
@@ -128,6 +195,8 @@ export class SQueryResults {
 
         propnames2.sort();
         propnames2.unshift("Node Name");
+        propnames2.unshift("Node Type");
+        propnames2.unshift("Node Parent");
         return propnames2;
     }
 
@@ -137,6 +206,19 @@ export class SQueryResults {
         SQueryResults._generatePropertyView();
 
     }
+
+    static _propertyAggTypeSelected() {
+        SQueryResults._aggType = $("#SQueryPropAggType")[0].value;
+        SQueryResults._generatePropertyView();
+
+    }
+
+    static _propertyAMTSelected() {
+        SQueryResults._tablePropertyAMT = $("#SQueryPropSelectAMT")[0].value;
+        SQueryResults._generatePropertyView();
+
+    }
+
     static _applyColors() {
         let autoColors = SQueryEditor._mainFilter.getAutoColors();
         if (!autoColors) {
@@ -195,10 +277,15 @@ export class SQueryResults {
         $("#SQueryToggleViewButton").html("Item View");
 
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
 
 
-        let html = '<div style="height:25px;">Prop Select:<select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyTypeSelect" value="">';       
+
+        let amountStrings = SQueryResults.getAmountStrings(sortedStrings);
+
+
+        let html = '<div style="height:25px;"><span style="top:-20px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';       
 
        
         for (let i = 0; i < sortedStrings.length;i++) {
@@ -207,31 +294,68 @@ export class SQueryResults {
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
-        html += '</select>';
+        html += '</select></span>';
+        html += '<span style="top:0px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';       
+        for (let i = 0; i < amountStrings.length;i++) {
+            if (SQueryResults._tablePropertyAMT == amountStrings[i])
+                html += '<option value="' + amountStrings[i] + '" selected>' + amountStrings[i] + '</option>\n';
+            else
+                html += '<option value="' + amountStrings[i] + '">' + amountStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+        html += '<span style="top:0px;left:190px;position:absolute"><span style="font-family:courier">Agg:</span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';       
+        let choices =  ["sum","avg"];
+        for (let i = 0; i < choices.length;i++) {
+            if (SQueryResults._aggType == choices[i])
+                html += '<option value="' + choices[i] + '" selected>' + choices[i] + '</option>\n';
+            else
+                html += '<option value="' + choices[i] + '">' + choices[i] + '</option>\n';
+        }
+        html += '</select></span>';
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
         html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
         html += '</div>';
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
 
-        $("#" + SQueryResults._maindiv + "_searchitems").append('<div id = "SQueryResultsTabulator"></div>');
+        $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
+
+
+        let tabulatorColumes = [{
+            title: SQueryResults._tableProperty, field: "name"
+        },
+        {
+            title: "#", field: "num", width: 40
+        },
+        {
+            title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 60,
+            formatter: "color", editorParams: { values: ["red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
+        },
+        {
+            title: "ID", field: "id", width: 20, visible: false
+        }];
+
+        if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
+
+            let unit = SQueryResults._getAMTUnit();
+            let unitTitle = "";
+            if (unit) {
+                unitTitle = SQueryResults._aggType + "(" + unit + ")";
+            }
+            else {
+                unitTitle = SQueryResults._aggType;
+            }
+            tabulatorColumes.splice(1,0,{
+                title: unitTitle, field: "amt", width: 120
+            });
+        }
+
 
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
+            rowHeight:15,
             selectable: 0,
             layout: "fitColumns",
-            columns: [
-                {
-                    title: SQueryResults._tableProperty, field: "name"
-                },
-                {
-                    title: "#", field: "num", width: 30
-                },
-                {title:"Color",field:"color",  headerSort : false,field:"color", editor:"list", width:70,formatter:"color"},
-                {
-                    title: "ID", field: "id", width: 20, visible: false
-                },
-
-            ],
+            columns:tabulatorColumes,
         });
 
         SQueryResults._table.on("rowClick", async function (e, row) {
@@ -239,11 +363,16 @@ export class SQueryResults {
 
             let ids = SQueryResults._categoryHash[data.id].ids;
             SQueryResults._viewer.selectionManager.clear();
-            let selections = [];
-            for (let i = 0; i < ids.length; i++) {
-                selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+            if (ids.length == 1) {
+                SQueryResults._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
             }
-            SQueryResults._viewer.selectionManager.add(selections);
+            else {
+                let selections = [];
+                for (let i = 0; i < ids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+                }
+                SQueryResults._viewer.selectionManager.add(selections);
+            }
 
         });
 
@@ -262,12 +391,116 @@ export class SQueryResults {
 
             for (let i in SQueryResults._categoryHash) {
                 let color = autoColors ? autoColors[i] : null;
-                tdata.push({ name: i, num: SQueryResults._categoryHash[i].ids.length,color:color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i });
+                let data =  { name: i, num: SQueryResults._categoryHash[i].ids.length,color:color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
+                if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
+                    let amount = SQueryResults._calculateAMT(SQueryResults._categoryHash[i].ids);
+                    data.amt = amount;
+                }
+
+                tdata.push(data);
             }
             SQueryResults._table.setData(tdata);
         });
 
+        SQueryResults._table.on("cellEdited", function (cell) {
+            if (cell.getField() == "color") {
+                let autoColors = SQueryEditor._mainFilter.getAutoColors();
+                if (!autoColors) {
+                    autoColors = [];
+                    SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+                }
+                let data = cell.getRow().getData();
+                autoColors[data.name] = SQueryResults._convertColor(data.color);
+            }
+            SQueryManagerUI._table.redraw();
+        });
 
+
+    }
+    static _getAMTUnit() {
+        let prop = SQueryResults._manager._allPropertiesHash[SQueryResults._tablePropertyAMT];
+        if (prop != undefined) {
+            for (let j in prop) {
+                if (j.indexOf("mm²") != -1) {
+                    return "mm²";
+                }
+                else if (j.indexOf("m²") != -1) {
+                    return "m²";
+                }
+                else if(j.indexOf("mm³") != -1) {
+                    return "mm³";
+                }
+                else if (j.indexOf("m³") != -1) {
+                    return "m³";
+                }
+                else if (j.indexOf("mm") != -1) {
+                    return "mm";
+                }
+                else if (j.indexOf("m") != -1) {
+                    return "m";
+                }
+                else if (j.indexOf("inch³") != -1) {
+                    return "inch³";
+                }
+                else if (j.indexOf("inch²") != -1) {
+                    return "inch²";
+                }
+                break;
+            }
+        }
+    }        
+
+    static _calculateAMT(ids) {
+        if (SQueryResults._aggType == "sum") {
+            let amount = 0;
+            for (let i = 0; i < ids.length; i++) {
+                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
+                if (res != undefined) {
+                    amount += parseFloat(res);
+                }
+            }
+            return amount;
+        }
+        else {
+            let numbers = [];
+            for (let i = 0; i < ids.length; i++) {
+                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
+                if (res != undefined) {
+                    numbers.push(parseFloat(res));
+                }
+            }
+
+            if (numbers.length === 0) {
+                return 0;
+            }
+              
+            const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+            const avg = sum / numbers.length;
+            return avg;            
+        }
+    }
+
+    static _convertColor(color) {
+        switch (color) {
+            case "red":
+                return new Communicator.Color(255, 0, 0);
+            case "green":
+                return new Communicator.Color(0, 255, 0);
+            case "blue":
+                return new Communicator.Color(0, 0, 255);
+            case "yellow":
+                return new Communicator.Color(255, 255, 0);
+            case "brown":
+                return new Communicator.Color(150, 75, 0);
+            case "black":
+                return new Communicator.Color(0, 0, 0);
+            case "white":
+                return new Communicator.Color(255, 255, 255);
+            case "orange":
+                return new Communicator.Color(255, 165, 0);                                    
+            case "grey":
+                return new Communicator.Color(128, 128, 128);
+        }
     }
 
     static toggleView() {
@@ -285,11 +518,17 @@ export class SQueryResults {
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
+        $("#" + SQueryResults._maindiv + "_searchitems").css("overflow","auto");
         $("#" + SQueryResults._maindiv + "_found").empty();
         if (founditems == undefined)
             return;
 
-        $("#" + SQueryResults._maindiv + "_found").append("Found:" + founditems.length);
+        if (founditems.length == 1) {
+            $("#" + SQueryResults._maindiv + "_found").append(founditems.length + " item found");
+        }
+        else {
+            $("#" + SQueryResults._maindiv + "_found").append(founditems.length + " items found");
+        }
 
         let html = "";
         let y = 0;

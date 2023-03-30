@@ -209,7 +209,7 @@ export class SQueryManager {
 
         for (let i in this._propertyHash) {
             for (let j in this._propertyHash[i]) {
-                this._propertyHash[i][j] = this._propertyHash[i][j].replace(/,/g, '.');
+                this._propertyHash[i][j] = this._propertyHash[i][j].replace(/,/g, '');
                 this._allPropertiesHash[j][this._propertyHash[i][j]] = true;
             }
         }
