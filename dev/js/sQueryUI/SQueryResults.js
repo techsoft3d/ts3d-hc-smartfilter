@@ -173,7 +173,7 @@ export class SQueryResults {
         amountStrings.push("--EMPTY--");
         for (let i = 0; i < items.length; i++) {
             let ltext = items[i].toLowerCase();
-            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
                 continue;
             }
             let prop = SQueryResults._manager._allPropertiesHash[items[i]];
@@ -191,7 +191,7 @@ export class SQueryResults {
 
     static isNumberProp(ltextin) {
         let ltext = ltextin.toLowerCase();
-        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
             return false;
         }
 
