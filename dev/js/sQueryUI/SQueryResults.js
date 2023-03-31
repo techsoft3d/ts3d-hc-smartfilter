@@ -9,6 +9,9 @@ export class SQueryResults {
         SQueryResults._isPropertyView = false;
         SQueryResults._tablePropertyAMT = "--EMPTY--";
         SQueryResults._aggType = "sum";
+        SQueryResults._tablePropertyExpanded1 = "--EMPTY--";
+        SQueryResults._tablePropertyExpanded2 = "--EMPTY--";
+
     }
 
     static async display() {
@@ -186,6 +189,24 @@ export class SQueryResults {
         return amountStrings;
     }
 
+    static isNumberProp(ltextin) {
+        let ltext = ltextin.toLowerCase();
+        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+            return false;
+        }
+
+        let prop = SQueryResults._manager._allPropertiesHash[ltextin];
+        if (prop != undefined) {
+            for (let j in prop) {
+                if (!isNaN(parseFloat(j))) {
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
     static getAllProperties() {
 
         let searchresults = SQueryEditor._founditems;
@@ -223,6 +244,18 @@ export class SQueryResults {
         SQueryResults._generatePropertyView();
 
     }
+
+    static _propertyExpandedSelected(num) {
+        if (num == 0) {
+            SQueryResults._tablePropertyExpanded0 = $("#SQueryPropExpandedSelect0")[0].value;
+        }
+        else if (num == 1) {
+            SQueryResults._tablePropertyExpanded1 = $("#SQueryPropExpandedSelect1")[0].value;
+        }
+        SQueryResults.generateExpandedResults();
+
+    }
+
 
     static _propertyAggTypeSelected() {
         SQueryResults._aggType = $("#SQueryPropAggType")[0].value;
@@ -328,6 +361,7 @@ export class SQueryResults {
 
     static _generatePropertyView(redrawOnly = false) {
 
+        $("#SQueryResultsFirstRow").css("display", "block");
         if (SQueryEditor._mainFilter.getAutoColorProperty()) {
             SQueryResults._tableProperty = SQueryEditor._mainFilter.getAutoColorProperty();
         }
@@ -351,7 +385,7 @@ export class SQueryResults {
             SQueryResults._findCategoryFromSearch();
         }
 
-        $("#SQueryToggleViewButton").html("Item View");
+        $("#SQueryToggleViewButton").html("Search View");
 
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
@@ -363,7 +397,6 @@ export class SQueryResults {
 
 
         let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
-
 
         for (let i = 0; i < sortedStrings.length; i++) {
             if (SQueryResults._tableProperty == sortedStrings[i])
@@ -431,7 +464,7 @@ export class SQueryResults {
 
         if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
 
-            let unit = SQueryResults._getAMTUnit();
+            let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyAMT);
             let unitTitle = "";
             if (unit) {
                 unitTitle = SQueryResults._aggType + "(" + unit + ")";
@@ -447,20 +480,25 @@ export class SQueryResults {
 
         let rowMenu = [
             {
-                label: "<i class='fas fa-user'></i> Expand",
+                label: "<i class='fas fa-user'></i> View Category",
                 action: async function (e, row) {
                     let ids = SQueryResults._categoryHash[row.getData().id].ids;
+                    
+                    SQueryResults._tablePropertyExpanded0 = SQueryResults._tableProperty;
+                    SQueryResults._tablePropertyExpanded1 = SQueryResults._tablePropertyAMT;
                     SQueryResults.generateExpandedResults(ids);
                 }
             },
             {
-                label: "<i class='fas fa-user'></i> Expand All",
+                label: "<i class='fas fa-user'></i> View All",
                 action: async function (e, row) {
                     let searchresults = SQueryEditor._founditems;
                     let ids = [];
                     for (let i = 0; i < searchresults.length; i++) {
                         ids.push(searchresults[i].id);
                     }
+                    SQueryResults._tablePropertyExpanded0 = SQueryResults._tableProperty;
+                    SQueryResults._tablePropertyExpanded1 = SQueryResults._tablePropertyAMT;
                     SQueryResults.generateExpandedResults(ids);
                 }
             }
@@ -532,7 +570,6 @@ export class SQueryResults {
             SQueryManagerUI._table.redraw();
         });
 
-
         const SQueryDropdowButton = document.querySelector('#SQueryResultsDropdown2');
         const SQueryDropdowContent = document.querySelector('#SQueryResultsDropdownContent2');
 
@@ -550,28 +587,68 @@ export class SQueryResults {
 
     }
 
-    static generateExpandedResults(nodeids) {
+    static generateExpandedResults(nodeids_in = null) {
+
+        let nodeids;
+        if (nodeids_in) {
+            SQueryResults._expandedNodeIds = nodeids_in;
+            nodeids = nodeids_in;
+        }
+        else {
+            nodeids = SQueryResults._expandedNodeIds;
+        }
+
+        if (SQueryResults._tablePropertyExpanded0.indexOf("Node Name") != -1) {
+            SQueryResults._tablePropertyExpanded0 = "Node Type";
+        }
+
+    
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
+        $("#SQueryResultsFirstRow").css("display", "none");
 
-        let html = '<div style="height:25px;">';
+
+        let sortedStrings = SQueryResults.getAllProperties();
+        sortedStrings.shift();
+        sortedStrings.shift();
+
+        let html = '<div style="height:35px;">';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:-5px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._generatePropertyView(true)\'>Property View</button>';
+        html += '<div style="height:25px;"><span style="top:-5px;position:relative"><span style="font-family:courier">Prop1:</span><select id="SQueryPropExpandedSelect0" onchange=\'hcSQueryUI.SQueryResults._propertyExpandedSelected(0);\' class="SQueryPropertyResultsSelect" value="">';
+        
+        for (let i = 0; i < sortedStrings.length; i++) {
+            if (SQueryResults._tablePropertyExpanded0 == sortedStrings[i])
+                html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
+            else
+                html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+        html += '<span style="top:15px;left:0px;position:absolute"><span style="font-family:courier">Prop2:</span><select id="SQueryPropExpandedSelect1" onchange=\'hcSQueryUI.SQueryResults._propertyExpandedSelected(1);\' class="SQueryPropertyResultsSelect" value="">';
+        sortedStrings.unshift("--EMPTY--");
+
+        for (let i = 0; i < sortedStrings.length; i++) {
+            if (SQueryResults._tablePropertyExpanded1 == sortedStrings[i])
+                html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
+            else
+                html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+        
+            
         html += '</div>';
+
+
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
 
         $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
 
 
-        let title1 = SQueryResults._tableProperty;
-        if (SQueryResults._tableProperty.indexOf("Node Name") != -1) {
-            title1 = "Node Type";
-
-        }
-
+        let title1 = SQueryResults._tablePropertyExpanded0;
 
         let sorter = undefined;
-        if (SQueryResults._tableProperty.indexOf("Date") != -1) {
+        if (SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1) {
             sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
 
                 let aDate = new Date(a);
@@ -598,15 +675,20 @@ export class SQueryResults {
             title: "ID", field: "id", width: 20, visible: false
         }];
 
-        if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
+        if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
 
-            let unit = SQueryResults._getAMTUnit();
             let unitTitle = "";
-            if (unit) {
-                unitTitle = SQueryResults._tablePropertyAMT + "(" + unit + ")";
+            if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded1);
+                if (unit) {
+                    unitTitle = SQueryResults._tablePropertyExpanded1 + "(" + unit + ")";
+                }
+                else {
+                    unitTitle = SQueryResults._tablePropertyExpanded1;
+                }
             }
             else {
-                unitTitle = SQueryResults._tablePropertyAMT;
+                unitTitle = SQueryResults._tablePropertyExpanded1;
             }
             tabulatorColumes.splice(2, 0, {
                 title: unitTitle, field: "prop2", width: 120
@@ -651,18 +733,32 @@ export class SQueryResults {
             for (let i=0;i<nodeids.length;i++) {
                 let name = SQueryResults._viewer.model.getNodeName(nodeids[i]);
                 let prop1;
-                if (SQueryResults._tableProperty.indexOf("Node Name") != -1 || SQueryResults._tableProperty.indexOf("Node Type") != -1) {
+                if (SQueryResults._tablePropertyExpanded0.indexOf("Node Name") != -1 || SQueryResults._tablePropertyExpanded0.indexOf("Node Type") != -1) {
                     prop1 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
                 }
-                else if (SQueryResults._tableProperty.indexOf("Node Parent") != -1) {
+                else if (SQueryResults._tablePropertyExpanded0.indexOf("Node Parent") != -1) {
                     prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
                 }
                 else {
-                    prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tableProperty];
+                    prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0];
+                }
+                if (prop1 == undefined) {
+                    prop1 = "Not Defined";
                 }
                 let data = { name:name , id: nodeids[i], prop1:prop1};
-                if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
-                    data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyAMT]);
+                if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
+                    if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                        data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1]);
+                        if (isNaN(data.prop2)) {
+                            data.prop2 = "Not Defined";
+                        }
+                    }
+                    else {
+                        data.prop2 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1];
+                        if (data.prop2 == undefined) {
+                            data.prop2 = "Not Defined";
+                        }
+                    }                    
                 }
                 tdata.push(data);
             }
@@ -673,8 +769,8 @@ export class SQueryResults {
 
 
 
-    static _getAMTUnit() {
-        let prop = SQueryResults._manager._allPropertiesHash[SQueryResults._tablePropertyAMT];
+    static _getAMTUnit(propstring) {
+        let prop = SQueryResults._manager._allPropertiesHash[propstring];
         if (prop != undefined) {
             for (let j in prop) {
                 if (j.indexOf("mm²") != -1) {
