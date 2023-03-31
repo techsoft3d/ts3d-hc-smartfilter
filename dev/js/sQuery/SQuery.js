@@ -408,6 +408,11 @@ export class SQuery {
             }
             condition.relationship = savrel;
         }
+        else {
+            if (condition.conditionType == SQueryConditionType.notExists) {
+                return true;
+            }
+        }
         return false;
 
     }
@@ -478,6 +483,11 @@ export class SQuery {
             }
             condition.relationship = savrel;
         }
+        else {
+            if (condition.conditionType == SQueryConditionType.notExists) {
+                return true;
+            }
+        }
         return false;
     }
 
@@ -494,6 +504,7 @@ export class SQuery {
             this._manager._containedInSpatialStructureHash[id] = elements;
         }
 
+       
 
         if (elements.length > 0) {
 
@@ -510,6 +521,12 @@ export class SQuery {
             }
             condition.relationship = savrel;
         }
+        else {
+            if (condition.conditionType == SQueryConditionType.notExists) {
+                return true;
+            }
+        }
+        
         return false;
     }
 

@@ -1,6 +1,10 @@
 # SQuerys
 
 
+## Version Update (1.0.0)
+* Support for picking categories
+* Many other improvements and fixes
+
 ## Version Update (0.9.9)
 * Support for secondary quantity in results
 

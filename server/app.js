@@ -108,6 +108,7 @@ async function extractProperties() {
 
         for (let i in propertyHash) {
             for (let j in propertyHash[i]) {
+                propertyHash[i][j] = propertyHash[i][j].replace(/,/g, '');
                 allPropertiesHash[j][propertyHash[i][j]] = true;
             }
         }
