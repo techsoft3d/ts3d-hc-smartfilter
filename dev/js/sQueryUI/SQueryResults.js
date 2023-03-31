@@ -232,6 +232,13 @@ export class SQueryResults {
     }
 
     static _assignColors() {
+        // let rows = SQueryResults._table.getRows();
+        // let delta = 256/rows.length;
+        // for (let i=0;i<rows.length;i++) {
+        //     let m = delta * rows[i].getPosition();
+        //     SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m,m,m);
+        // }
+
         for (let i in SQueryResults._categoryHash) {
             let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
             SQueryResults._categoryHash[i].color = color;
