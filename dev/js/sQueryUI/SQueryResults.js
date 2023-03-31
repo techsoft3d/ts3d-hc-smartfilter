@@ -62,10 +62,26 @@ export class SQueryResults {
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
-            else if (SQueryResults._tableProperty == "Node Name (No Extension)") {
+            else if (SQueryResults._tableProperty == "Node Name (No :Ext)") {
                 for (let j = 0; j < searchresults.length; j++) {
                     let name;
                     let dindex = searchresults[j].name.lastIndexOf(":");
+                    if (dindex > -1) {
+                        name = searchresults[j].name.substring(0,dindex);
+                    }
+                    else {
+                        name = searchresults[j].name;
+                    }
+                    if (SQueryResults._categoryHash[name] == undefined) {
+                        SQueryResults._categoryHash[name] = { ids: [] };
+                    }
+                    SQueryResults._categoryHash[name].ids.push(searchresults[j].id);
+                }
+            }
+            else if (SQueryResults._tableProperty == "Node Name (No -Ext)") {
+                for (let j = 0; j < searchresults.length; j++) {
+                    let name;
+                    let dindex = searchresults[j].name.lastIndexOf("-");
                     if (dindex > -1) {
                         name = searchresults[j].name.substring(0,dindex);
                     }
@@ -233,7 +249,8 @@ export class SQueryResults {
         propnames2.sort();
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
-        propnames2.unshift("Node Name (No Extension)");
+        propnames2.unshift("Node Name (No -Ext)");
+        propnames2.unshift("Node Name (No :Ext)");
         propnames2.unshift("Node Name");
         return propnames2;
     }
@@ -673,11 +690,25 @@ export class SQueryResults {
             title: "Name", field: "name"
         },
         {
-            title: title1, field: "prop1",sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
-        },
-        {
             title: "ID", field: "id", visible: false
         }];
+
+        let unitTitle = "";
+        if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+            let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded0);
+            if (unit) {
+                unitTitle = SQueryResults._tablePropertyExpanded0 + "(" + unit + ")";
+            }
+            else {
+                unitTitle = SQueryResults._tablePropertyExpanded0;
+            }
+        }
+        else {
+            unitTitle = SQueryResults._tablePropertyExpanded0;
+        }
+        tabulatorColumes.splice(1, 0, {
+            title: unitTitle, field: "prop1", sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
+        });
 
         if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
 
@@ -742,6 +773,12 @@ export class SQueryResults {
                 }
                 else if (SQueryResults._tablePropertyExpanded0.indexOf("Node Parent") != -1) {
                     prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
+                }
+                else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+                    prop1 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0]);
+                    if (isNaN(prop1)) {
+                        prop1 = "Not Defined";
+                    }
                 }
                 else {
                     prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0];
