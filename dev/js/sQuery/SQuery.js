@@ -88,8 +88,12 @@ export class SQuery {
                 await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
                 break;
             case "Transparent":
-                await this._viewer.model.setNodesOpacity(nodeids, 0.7);
+                await this._viewer.model.setNodesOpacity(nodeids, 0.5);
                 break;
+            case "Opaque":
+                await this._viewer.model.setNodesOpacity(nodeids, 1.0);
+                break;
+    
             case "Isolate":
                 await this._viewer.view.isolateNodes(nodeids, 0, false);
                 break;

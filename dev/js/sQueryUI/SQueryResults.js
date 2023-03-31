@@ -751,7 +751,13 @@ export class SQueryResults {
                 }
                 let data = { name:name , id: nodeids[i], prop1:prop1};
                 if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
-                    if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                    if (SQueryResults._tablePropertyExpanded1.indexOf("Node Name") != -1 || SQueryResults._tablePropertyExpanded1.indexOf("Node Type") != -1) {
+                        data.prop2 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
+                    }
+                    else if (SQueryResults._tablePropertyExpanded1.indexOf("Node Parent") != -1) {
+                        data.prop2 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
+                    }
+                    else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
                         data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1]);
                         if (isNaN(data.prop2)) {
                             data.prop2 = "Not Defined";

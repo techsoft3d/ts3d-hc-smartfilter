@@ -199,7 +199,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.setOpacity(0.7);
+                        SQueryEditor.setOpacity(0.5);
                     }
                 },
                 {
@@ -296,7 +296,7 @@ export class SQueryManagerUI {
                             }
                         }
                     },
-                     editorParams:{values:["","Isolate","Show","Hide","Select","Auto Color","red", "green", "blue", "yellow", "grey", "Transparent"],
+                     editorParams:{values:["","Isolate","Show","Hide","Select","Auto Color","red", "green", "blue", "yellow", "grey", "Transparent", "Opaque"],
                 
                     itemFormatter:function (label, value, item, element){
                         //label - the text lable for the item
