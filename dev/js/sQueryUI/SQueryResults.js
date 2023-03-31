@@ -615,15 +615,30 @@ export class SQueryResults {
 
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
             rowHeight: 15,
-            selectable: 0,
+            selectable: true,
+            selectableRangeMode:"click",
             layout: "fitColumns",
             columns: tabulatorColumes,
         });
 
         SQueryResults._table.on("rowClick", async function (e, row) {
-            let data = row.getData();          
-            SQueryResults._viewer.selectionManager.selectNode(parseInt(data.id), Communicator.SelectionMode.Set);        
+   //         let data = row.getData();          
+    //        SQueryResults._viewer.selectionManager.selectNode(parseInt(data.id), Communicator.SelectionMode.Set);        
         });
+
+
+        SQueryResults._table.on("rowSelectionChanged", async function (e, row) {
+            var rows = SQueryResults._table.getSelectedData();
+
+            SQueryResults._viewer.selectionManager.clear();
+            let selections = [];
+            for (let i = 0; i < rows.length; i++) {
+                selections.push(new Communicator.Selection.SelectionItem(rows[i].id));
+            }
+            SQueryResults._viewer.selectionManager.add(selections);
+                    
+        });
+
 
         SQueryResults._table.on("tableBuilt", function () {
 
