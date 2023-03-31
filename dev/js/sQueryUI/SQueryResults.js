@@ -647,32 +647,36 @@ export class SQueryResults {
 
         let title1 = SQueryResults._tablePropertyExpanded0;
 
-        let sorter = undefined;
-        if (SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1) {
-            sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
+        let sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
 
-                let aDate = new Date(a);
-                let bDate = new Date(b);
-
-                if (aDate > bDate) {
-                    return 1;
-                }
-                if (aDate < bDate) {
-                    return -1;
-                }
-                return 0;
-
+            let aDate = new Date(a);
+            let bDate = new Date(b);
+            if (aDate == "Invalid Date") {
+                return -1;
             }
-        }
+            if (bDate == "Invalid Date") {
+                return -1;
+            }
 
+            if (aDate > bDate) {
+                return 1;
+            }
+            if (aDate < bDate) {
+                return -1;
+            }
+            return 0;
+
+        }
+    
+        
         let tabulatorColumes = [{
             title: "Name", field: "name"
         },
         {
-            title: title1, field: "prop1",sorter:sorter
+            title: title1, field: "prop1",sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
         },
         {
-            title: "ID", field: "id", width: 20, visible: false
+            title: "ID", field: "id", visible: false
         }];
 
         if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
@@ -691,7 +695,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._tablePropertyExpanded1;
             }
             tabulatorColumes.splice(2, 0, {
-                title: unitTitle, field: "prop2", width: 120
+                title: unitTitle, field: "prop2", sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
             });
         }
 
@@ -884,6 +888,7 @@ export class SQueryResults {
 
 
     static generateSearchResults(founditems) {
+        $("#SQueryResultsFirstRow").css("display", "block");
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
