@@ -9,6 +9,7 @@ export class SQueryResults {
         SQueryResults._isPropertyView = false;
         SQueryResults._tablePropertyAMT = "--EMPTY--";
         SQueryResults._aggType = "sum";
+        SQueryResults.applyColorMode = 0;
     }
 
     static async display() {
@@ -232,16 +233,47 @@ export class SQueryResults {
     }
 
     static _assignColors() {
-        // let rows = SQueryResults._table.getRows();
-        // let delta = 256/rows.length;
-        // for (let i=0;i<rows.length;i++) {
-        //     let m = delta * rows[i].getPosition();
-        //     SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m,m,m);
-        // }
+        if (SQueryResults.applyColorMode == 1) {
+            SQueryResults.applyColorMode = 0;
+        let rows = SQueryResults._table.getRows();
+        let min = Number.MAX_VALUE;
+        let max = -Number.MAX_VALUE;
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (SQueryResults._tablePropertyAMT == "--EMPTY--") {
+                num = parseInt(rows[i].getData().num);
+            }
+            else {
+                num = parseFloat(rows[i].getData().amt);
+            }
+            if (num < min) {
+                min = num;
+            }
+            if (num > max) {
+                max = num;
+            }
+        }
+        let tdist = (max - min);
 
-        for (let i in SQueryResults._categoryHash) {
-            let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
-            SQueryResults._categoryHash[i].color = color;
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (SQueryResults._tablePropertyAMT == "--EMPTY--") {
+                num = parseInt(rows[i].getData().num);
+            }
+            else {
+                num = parseFloat(rows[i].getData().amt);
+            }
+
+            let m = (num - min) / tdist * 256;
+            SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m, m, m);
+        }
+        }
+        else {
+            SQueryResults.applyColorMode = 1;
+            for (let i in SQueryResults._categoryHash) {
+                let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
+                SQueryResults._categoryHash[i].color = color;
+            }
         }
 
         let autoColors = [];
