@@ -632,10 +632,15 @@ export class SQueryResults {
 
             SQueryResults._viewer.selectionManager.clear();
             let selections = [];
-            for (let i = 0; i < rows.length; i++) {
-                selections.push(new Communicator.Selection.SelectionItem(rows[i].id));
+            if (rows.length == 1) { 
+                SQueryResults._viewer.selectionManager.selectNode(rows[0].id, Communicator.SelectionMode.Set);
             }
-            SQueryResults._viewer.selectionManager.add(selections);
+            else {
+                for (let i = 0; i < rows.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(rows[i].id));
+                }
+                SQueryResults._viewer.selectionManager.add(selections);
+            }
                     
         });
 
