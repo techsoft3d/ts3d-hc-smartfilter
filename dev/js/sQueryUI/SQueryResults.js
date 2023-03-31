@@ -9,7 +9,6 @@ export class SQueryResults {
         SQueryResults._isPropertyView = false;
         SQueryResults._tablePropertyAMT = "--EMPTY--";
         SQueryResults._aggType = "sum";
-        SQueryResults.applyColorMode = 0;
     }
 
     static async display() {
@@ -58,6 +57,22 @@ export class SQueryResults {
                         SQueryResults._categoryHash[searchresults[j].name] = { ids: [] };
                     }
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
+                }
+            }
+            else if (SQueryResults._tableProperty == "Node Name (No Extension)") {
+                for (let j = 0; j < searchresults.length; j++) {
+                    let name;
+                    let dindex = searchresults[j].name.lastIndexOf(":");
+                    if (dindex > -1) {
+                        name = searchresults[j].name.substring(0,dindex);
+                    }
+                    else {
+                        name = searchresults[j].name;
+                    }
+                    if (SQueryResults._categoryHash[name] == undefined) {
+                        SQueryResults._categoryHash[name] = { ids: [] };
+                    }
+                    SQueryResults._categoryHash[name].ids.push(searchresults[j].id);
                 }
             }
             else if (SQueryResults._tableProperty == "Node Parent") {
@@ -197,6 +212,7 @@ export class SQueryResults {
         propnames2.sort();
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
+        propnames2.unshift("Node Name (No Extension)");
         propnames2.unshift("Node Name");
         return propnames2;
     }
@@ -220,7 +236,7 @@ export class SQueryResults {
 
     }
 
-    static _applyColors() {
+    static applyColors() {
         let autoColors = SQueryEditor._mainFilter.getAutoColors();
         if (!autoColors) {
             return;
@@ -232,9 +248,26 @@ export class SQueryResults {
         }
     }
 
-    static _assignColors() {
-        if (SQueryResults.applyColorMode == 1) {
-            SQueryResults.applyColorMode = 0;
+
+    static _assignColorsMainGradient() {    
+        let rows = SQueryResults._table.getRows();
+        let delta = 256/rows.length;
+        for (let i=0;i<rows.length;i++) {
+            let m = delta * rows[i].getPosition();
+            SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m,m,m);
+        }
+
+        let autoColors = [];
+        for (let i in SQueryResults._categoryHash) {
+            autoColors[i] = SQueryResults._categoryHash[i].color;
+        }
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+        SQueryResults._generatePropertyView(true)
+    }
+
+
+
+    static _assignColorsAMTGradient() {
         let rows = SQueryResults._table.getRows();
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
@@ -267,13 +300,21 @@ export class SQueryResults {
             let m = (num - min) / tdist * 256;
             SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m, m, m);
         }
+
+
+        let autoColors = [];
+        for (let i in SQueryResults._categoryHash) {
+            autoColors[i] = SQueryResults._categoryHash[i].color;
         }
-        else {
-            SQueryResults.applyColorMode = 1;
-            for (let i in SQueryResults._categoryHash) {
-                let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
-                SQueryResults._categoryHash[i].color = color;
-            }
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+        SQueryResults._generatePropertyView(true)
+    }
+
+
+    static assignColorsRandom() {
+        for (let i in SQueryResults._categoryHash) {
+            let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
+            SQueryResults._categoryHash[i].color = color;
         }
 
         let autoColors = [];
@@ -281,11 +322,8 @@ export class SQueryResults {
             autoColors[i] = SQueryResults._categoryHash[i].color;
         }
 
-
         SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
-
         SQueryResults._generatePropertyView(true)
-
     }
 
     static _generatePropertyView(redrawOnly = false) {
@@ -351,8 +389,7 @@ export class SQueryResults {
                 html += '<option value="' + choices[i] + '">' + choices[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._assignColors(this)\'>Assign Colors</button>';
-        html += '<button class="SQuerySearchButton" type="button" style="right:101px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._applyColors(this)\'>Apply</button>';
+        html += SQueryResults._generateAssignColorDropdown();
         html += '</div>';
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
@@ -360,8 +397,26 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
 
 
+        let sorter = undefined;
+        if (SQueryResults._tableProperty.indexOf("Date") != -1) {
+            sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
+
+                let aDate = new Date(a);
+                let bDate = new Date(b);
+
+                if (aDate > bDate) {
+                    return 1;
+                }
+                if (aDate < bDate) {
+                    return -1;
+                }
+                return 0;
+
+            }
+        }
+
         let tabulatorColumes = [{
-            title: SQueryResults._tableProperty, field: "name"
+            title: SQueryResults._tableProperty, field: "name", sorter:sorter
         },
         {
             title: "#", field: "num", width: 40
@@ -476,6 +531,23 @@ export class SQueryResults {
             }
             SQueryManagerUI._table.redraw();
         });
+
+
+        const SQueryDropdowButton = document.querySelector('#SQueryResultsDropdown2');
+        const SQueryDropdowContent = document.querySelector('#SQueryResultsDropdownContent2');
+
+        SQueryDropdowButton.addEventListener('click', function () {
+            SQueryDropdowContent.classList.toggle('SQueryDropdowShow');
+        });
+
+        window.addEventListener('click', function (event) {
+            if (!event.target.matches('.SQueryDropdow-button')) {
+                if (SQueryDropdowContent.classList.contains('SQueryDropdowShow')) {
+                    SQueryDropdowContent.classList.remove('SQueryDropdowShow');
+                }
+            }
+        });
+
     }
 
     static generateExpandedResults(nodeids) {
@@ -491,11 +563,36 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
 
 
+        let title1 = SQueryResults._tableProperty;
+        if (SQueryResults._tableProperty.indexOf("Node Name") != -1) {
+            title1 = "Node Type";
+
+        }
+
+
+        let sorter = undefined;
+        if (SQueryResults._tableProperty.indexOf("Date") != -1) {
+            sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
+
+                let aDate = new Date(a);
+                let bDate = new Date(b);
+
+                if (aDate > bDate) {
+                    return 1;
+                }
+                if (aDate < bDate) {
+                    return -1;
+                }
+                return 0;
+
+            }
+        }
+
         let tabulatorColumes = [{
             title: "Name", field: "name"
         },
         {
-            title: SQueryResults._tableProperty, field: "prop1"
+            title: title1, field: "prop1",sorter:sorter
         },
         {
             title: "ID", field: "id", width: 20, visible: false
@@ -533,7 +630,17 @@ export class SQueryResults {
             let tdata = [];
             for (let i=0;i<nodeids.length;i++) {
                 let name = SQueryResults._viewer.model.getNodeName(nodeids[i]);
-                let data = { name:name , id: nodeids[i], prop1:SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tableProperty]};
+                let prop1;
+                if (SQueryResults._tableProperty.indexOf("Node Name") != -1 || SQueryResults._tableProperty.indexOf("Node Type") != -1) {
+                    prop1 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
+                }
+                else if (SQueryResults._tableProperty.indexOf("Node Parent") != -1) {
+                    prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
+                }
+                else {
+                    prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tableProperty];
+                }
+                let data = { name:name , id: nodeids[i], prop1:prop1};
                 if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
                     data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyAMT]);
                 }
@@ -762,5 +869,18 @@ export class SQueryResults {
         html += '</ul>';
         return html;
     }
+
+    static _generateAssignColorDropdown() {
+        let html = "";
+        html += '<button id="SQueryResultsDropdown2" style="right:5px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">Set Colors</button>';
+        html += '<ul  id="SQueryResultsDropdownContent2" style="right:-20px;top:10px;position:absolute;" class="SQueryDropdow-content">';
+        html += '<li style="font-weight:bold" onclick=\'hcSQueryUI.SQueryResults.applyColors()\'>Apply to model</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryResults.assignColorsRandom()\'>Assign random</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryResults._assignColorsAMTGradient()\'>Assign Gradient (AMT)</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryResults._assignColorsMainGradient()\'>Assign Gradient (Main)</li>';
+        html += '</ul>';
+        return html;
+    }
+
 
 }
