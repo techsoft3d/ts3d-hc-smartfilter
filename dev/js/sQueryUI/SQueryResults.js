@@ -469,7 +469,7 @@ export class SQueryResults {
             title: SQueryResults._tableProperty, field: "name", sorter:sorter
         },
         {
-            title: "#", field: "num", width: 40
+            title: "#", field: "num", width: 40,bottomCalc:"sum"
         },
         {
             title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 60,
@@ -490,7 +490,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._aggType;
             }
             tabulatorColumes.splice(1, 0, {
-                title: unitTitle, field: "amt", width: 120
+                title: unitTitle, field: "amt", width: 120,bottomCalc:SQueryResults._aggType != "med" ? SQueryResults._aggType: undefined
             });
         }
 
@@ -694,10 +694,12 @@ export class SQueryResults {
         }];
 
         let unitTitle = "";
+        let bcalc = undefined;
         if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
             let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded0);
             if (unit) {
                 unitTitle = SQueryResults._tablePropertyExpanded0 + "(" + unit + ")";
+                bcalc = "sum";
             }
             else {
                 unitTitle = SQueryResults._tablePropertyExpanded0;
@@ -707,8 +709,10 @@ export class SQueryResults {
             unitTitle = SQueryResults._tablePropertyExpanded0;
         }
         tabulatorColumes.splice(1, 0, {
-            title: unitTitle, field: "prop1", sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
+            title: unitTitle, field: "prop1", bottomCalc:bcalc, sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
         });
+
+        let bcalc2 = undefined;
 
         if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
 
@@ -717,6 +721,7 @@ export class SQueryResults {
                 let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded1);
                 if (unit) {
                     unitTitle = SQueryResults._tablePropertyExpanded1 + "(" + unit + ")";
+                    bcalc2 = "sum";
                 }
                 else {
                     unitTitle = SQueryResults._tablePropertyExpanded1;
@@ -726,7 +731,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._tablePropertyExpanded1;
             }
             tabulatorColumes.splice(2, 0, {
-                title: unitTitle, field: "prop2", sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
+                title: unitTitle, field: "prop2", bottomCalc: bcalc2, sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
             });
         }
 

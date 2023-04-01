@@ -109,6 +109,11 @@ async function extractProperties() {
         for (let i in propertyHash) {
             for (let j in propertyHash[i]) {
                 propertyHash[i][j] = propertyHash[i][j].replace(/,/g, '');
+                if (j == "OWNERHISTORY/CreationDate" || j == "OWNERHISTORY/LastModifiedDate") {
+                    let d = new Date(0);
+                    d.setUTCSeconds(parseInt(propertyHash[i][j]));
+                    propertyHash[i][j] = d.toDateString();
+                }
                 allPropertiesHash[j][propertyHash[i][j]] = true;
             }
         }
