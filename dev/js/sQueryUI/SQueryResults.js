@@ -62,10 +62,26 @@ export class SQueryResults {
                     SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
                 }
             }
-            else if (SQueryResults._tableProperty == "Node Name (No Extension)") {
+            else if (SQueryResults._tableProperty == "Node Name (No :Ext)") {
                 for (let j = 0; j < searchresults.length; j++) {
                     let name;
                     let dindex = searchresults[j].name.lastIndexOf(":");
+                    if (dindex > -1) {
+                        name = searchresults[j].name.substring(0,dindex);
+                    }
+                    else {
+                        name = searchresults[j].name;
+                    }
+                    if (SQueryResults._categoryHash[name] == undefined) {
+                        SQueryResults._categoryHash[name] = { ids: [] };
+                    }
+                    SQueryResults._categoryHash[name].ids.push(searchresults[j].id);
+                }
+            }
+            else if (SQueryResults._tableProperty == "Node Name (No -Ext)") {
+                for (let j = 0; j < searchresults.length; j++) {
+                    let name;
+                    let dindex = searchresults[j].name.lastIndexOf("-");
                     if (dindex > -1) {
                         name = searchresults[j].name.substring(0,dindex);
                     }
@@ -173,7 +189,7 @@ export class SQueryResults {
         amountStrings.push("--EMPTY--");
         for (let i = 0; i < items.length; i++) {
             let ltext = items[i].toLowerCase();
-            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+            if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
                 continue;
             }
             let prop = SQueryResults._manager._allPropertiesHash[items[i]];
@@ -191,7 +207,7 @@ export class SQueryResults {
 
     static isNumberProp(ltextin) {
         let ltext = ltextin.toLowerCase();
-        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1) {
+        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
             return false;
         }
 
@@ -233,7 +249,8 @@ export class SQueryResults {
         propnames2.sort();
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
-        propnames2.unshift("Node Name (No Extension)");
+        propnames2.unshift("Node Name (No -Ext)");
+        propnames2.unshift("Node Name (No :Ext)");
         propnames2.unshift("Node Name");
         return propnames2;
     }
@@ -452,7 +469,7 @@ export class SQueryResults {
             title: SQueryResults._tableProperty, field: "name", sorter:sorter
         },
         {
-            title: "#", field: "num", width: 40
+            title: "#", field: "num", width: 40,bottomCalc:"sum"
         },
         {
             title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 60,
@@ -473,7 +490,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._aggType;
             }
             tabulatorColumes.splice(1, 0, {
-                title: unitTitle, field: "amt", width: 120
+                title: unitTitle, field: "amt", width: 120,bottomCalc:SQueryResults._aggType != "med" ? SQueryResults._aggType: undefined
             });
         }
 
@@ -647,33 +664,55 @@ export class SQueryResults {
 
         let title1 = SQueryResults._tablePropertyExpanded0;
 
-        let sorter = undefined;
-        if (SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1) {
-            sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
+        let sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
 
-                let aDate = new Date(a);
-                let bDate = new Date(b);
-
-                if (aDate > bDate) {
-                    return 1;
-                }
-                if (aDate < bDate) {
-                    return -1;
-                }
-                return 0;
-
+            let aDate = new Date(a);
+            let bDate = new Date(b);
+            if (aDate == "Invalid Date") {
+                return -1;
             }
-        }
+            if (bDate == "Invalid Date") {
+                return -1;
+            }
 
+            if (aDate > bDate) {
+                return 1;
+            }
+            if (aDate < bDate) {
+                return -1;
+            }
+            return 0;
+
+        }
+    
+        
         let tabulatorColumes = [{
             title: "Name", field: "name"
         },
         {
-            title: title1, field: "prop1",sorter:sorter
-        },
-        {
-            title: "ID", field: "id", width: 20, visible: false
+            title: "ID", field: "id", visible: false
         }];
+
+        let unitTitle = "";
+        let bcalc = undefined;
+        if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+            let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded0);
+            if (unit) {
+                unitTitle = SQueryResults._tablePropertyExpanded0 + "(" + unit + ")";
+                bcalc = "sum";
+            }
+            else {
+                unitTitle = SQueryResults._tablePropertyExpanded0;
+            }
+        }
+        else {
+            unitTitle = SQueryResults._tablePropertyExpanded0;
+        }
+        tabulatorColumes.splice(1, 0, {
+            title: unitTitle, field: "prop1", bottomCalc:bcalc, sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
+        });
+
+        let bcalc2 = undefined;
 
         if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
 
@@ -682,6 +721,7 @@ export class SQueryResults {
                 let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded1);
                 if (unit) {
                     unitTitle = SQueryResults._tablePropertyExpanded1 + "(" + unit + ")";
+                    bcalc2 = "sum";
                 }
                 else {
                     unitTitle = SQueryResults._tablePropertyExpanded1;
@@ -691,7 +731,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._tablePropertyExpanded1;
             }
             tabulatorColumes.splice(2, 0, {
-                title: unitTitle, field: "prop2", width: 120
+                title: unitTitle, field: "prop2", bottomCalc: bcalc2, sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
             });
         }
 
@@ -739,6 +779,12 @@ export class SQueryResults {
                 else if (SQueryResults._tablePropertyExpanded0.indexOf("Node Parent") != -1) {
                     prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
                 }
+                else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+                    prop1 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0]);
+                    if (isNaN(prop1)) {
+                        prop1 = "Not Defined";
+                    }
+                }
                 else {
                     prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0];
                 }
@@ -747,7 +793,13 @@ export class SQueryResults {
                 }
                 let data = { name:name , id: nodeids[i], prop1:prop1};
                 if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
-                    if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                    if (SQueryResults._tablePropertyExpanded1.indexOf("Node Name") != -1 || SQueryResults._tablePropertyExpanded1.indexOf("Node Type") != -1) {
+                        data.prop2 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
+                    }
+                    else if (SQueryResults._tablePropertyExpanded1.indexOf("Node Parent") != -1) {
+                        data.prop2 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
+                    }
+                    else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
                         data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1]);
                         if (isNaN(data.prop2)) {
                             data.prop2 = "Not Defined";
@@ -884,6 +936,7 @@ export class SQueryResults {
 
 
     static generateSearchResults(founditems) {
+        $("#SQueryResultsFirstRow").css("display", "block");
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();

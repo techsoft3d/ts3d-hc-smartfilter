@@ -207,9 +207,16 @@ export class SQueryManager {
             }
         }
 
+
+
         for (let i in this._propertyHash) {
             for (let j in this._propertyHash[i]) {
                 this._propertyHash[i][j] = this._propertyHash[i][j].replace(/,/g, '');
+                if (j == "OWNERHISTORY/CreationDate" || j == "OWNERHISTORY/LastModifiedDate") {
+                    let d = new Date(0);
+                    d.setUTCSeconds(parseInt(this._propertyHash[i][j]));
+                    this._propertyHash[i][j] = d.toDateString();
+                }
                 this._allPropertiesHash[j][this._propertyHash[i][j]] = true;
             }
         }

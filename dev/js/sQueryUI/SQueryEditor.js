@@ -83,8 +83,13 @@ export class SQueryEditor {
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
         html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';              
+        html +='<li onclick=\'hcSQueryUI.SQueryEditor._toggleLighting()\'>Toggle Lighting</li>';              
         html += '</ul>';
         return html;
+    }
+
+    static _toggleLighting() {
+        SQueryEditor._viewer.view.setLightingEnabled(!SQueryEditor._viewer.view.getLightingEnabled());
     }
 
     static async display() {
