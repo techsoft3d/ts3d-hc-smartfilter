@@ -199,7 +199,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.setOpacity(0.5);
+                        SQueryEditor.setOpacity(0.25);
                     }
                 },
                 {
@@ -426,7 +426,8 @@ export class SQueryManagerUI {
             text = text.replace(/&quot;/g, '"');
             prop.id =  SQueryManagerUI._manager.getSQueryID(i);;
             prop.description = text;
-            prop.action = filter.getAction();
+            prop.action0 = filter.getAction(0);
+            prop.action1 = filter.getAction(1);         
             prop.prop = SQueryManagerUI._manager.getSQuery(i).getProp();
             await SQueryManagerUI._table.addRow(prop);
         }     

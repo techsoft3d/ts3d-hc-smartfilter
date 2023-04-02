@@ -100,7 +100,7 @@ export class SQuery {
                     await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
                     break;
                 case "Transparent":
-                    await this._viewer.model.setNodesOpacity(nodeids, 0.5);
+                    await this._viewer.model.setNodesOpacity(nodeids, 0.25);
                     break;
                 case "Opaque":
                     await this._viewer.model.setNodesOpacity(nodeids, 1.0);
@@ -216,7 +216,7 @@ export class SQuery {
             this._action = ["",""];
         }
         else {
-            this._action = json.action;
+            this._action = JSON.parse(JSON.stringify(json.action));
         }
 
 
