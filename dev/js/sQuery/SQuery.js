@@ -10,7 +10,7 @@ export class SQuery {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
-        this._action = "";
+        this._action = ["",""];
         this._keepSearchingChildren = false;
         this._prop = false;
         this._autoColors = null;
@@ -24,12 +24,22 @@ export class SQuery {
     }
 
 
-    getAction() {
-        return this._action;
+    getAction(slot=0) {
+        return this._action[slot];
     }
 
-    setAction(action) {
-        this._action = action;
+    setAction(action,slot=0) {
+        this._action[slot] = action;
+    }
+
+    hasAction() {
+        if (this._action[0] == "" && this._action[1] == "") {
+            return false;
+        }
+        else {
+            return true;
+        }
+
     }
 
 
@@ -48,7 +58,7 @@ export class SQuery {
 
     async performAction(nodeids_in, ignoreVisibility = true) {
 
-        if (this._action == "") {
+        if (this._action[0] == "" && this._action[1] == "") {
             return;
         }
         let nodeidst;
@@ -59,60 +69,63 @@ export class SQuery {
             nodeidst = await this.apply();
         }
 
-        let nodeids = [];
-        if (ignoreVisibility || this._action == "Isolate") {
-            nodeids = nodeidst;
-        }
-        else {
-            for (let i = 0; i < nodeidst.length; i++) {
-                if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
-                    nodeids.push(nodeidst[i]);
+
+        for (let currentAction = 0; currentAction < 2; currentAction++) {
+            let nodeids = [];
+            if (ignoreVisibility || this._action[currentAction] == "Isolate") {
+                nodeids = nodeidst;
+            }
+            else {
+                for (let i = 0; i < nodeidst.length; i++) {
+                    if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
+                        nodeids.push(nodeidst[i]);
+                    }
                 }
             }
-        }
 
-        switch (this._action) {
-            case "red":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
-                break;
-            case "green":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
-                break;
-            case "blue":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
-                break;
-            case "yellow":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
-                break;
-            case "grey":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
-                break;
-            case "Transparent":
-                await this._viewer.model.setNodesOpacity(nodeids, 0.5);
-                break;
-            case "Opaque":
-                await this._viewer.model.setNodesOpacity(nodeids, 1.0);
-                break;
-    
-            case "Isolate":
-                await this._viewer.view.isolateNodes(nodeids, 0, false);
-                break;
-            case "Show":
-                await this._viewer.model.setNodesVisibility(nodeids, true);
-                break;
-            case "Hide":
-                await this._viewer.model.setNodesVisibility(nodeids, false);
-                break;
-            case "Auto Color":
-                await this.autoColorAction(nodeids);
-                break;
-            case "Select":
-                let selections = [];
-                for (let i = 0; i < nodeids.length; i++) {
-                    selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
-                }
-                await this._viewer.selectionManager.add(selections);
-                break;
+            switch (this._action[currentAction]) {
+                case "red":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
+                    break;
+                case "green":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
+                    break;
+                case "blue":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
+                    break;
+                case "yellow":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
+                    break;
+                case "grey":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
+                    break;
+                case "Transparent":
+                    await this._viewer.model.setNodesOpacity(nodeids, 0.5);
+                    break;
+                case "Opaque":
+                    await this._viewer.model.setNodesOpacity(nodeids, 1.0);
+                    break;
+
+                case "Isolate":
+                    await this._viewer.view.isolateNodes(nodeids, 0, false);
+                    break;
+                case "Show":
+                    await this._viewer.model.setNodesVisibility(nodeids, true);
+                    break;
+                case "Hide":
+                    await this._viewer.model.setNodesVisibility(nodeids, false);
+                    break;
+                case "Auto Color":
+                    await this.autoColorAction(nodeids);
+                    break;
+                case "Select":
+                    let selections = [];
+                    for (let i = 0; i < nodeids.length; i++) {
+                        selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
+                    }
+                    await this._viewer.selectionManager.add(selections);
+                    break;
+            }
         }
     }
 
@@ -200,7 +213,7 @@ export class SQuery {
         }
 
         if (json.action == undefined) {
-            this._action = "";
+            this._action = ["",""];
         }
         else {
             this._action = json.action;
