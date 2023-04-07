@@ -298,6 +298,9 @@ export class SQueryResults {
         }
     }
 
+   
+
+
 
     static _assignColorsMainGradient() {    
 
@@ -326,6 +329,60 @@ export class SQueryResults {
         SQueryResults._table.updateData(tdata);
     }
 
+
+
+    static _assignExpandedColorsGradient(column) {
+        let pname = column;
+    
+        let rows = SQueryResults._table.getRows();
+        let min = Number.MAX_VALUE;
+        let max = -Number.MAX_VALUE;
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (pname == "prop1") {
+                num = parseFloat(rows[i].getData().prop1);
+            }
+            else {
+                num = parseFloat(rows[i].getData().prop2);
+            }
+
+            if (num < min) {
+                min = num;
+            }
+            if (num > max) {
+                max = num;
+            }
+        }
+
+        let tdist = (max - min);
+
+        let tdata = [];
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+             if (pname == "prop1") {
+                num = parseFloat(rows[i].getData().prop1);
+            }
+            else {
+                num = parseFloat(rows[i].getData().prop2);
+            }
+
+            let m = (num - min) / tdist * 256;
+            tdata.push({id: rows[i].getData().id, colorsav:m,color: 'rgba(' + m + ',' + m + ',' + m + ',1)'});
+            
+        }
+
+        SQueryResults._table.updateData(tdata);
+    }
+
+
+    static applyExpandedColors() {
+
+        let rows = SQueryResults._table.getRows();
+        for (let i = 0; i < rows.length; i++) {
+            let m = rows[i].getData().colorsav;
+            SQueryEditor._viewer.model.setNodesFaceColor([rows[i].getData().id], new Communicator.Color(m, m, m));
+        }
+    }
 
 
     static _assignColorsGradient(column) {
@@ -526,7 +583,7 @@ export class SQueryResults {
             title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu
         },
         {
-            title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 60,
+            title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 45,
             formatter: "color", editorParams: { values: ["red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
         },
         {
@@ -676,6 +733,7 @@ export class SQueryResults {
 
         let html = '<div style="height:35px;">';
         html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:-5px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._generatePropertyView(true)\'>Property View</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:17px;position:absolute;" onclick="hcSQueryUI.SQueryResults.applyExpandedColors()">Apply Colors</button>';
         html += '<div style="height:25px;"><span style="top:-5px;position:relative"><span style="font-family:courier">Prop1:</span><select id="SQueryPropExpandedSelect0" onchange=\'hcSQueryUI.SQueryResults._propertyExpandedSelected(0);\' class="SQueryPropertyResultsSelect" value="">';
         
         for (let i = 0; i < sortedStrings.length; i++) {
@@ -728,6 +786,16 @@ export class SQueryResults {
             return 0;
 
         }
+
+        let columnMenu = [        
+            {
+                label: "<i class='fas fa-user'></i> Assign Gradient",
+                action: async function (e, column) {
+                    SQueryResults._assignExpandedColorsGradient(column.getDefinition().field);
+                }
+            },
+            
+        ];
     
         
         let tabulatorColumes = [{
@@ -735,6 +803,10 @@ export class SQueryResults {
         },
         {
             title: "ID", field: "id", visible: false
+        },
+        {
+            title: "Color", field: "color", headerSort: false, field: "color", width: 45,
+            formatter: "color"
         }];
 
         let unitTitle = "";
@@ -753,7 +825,7 @@ export class SQueryResults {
             unitTitle = SQueryResults._tablePropertyExpanded0;
         }
         tabulatorColumes.splice(1, 0, {
-            title: unitTitle, field: "prop1", bottomCalc:bcalc, sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
+            headerMenu:columnMenu, title: unitTitle, field: "prop1", bottomCalc:bcalc, sorter:SQueryResults._tablePropertyExpanded0.indexOf("Date") != -1 ? sorter : undefined
         });
 
         let bcalc2 = undefined;
@@ -775,7 +847,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._tablePropertyExpanded1;
             }
             tabulatorColumes.splice(2, 0, {
-                title: unitTitle, field: "prop2", bottomCalc: bcalc2, sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
+                headerMenu:columnMenu,title: unitTitle, field: "prop2", bottomCalc: bcalc2, sorter:SQueryResults._tablePropertyExpanded1.indexOf("Date") != -1 ? sorter : undefined
             });
         }
 
