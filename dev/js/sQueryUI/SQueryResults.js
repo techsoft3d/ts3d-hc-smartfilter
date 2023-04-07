@@ -300,6 +300,7 @@ export class SQueryResults {
 
 
     static _assignColorsMainGradient() {    
+
         let rows = SQueryResults._table.getRows();
         let delta = 256/rows.length;
         for (let i=0;i<rows.length;i++) {
@@ -327,18 +328,32 @@ export class SQueryResults {
 
 
 
-    static _assignColorsAMTGradient() {
+    static _assignColorsGradient(column) {
+        let pname = column;
+        if (column == "name") {
+            if (!SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+                SQueryResults._assignColorsMainGradient();
+                return;
+            }
+            pname = SQueryResults._tableProperty;
+        }
+
+    
         let rows = SQueryResults._table.getRows();
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
         for (let i = 0; i < rows.length; i++) {
             let num;
-            if (SQueryResults._tablePropertyAMT == "--EMPTY--") {
+            if (pname == "num") {
                 num = parseInt(rows[i].getData().num);
             }
-            else {
+            else if (pname == "amt") {
                 num = parseFloat(rows[i].getData().amt);
             }
+            else {
+                num = parseFloat(rows[i].getData().name);
+            }
+
             if (num < min) {
                 min = num;
             }
@@ -350,11 +365,14 @@ export class SQueryResults {
 
         for (let i = 0; i < rows.length; i++) {
             let num;
-            if (SQueryResults._tablePropertyAMT == "--EMPTY--") {
+            if (pname == "num") {
                 num = parseInt(rows[i].getData().num);
             }
-            else {
+            else if (pname == "amt") {
                 num = parseFloat(rows[i].getData().amt);
+            }
+            else {
+                num = parseFloat(rows[i].getData().name);
             }
 
             let m = (num - min) / tdist * 256;
@@ -486,19 +504,23 @@ export class SQueryResults {
             {
                 label: "<i class='fas fa-user'></i> Assign Gradient",
                 action: async function (e, column) {
-                    if (column.getDefinition().field == "num") {
-                        SQueryResults._assignColorsAMTGradient();
-                    }
-                    if (column.getDefinition().field == "name") {
-                        SQueryResults._assignColorsMainGradient();
-                    }
+                    SQueryResults._assignColorsGradient(column.getDefinition().field);
                 }
             },
             
         ];
 
+        let firstColumnTitle = SQueryResults._tableProperty;
+        if (SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+
+            let unit = SQueryResults._getAMTUnit(SQueryResults._tableProperty);
+            if (unit) {
+                firstColumnTitle = "(" + unit + ")";
+            }            
+        }
+
         let tabulatorColumes = [{
-            title: SQueryResults._tableProperty, field: "name", sorter:sorter,headerMenu:columnMenu
+            title: firstColumnTitle, field: "name", sorter:sorter,headerMenu:columnMenu
         },
         {
             title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu
@@ -597,7 +619,11 @@ export class SQueryResults {
 
             for (let i in SQueryResults._categoryHash) {
                 let color = autoColors ? autoColors[i] : null;
-                let data = { name: i, num: SQueryResults._categoryHash[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
+                let column1name = i;
+                if (SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+                    column1name = parseFloat(i);
+                }
+                let data = { name: column1name, num: SQueryResults._categoryHash[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
                 if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
                     let amount = SQueryResults._calculateAMT(SQueryResults._categoryHash[i].ids);
                     data.amt = amount;
