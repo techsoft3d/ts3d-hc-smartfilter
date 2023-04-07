@@ -312,7 +312,17 @@ export class SQueryResults {
             autoColors[i] = SQueryResults._categoryHash[i].color;
         }
         SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
-        SQueryResults._generatePropertyView(true)
+        SQueryResults._updateColorsInTable();
+    }
+
+    static _updateColorsInTable() {
+        let tdata = [];
+        for (let i in SQueryResults._categoryHash) {
+            let color = SQueryResults._categoryHash[i].color;
+            let data = { color: 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)',id: i };
+            tdata.push(data);
+        }
+        SQueryResults._table.updateData(tdata);
     }
 
 
@@ -357,7 +367,7 @@ export class SQueryResults {
             autoColors[i] = SQueryResults._categoryHash[i].color;
         }
         SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
-        SQueryResults._generatePropertyView(true)
+        SQueryResults._updateColorsInTable();
     }
 
 
@@ -373,7 +383,8 @@ export class SQueryResults {
         }
 
         SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
-        SQueryResults._generatePropertyView(true)
+        SQueryResults._updateColorsInTable();
+
     }
 
     static _generatePropertyView(redrawOnly = false) {
@@ -439,7 +450,7 @@ export class SQueryResults {
                 html += '<option value="' + choices[i] + '">' + choices[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += SQueryResults._generateAssignColorDropdown();
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick="hcSQueryUI.SQueryResults.applyColors()">Apply Colors</button>';
         html += '</div>';
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
@@ -465,11 +476,32 @@ export class SQueryResults {
             }
         }
 
+        let columnMenu = [        
+            {
+                label: "<i class='fas fa-user'></i> Assign Random Colors",
+                action: async function (e, column) {
+                    SQueryResults.assignColorsRandom();
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Assign Gradient",
+                action: async function (e, column) {
+                    if (column.getDefinition().field == "num") {
+                        SQueryResults._assignColorsAMTGradient();
+                    }
+                    if (column.getDefinition().field == "name") {
+                        SQueryResults._assignColorsMainGradient();
+                    }
+                }
+            },
+            
+        ];
+
         let tabulatorColumes = [{
-            title: SQueryResults._tableProperty, field: "name", sorter:sorter
+            title: SQueryResults._tableProperty, field: "name", sorter:sorter,headerMenu:columnMenu
         },
         {
-            title: "#", field: "num", width: 40,bottomCalc:"sum"
+            title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu
         },
         {
             title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 60,
@@ -490,7 +522,7 @@ export class SQueryResults {
                 unitTitle = SQueryResults._aggType;
             }
             tabulatorColumes.splice(1, 0, {
-                title: unitTitle, field: "amt", width: 120,bottomCalc:SQueryResults._aggType != "med" ? SQueryResults._aggType: undefined
+                headerMenu:columnMenu,title: unitTitle, field: "amt", width: 120,bottomCalc:SQueryResults._aggType != "med" ? SQueryResults._aggType: undefined
             });
         }
 
@@ -518,9 +550,11 @@ export class SQueryResults {
                     SQueryResults._tablePropertyExpanded1 = SQueryResults._tablePropertyAMT;
                     SQueryResults.generateExpandedResults(ids);
                 }
-            }
+            },          
             
         ];
+
+   
 
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
             rowHeight: 15,
@@ -585,23 +619,7 @@ export class SQueryResults {
                 autoColors[data.name] = SQueryResults._convertColor(data.color);
             }
             SQueryManagerUI._table.redraw();
-        });
-
-        const SQueryDropdowButton = document.querySelector('#SQueryResultsDropdown2');
-        const SQueryDropdowContent = document.querySelector('#SQueryResultsDropdownContent2');
-
-        SQueryDropdowButton.addEventListener('click', function () {
-            SQueryDropdowContent.classList.toggle('SQueryDropdowShow');
-        });
-
-        window.addEventListener('click', function (event) {
-            if (!event.target.matches('.SQueryDropdow-button')) {
-                if (SQueryDropdowContent.classList.contains('SQueryDropdowShow')) {
-                    SQueryDropdowContent.classList.remove('SQueryDropdowShow');
-                }
-            }
-        });
-
+        });      
     }
 
     static generateExpandedResults(nodeids_in = null) {
@@ -1039,17 +1057,14 @@ export class SQueryResults {
         return html;
     }
 
-    static _generateAssignColorDropdown() {
-        let html = "";
-        html += '<button id="SQueryResultsDropdown2" style="right:5px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">Set Colors</button>';
-        html += '<ul  id="SQueryResultsDropdownContent2" style="right:-20px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-        html += '<li style="font-weight:bold" onclick=\'hcSQueryUI.SQueryResults.applyColors()\'>Apply to model</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryResults.assignColorsRandom()\'>Assign random</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryResults._assignColorsAMTGradient()\'>Assign Gradient (AMT)</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryResults._assignColorsMainGradient()\'>Assign Gradient (Main)</li>';
-        html += '</ul>';
-        return html;
-    }
+    // static _generateAssignColorDropdown() {
+    //     let html = "";
+    //     html += '<button id="SQueryResultsDropdown2" style="right:5px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">Set Colors</button>';
+    //     html += '<ul  id="SQueryResultsDropdownContent2" style="right:-20px;top:10px;position:absolute;" class="SQueryDropdow-content">';
+    //     html += '<li style="font-weight:bold" onclick=\'hcSQueryUI.SQueryResults.applyColors()\'>Apply to model</li>';
+    //     html += '</ul>';
+    //     return html;
+    // }
 
 
 }
