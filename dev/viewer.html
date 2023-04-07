@@ -100,7 +100,12 @@
               
           hwv.setCallbacks({
               modelStructureReady: msready,
+              sceneReady: function() {
+                hwv.view.setBackgroundColor(new Communicator.Color(128,128,255),new Communicator.Color(222,222,222));
+
+              }
           });
+
 
           hwv.start();
          

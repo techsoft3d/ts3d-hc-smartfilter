@@ -8,8 +8,6 @@ async function msready() {
     // let json = await res.json();
     // mySQueryManager = new hcSQuery.SQueryManager(hwv);
     // mySQueryManager.addModel("hospital",hwv.model.getRootNode(),json);
-
-
     mySQueryManager = new hcSQuery.SQueryManager(hwv);
 
     hcSQueryUI.SQueryEditor.initialize("searchtools", mySQueryManager);
