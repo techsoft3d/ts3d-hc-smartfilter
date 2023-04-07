@@ -462,6 +462,17 @@ export class SQueryResults {
 
     }
 
+    static _clearColors() {
+        SQueryEditor._mainFilter.setAutoColors(null,null);
+        let tdata = [];
+        for (let i in SQueryResults._categoryHash) {
+            SQueryResults._categoryHash[i].color = undefined;
+            let data = { color: null,id: i };
+            tdata.push(data);
+        }
+        SQueryResults._table.updateData(tdata);
+    }
+
     static _generatePropertyView(redrawOnly = false) {
 
         $("#SQueryResultsFirstRow").css("display", "block");
@@ -562,6 +573,12 @@ export class SQueryResults {
                 label: "<i class='fas fa-user'></i> Assign Gradient",
                 action: async function (e, column) {
                     SQueryResults._assignColorsGradient(column.getDefinition().field);
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Clear Colors",
+                action: async function (e, column) {
+                    SQueryResults._clearColors();
                 }
             },
             
