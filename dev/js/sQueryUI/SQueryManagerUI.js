@@ -132,7 +132,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.isolateAll();
+                        SQueryEditor.getFoundItems().isolateAll();
                     }
                 },
                 {
@@ -140,7 +140,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.makeVisible(true);
+                        SQueryEditor.getFoundItems().makeVisible(true);
                     }
                 },
                 {
@@ -148,7 +148,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.makeVisible(false);
+                        SQueryEditor.getFoundItems().makeVisible(false);
                     }
                 },
                 {
@@ -159,7 +159,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(255,0,0));
+                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,0,0));
                     }
                 },
                 {
@@ -167,7 +167,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(0,255,0));
+                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,255,0));
                     }
                 },
                 {
@@ -175,7 +175,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(0,0,255));
+                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,0,255));
                     }
                 },
                 {
@@ -183,7 +183,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(255,255,0));
+                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,255,0));
                     }
                 },
                 {
@@ -191,7 +191,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(128,128,128));
+                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(128,128,128));
                     }
                 },
                 {
@@ -199,7 +199,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.setOpacity(0.25);
+                        SQueryEditor.getFoundItems().setOpacity(0.25);
                     }
                 },
                 {
@@ -207,7 +207,7 @@ export class SQueryManagerUI {
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
                         await SQueryEditor.search();
-                        SQueryEditor.setOpacity(1.0);
+                        SQueryEditor.getFoundItems().setOpacity(1.0);
                     }
                 },
                 {

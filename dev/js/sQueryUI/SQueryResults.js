@@ -50,7 +50,7 @@ export class SQueryResults {
     static _findCategoryFromSearch() {
 
         let query = SQueryEditor._mainFilter;
-        let searchresults = SQueryEditor._founditems;
+        let searchresults = SQueryEditor._founditems.getItems();
         SQueryResults._categoryHash = [];
 
         if (SQueryResults._tableProperty) {
@@ -225,7 +225,7 @@ export class SQueryResults {
 
     static getAllProperties() {
 
-        let searchresults = SQueryEditor._founditems;
+        let searchresults = SQueryEditor._founditems.getItems();
         let propsnames = [];
         let thash = [];
         for (let i in SQueryResults._manager._allPropertiesHash) {
@@ -637,7 +637,7 @@ export class SQueryResults {
             {
                 label: "<i class='fas fa-user'></i> View All",
                 action: async function (e, row) {
-                    let searchresults = SQueryEditor._founditems;
+                    let searchresults = SQueryEditor._founditems.getItems();
                     let ids = [];
                     for (let i = 0; i < searchresults.length; i++) {
                         ids.push(searchresults[i].id);
@@ -1068,15 +1068,17 @@ export class SQueryResults {
     }
 
 
-    static generateSearchResults(founditems) {
+    static generateSearchResults(founditems_in) {
         $("#SQueryResultsFirstRow").css("display", "block");
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "auto");
         $("#" + SQueryResults._maindiv + "_found").empty();
-        if (founditems == undefined)
+        if (founditems_in == undefined)
             return;
+
+        let founditems = founditems_in.getItems();
 
         if (founditems.length == 1) {
             $("#" + SQueryResults._maindiv + "_found").append(founditems.length + " item found");
@@ -1099,7 +1101,7 @@ export class SQueryResults {
         for (let i = 0; i < lend; i++) {
             toggle = !toggle;
             if (SQueryResults._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(founditems[i].id))) {
-                let parent = SQueryResults._viewer.model.getNodeParent(SQueryEditor._founditems[i].id);
+                let parent = SQueryResults._viewer.model.getNodeParent(founditems[i].id);
                 if (SQueryResults._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
                     html += '<div onclick=\'hcSQueryUI.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
                 }
@@ -1124,8 +1126,6 @@ export class SQueryResults {
         }
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
-
-
         SQueryResults.adjust();
     }
 
@@ -1156,18 +1156,18 @@ export class SQueryResults {
         html += '<button id="SQueryResultsDropdown" style="right:56px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul  id="SQueryResultsDropdownContent" style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
         html += '<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.isolateAll(this)\'>Isolate</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(true)\'>Show</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.makeVisible(false)\'>Hide</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().isolateAll(this)\'>Isolate</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().makeVisible(true)\'>Show</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().makeVisible(false)\'>Hide</li>';
         html += '<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';
         html += '<li >---</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,0,0))\'>Red</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,255,0))\'>Green</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(0,0,255))\'>Blue</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(0.7)\'>Transparent</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.setOpacity(1)\'>Opaque</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,0,0))\'>Red</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,255,0))\'>Green</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,0,255))\'>Blue</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().setOpacity(0.7)\'>Transparent</li>';
+        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().setOpacity(1)\'>Opaque</li>';
         html += '</ul>';
         return html;
     }

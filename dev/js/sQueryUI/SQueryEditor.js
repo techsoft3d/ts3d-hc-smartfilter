@@ -193,12 +193,9 @@ export class SQueryEditor {
 
 
         let startnode = SQueryEditor._mainFilter.getStartNode();
-        SQueryEditor._founditems = [];
-        for (let i=0;i<nodeids.length;i++) {
-            let chaintext = SQueryEditor._mainFilter.createChainText(nodeids[i], startnode, SQueryEditor._chainSkip);
-            let item = {name: SQueryEditor._viewer.model.getNodeName(nodeids[i]), id: nodeids[i], chaintext: chaintext};            
-            SQueryEditor._founditems.push(item);
-        }    
+        SQueryEditor._founditems = new hcSQuery.SQueryResult(this._manager, SQueryEditor._mainFilter);
+        SQueryEditor._founditems.generateItems(nodeids, startnode, SQueryEditor._chainSkip);
+
         SQueryEditor._generateSearchResults();
         if (doAction) {
             SQueryEditor._mainFilter.performAction(nodeids);
@@ -235,54 +232,16 @@ export class SQueryEditor {
         this._viewer.selectionManager.clear();
     }
 
-
-    static makeVisible(onoff) {        
-                            
-        let selections = [];
-        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
-            selections.push(parseInt(SQueryEditor._founditems[i].id));
-        }
-        SQueryEditor._viewer.model.setNodesVisibility(selections, onoff);
-    }
-
-    static async colorize(color) {        
-                   
-        let selections = [];
-        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
-            selections.push(parseInt(SQueryEditor._founditems[i].id));
-        }
-        SQueryEditor._viewer.model.setNodesFaceColor(selections, color);
-    }
-
-    static async setOpacity(opacity) {        
-                   
-        let selections = [];
-        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
-            selections.push(parseInt(SQueryEditor._founditems[i].id));
-        }
-        SQueryEditor._viewer.model.setNodesOpacity(selections, opacity);
-    }
-
-
-    static isolateAll() {        
-                            
-        let selections = [];
-        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
-            selections.push(parseInt(SQueryEditor._founditems[i].id));
-        }
-        SQueryEditor._viewer.view.isolateNodes(selections);
+    static getFoundItems() {
+        return SQueryEditor._founditems;
     }
 
     static selectAll() {        
                      
-        if (!SQueryEditor.ctrlPressed)
+        if (!SQueryEditor.ctrlPressed) {
             SQueryEditor._viewer.selectionManager.clear();
-
-        let selections = [];
-        for (let i = 0; i < SQueryEditor._founditems.length; i++) {
-            selections.push(new Communicator.Selection.SelectionItem(parseInt(SQueryEditor._founditems[i].id)));
         }
-        SQueryEditor._viewer.selectionManager.add(selections);
+        this._founditems.selectAll();
         SQueryEditor._generateSearchResults();
     }
 
@@ -444,12 +403,8 @@ export class SQueryEditor {
     static _limitSelectionShow() {
       
         let nodeids = SQueryEditor._mainFilter.getLimitSelectionList();
-        SQueryEditor._founditems = [];
-        for (let i = 0; i < nodeids.length; i++) {
-            let chaintext = SQueryEditor._mainFilter.createChainText(nodeids[i], SQueryEditor._viewer.model.getRootNode(), 0);
-            let item = {name: SQueryEditor._viewer.model.getNodeName(nodeids[i]), id: nodeids[i], chaintext: chaintext};            
-            SQueryEditor._founditems.push(item);
-        }    
+        SQueryEditor._founditems = new hcSQuery.SQueryResult(this._manager, SQueryEditor._mainFilter);
+        SQueryEditor._founditems.generateItems(nodeids,SQueryEditor._viewer.model.getRootNode(),0);
 
         SQueryEditor.selectAll();        
     }

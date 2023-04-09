@@ -2,6 +2,7 @@ import { SQueryCondition } from './SQueryCondition.js';
 import { SQueryConditionType } from './SQueryCondition.js';
 import { SQueryRelationshipType } from './SQueryCondition.js';
 import { SQueryPropertyType } from './SQueryCondition.js';
+import { SQueryResult } from './SQueryResult.js';
 
 export class SQuery {
     constructor(manager, startnode) {
@@ -308,25 +309,7 @@ export class SQuery {
         return matchingnodes;
     }
 
-    createChainText(id, startid, chainskip) {
-        let current = id;
-        let chain = [];
-        while (1) {
-            let newone = this._viewer.model.getNodeParent(current);
-            if (newone == null || newone == startid)
-                break;
-            chain.push(this._viewer.model.getNodeName(newone));
-            current = newone;
-        }
-        let chaintext = "";
-        for (let j = chain.length - 1 - chainskip; j >= 0; j--) {
-            if (j > 0)
-                chaintext += chain[j] + "->";
-            else
-                chaintext += chain[j];
-        }
-        return chaintext;
-    }
+  
     async testOneNodeAgainstConditions(id) {
         let conditions = this._conditions;
         for (let i = 0; i < conditions.length; i++) {
@@ -776,7 +759,7 @@ export class SQuery {
                     searchAgainst = chaintext;
                 }
                 else {
-                    searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(), 0);
+                    searchAgainst = SQueryResult.createChainText(this._viewer,id, this._viewer.model.getRootNode(), 0);
 
                 }
             }
