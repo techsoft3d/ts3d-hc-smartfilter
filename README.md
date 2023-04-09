@@ -1,5 +1,8 @@
 # SQuerys
 
+## Version Update (1.1.0)
+* UI included in main library
+* Many other improvements and fixes
 
 ## Version Update (1.0.0)
 * Support for picking categories
@@ -76,17 +79,12 @@ For questions/feedback please send an email to guido@techsoft3d.com or post in o
 * Improved Documentation
 
 ## Install
-Add `dist/squery.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
+Add `dist/squery.min.js` to your project 
 ```
     <script src="./js/squery.min.js"></script>
 ```
 
-Add `dist/squeryui.min.js` for the optional UI functionality. 
-```
-    <script src="./js/squeryui.min.js"></script>
-```
-
-If you are using the UI library you also need to add `dist/squeryui.css` to your project:
+If you are using the UI component of the library you also need to add `dist/squeryui.css` to your project:
 ```
     <link rel="stylesheet" href="./css/squeryui.css">
 ```
@@ -103,8 +101,8 @@ Here is how to start the demo with the provided sample model locally when using 
 
 ```
 let manager = new hcSQuery.SQueryManager(hwv);
-hcSQuery.SQueryEditor.initialize("searcheditor", manager);
-hcSQuery.SQueryEditor.display();
+hcSQuery.SQueryEditorUI.initialize("searcheditor", manager);
+hcSQuery.SQueryEditorUI.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
@@ -173,13 +171,13 @@ If this option is selected the search will be performed on the specified Query
 ### Advanced Usage:
 
 ```
- hcSQuery.SQueryEditor.setChainSkip(1);
+ hcSQuery.SQueryEditorUI.setChainSkip(1);
 ```
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
- hcSQuery.SQueryEditor.setShowLimitOption(true);
+ hcSQuery.SQueryEditorUI.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
 

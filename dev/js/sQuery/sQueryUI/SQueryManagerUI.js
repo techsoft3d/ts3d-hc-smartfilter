@@ -1,4 +1,4 @@
-import { SQueryEditor } from './SQueryEditor.js';
+import { SQueryEditorUI } from './SQueryEditorUI.js';
 
 export class SQueryManagerUI {
 
@@ -79,8 +79,8 @@ export class SQueryManagerUI {
     }
 
     static async _addCurrentFilter() {
-        SQueryEditor.updateFilterFromUI();
-        let filter = SQueryEditor.getFilter();
+        SQueryEditorUI.updateFilterFromUI();
+        let filter = SQueryEditorUI.getFilter();
         let jfilter = filter.toJSON();
 
         let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);
@@ -121,32 +121,32 @@ export class SQueryManagerUI {
                     label: "<i class='fas fa-user'></i> Select",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.selectAll();
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.selectAll();
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Isolate",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().isolateAll();
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().isolateAll();
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Show",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().makeVisible(true);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().makeVisible(true);
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Hide",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().makeVisible(false);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().makeVisible(false);
                     }
                 },
                 {
@@ -156,56 +156,56 @@ export class SQueryManagerUI {
                     label: "<i class='fas fa-user'></i> Red",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,0,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(255,0,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Green",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,255,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(0,255,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Blue",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,0,255));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(0,0,255));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Yellow",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,255,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(255,255,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Grey",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().colorize(new Communicator.Color(128,128,128));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(128,128,128));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Transparent",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().setOpacity(0.25);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().setOpacity(0.25);
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Opaque",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.getFoundItems().setOpacity(1.0);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().setOpacity(1.0);
                     }
                 },
                 {
@@ -219,10 +219,10 @@ export class SQueryManagerUI {
                         let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
                         let filterjson = SQuery.toJSON();
                 
-                        let editorfilter = SQueryEditor.getFilter();
+                        let editorfilter = SQueryEditorUI.getFilter();
                         editorfilter.fromJSON(filterjson);                
-                        SQueryEditor.clearSearchResults();                
-                        await SQueryEditor.refreshUI();               
+                        SQueryEditorUI.clearSearchResults();                
+                        await SQueryEditorUI.refreshUI();               
                     }
                 },
                 {
@@ -358,15 +358,15 @@ export class SQueryManagerUI {
                 let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
                 let filterjson = SQuery.toJSON();
-                let editorfilter = SQueryEditor.getFilter();
+                let editorfilter = SQueryEditorUI.getFilter();
                 editorfilter.fromJSON(filterjson);
-                SQueryEditor.clearSearchResults();                
-                await SQueryEditor.refreshUI();                
+                SQueryEditorUI.clearSearchResults();                
+                await SQueryEditorUI.refreshUI();                
                 if (!SQuery.hasAction()) {
-                    await SQueryEditor.search();
+                    await SQueryEditorUI.search();
                 }       
                 else {
-                    await SQueryEditor.search(true);
+                    await SQueryEditorUI.search(true);
                 }         
             });
 
@@ -435,9 +435,9 @@ export class SQueryManagerUI {
         
         let SQuery = SQueryManagerUI._manager.getSQueryByID(id);
         let filterjson = SQuery.toJSON();
-        let editorfilter = SQueryEditor.getFilter();
+        let editorfilter = SQueryEditorUI.getFilter();
         editorfilter.fromJSON(filterjson);
-        await SQueryEditor.refreshUI();
+        await SQueryEditorUI.refreshUI();
 
     }
 
@@ -483,8 +483,8 @@ export class SQueryManagerUI {
         let data = row.getData();
         let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
-        SQueryEditor.updateFilterFromUI();
-        let filter = SQueryEditor.getFilter();
+        SQueryEditorUI.updateFilterFromUI();
+        let filter = SQueryEditorUI.getFilter();
         let jfilter = filter.toJSON();
 
         let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);

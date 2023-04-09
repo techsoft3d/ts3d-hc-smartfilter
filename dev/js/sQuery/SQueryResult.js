@@ -139,8 +139,8 @@ export class SQueryResult {
                     else {
                         name = searchresults[j].name;
                     }
-                    if (SQueryResults._categoryHash[name] == undefined) {
-                        SQueryResults._categoryHash[name] = { ids: [] };
+                    if (SQueryResultsUI._categoryHash[name] == undefined) {
+                        SQueryResultsUI._categoryHash[name] = { ids: [] };
                     }
                     this._categoryHash[name].ids.push(searchresults[j].id);
                 }
@@ -246,7 +246,7 @@ export class SQueryResult {
         else {
             let numbers = [];
             for (let i = 0; i < ids.length; i++) {
-                let res = SQueryResults._manager._propertyHash[ids[i]][property];
+                let res = SQueryResultsUI._manager._propertyHash[ids[i]][property];
                 if (res != undefined) {
                     numbers.push(parseFloat(res));
                 }
