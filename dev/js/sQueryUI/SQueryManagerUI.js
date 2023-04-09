@@ -1,5 +1,3 @@
-import { dummy } from './tabulator_esm.min.js';
-
 import { SQueryEditor } from './SQueryEditor.js';
 
 export class SQueryManagerUI {

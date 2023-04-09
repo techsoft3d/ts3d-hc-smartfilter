@@ -1,5 +1,3 @@
-import { dummy } from './tabulator_esm.min.js';
-
 export class SQueryPropertiesUI {
 
     static initialize(div, manager) {
