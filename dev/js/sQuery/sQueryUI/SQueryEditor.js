@@ -81,11 +81,11 @@ export class SQueryEditor {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';              
+        html +='<li onclick=\'hcSQuery.SQueryEditor._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
+        html +='<li onclick=\'hcSQuery.SQueryEditor._setSearchVisible(this)\'>Search Visible</li>';              
         html +='<li>---</li>';              
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor._toggleLighting()\'>Toggle Lighting</li>';              
-        html +='<li onclick=\'hcSQueryUI.SQueryEditor._viewer.model.setNodesFaceColor([hcSQueryUI.SQueryEditor._viewer.model.getRootNode()],Communicator.Color.white())\'>Set to White</li>';              
+        html +='<li onclick=\'hcSQuery.SQueryEditor._toggleLighting()\'>Toggle Lighting</li>';              
+        html +='<li onclick=\'hcSQuery.SQueryEditor._viewer.model.setNodesFaceColor([hcSQuery.SQueryEditor._viewer.model.getRootNode()],Communicator.Color.white())\'>Set to White</li>';              
         html += '</ul>';
         return html;
     }
@@ -104,7 +104,7 @@ export class SQueryEditor {
             html+='<div id = "SQueryEditorFirstRow">';
             if (SQueryEditor._showLimitOption) {
                 html += '<div id="' + SQueryEditor._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button title = "Select nodes current search is limited to" id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor._limitSelectionShow()\'>Limit</button><input title = "Limit search to currently selected entities" onclick=\'hcSQueryUI.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
+                html += '<button title = "Select nodes current search is limited to" id="SQUeryLimitSelectionButton" disabled style="position:relative;top:-1px"class="SQuerySearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSQuery.SQueryEditor._limitSelectionShow()\'>Limit</button><input title = "Limit search to currently selected entities" onclick=\'hcSQuery.SQueryEditor._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SQueryEditor._maindiv + '_searchfromselection">'
                 html += '</div>';
             }
             else {
@@ -113,7 +113,7 @@ export class SQueryEditor {
             }
 
             html += SQueryEditor._generateDropdown();
-            html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.search()\'>Search</button>';
+            html += '<button class="SQuerySearchButtonImportant" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQuery.SQueryEditor.search()\'>Search</button>';
             html += '<hr class="SQueryEditorDivider">';
             html += '</div>';
         }
@@ -462,7 +462,7 @@ export class SQueryEditor {
         else {
 
             let html = '<span style="top:5px;left:6px;position:relative;font-size:14px; margin-top:2px;width:50px;max-width:50px;min-width:50px">';
-            html += '<select class="SQuerySearchSelect" onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' id="' +  
+            html += '<select class="SQuerySearchSelect" onchange=\'hcSQuery.SQueryEditor._andorchangedFromUI()\' id="' +  
             SQueryEditor._maindiv + '_andOrchoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
             if (condition.and) {
@@ -481,7 +481,7 @@ export class SQueryEditor {
 
     static _generateChoiceSelect(condition, filterpos,SQuery) {
 
-        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._andorchangedFromUI()\' class="SQueryAndOrSelect" id="' +  
+        let html = '<select onchange=\'hcSQuery.SQueryEditor._andorchangedFromUI()\' class="SQueryAndOrSelect" id="' +  
             SQueryEditor._maindiv + '_propertyChoiceSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';
 
         let choices;
@@ -524,7 +524,7 @@ export class SQueryEditor {
     static _generatePropertyTypeSelect(condition, filterpos, SQuery) {
       
 
-        let html = '<select onchange=\'hcSQueryUI.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQueryUI.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
+        let html = '<select onchange=\'hcSQuery.SQueryEditor._clearInputField(' + filterpos + "," + SQuery.tempId + ');hcSQuery.SQueryEditor._andorchangedFromUI();\' class="SQueryPropertyTypeSelect" id="' +  
             SQueryEditor._maindiv + '_propertyTypeSelect' + filterpos + "-" + SQuery.tempId + '" value="">\n';       
 
         let sortedStrings = SQueryEditor._manager.getAllProperties(SQueryEditor._hideIFCProperties);
@@ -565,13 +565,13 @@ export class SQueryEditor {
 
     static async _updateBoundingDatalist(el) {
         let nodeids = [];
-        let r = hcSQueryUI.SQueryEditor._viewer.selectionManager.getResults();
+        let r = hcSQuery.SQueryEditor._viewer.selectionManager.getResults();
         for (let i = 0; i < r.length; i++) {
             nodeids.push(r[i].getNodeId());
         }
 
         if (nodeids.length > 0) {
-            let lbounds = await hcSQueryUI.SQueryEditor._viewer.model.getNodesBounding(nodeids);
+            let lbounds = await hcSQuery.SQueryEditor._viewer.model.getNodesBounding(nodeids);
             let text = ("bounds:" + lbounds.min.x + " " + lbounds.min.y + " " + lbounds.min.z + " " + lbounds.max.x + " " + lbounds.max.y + " " + lbounds.max.z);
             $(el).next().html('<option value="' + text + '"></option>')
         }
@@ -583,12 +583,12 @@ export class SQueryEditor {
 
     static async _updateColorDatalist(el) {
 
-        if (hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast()) {
-            let nodeid = hcSQueryUI.SQueryEditor._viewer.selectionManager.getLast().getNodeId();
-            let children = hcSQueryUI.SQueryEditor._viewer.model.getNodeChildren(nodeid);
+        if (hcSQuery.SQueryEditor._viewer.selectionManager.getLast()) {
+            let nodeid = hcSQuery.SQueryEditor._viewer.selectionManager.getLast().getNodeId();
+            let children = hcSQuery.SQueryEditor._viewer.model.getNodeChildren(nodeid);
             if (children.length > 0)
                 nodeid = children[0];
-            let colors = await hcSQueryUI.SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
+            let colors = await hcSQuery.SQueryEditor._viewer.model.getNodesEffectiveFaceColor([nodeid]);
             $(el).next().html('<option value="' + colors[0].r + " " + colors[0].g + " " + colors[0].b + '"></option>');
         }
         else {
@@ -601,11 +601,11 @@ export class SQueryEditor {
 
         let html = "";
         if (condition.propertyName == "Bounding") {            
-            html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+            html = '<input type="search" onfocus="hcSQuery.SQueryEditor._updateBoundingDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
             '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';
         }
         else if (condition.propertyName == "Node Color") {
-                html = '<input type="search" onfocus="hcSQueryUI.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
+                html = '<input type="search" onfocus="hcSQuery.SQueryEditor._updateColorDatalist(this)" class = "valueinput" list="datalist' + filterpos + "-" + SQuery.tempId +'" id="' + SQueryEditor._maindiv + 
                 '_modeltreesearchtext' + filterpos + "-" + SQuery.tempId + '" value="' + condition.text + '">\n';    
         }
         else {
@@ -682,7 +682,7 @@ export class SQueryEditor {
             if (condition.childFilter) {
                 SQueryEditor.tempId++;
                 html += '<div>';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQuery.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();
                 html += '</div>';
                 html += SQueryEditor._generateAndOrChoiceSelect(condition, i, SQuery);
@@ -695,7 +695,7 @@ export class SQueryEditor {
                 }
 
                 html += '<div style="height:30px;margin-top:-3px">';
-                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQueryUI.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
+                html += '<div style="position:relative;width:10px; height:10px;float:left;top:10px;left:-1px" onclick=\'hcSQuery.SQueryEditor._deleteFilter(' + i + "," + SQuery.tempId + ')\'>';
                 html += SQueryEditor._generateTrashBin();
                 html += '</div>';                
                 html += SQueryEditor._generateAndOrChoiceSelect(condition, i, SQuery);
@@ -723,10 +723,10 @@ export class SQueryEditor {
                 html += '</div>';
             }        
         }
-        html += '<button title = "Add new condition" class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQueryUI.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
+        html += '<button title = "Add new condition" class="SQuerySearchButton" type="button" style="margin-top:2px;left:2px;bottom:2px;position:relative;" onclick=\'hcSQuery.SQueryEditor._addFilterFromUI(false,' +  SQuery.tempId + ')\'>Add condition</button>';
         if (!SQueryIn)
         {
-            html += '<button title="Add new condition group: hold down Shift to convert existing conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQueryUI.SQueryEditor.shiftPressed ? hcSQueryUI.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQueryUI.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
+            html += '<button title="Add new condition group: hold down Shift to convert existing conditions to group" class="SQuerySearchButton" type="button" style="left:4px;bottom:2px;position:relative;" onclick=\'!hcSQuery.SQueryEditor.shiftPressed ? hcSQuery.SQueryEditor._addFilterFromUI(true,' +  SQuery.tempId + ') : hcSQuery.SQueryEditor._convertToChildfilter(true,' +  SQuery.tempId + ')\'>Add condition group</button>';
         }
         else
         {           

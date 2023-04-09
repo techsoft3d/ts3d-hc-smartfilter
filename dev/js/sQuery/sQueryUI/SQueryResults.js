@@ -19,8 +19,8 @@ export class SQueryResults {
         html += '<div id = "SQueryResultsFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
         html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SQueryResults._maindiv + '_found"></div>';
         html += SQueryResults._generateDropdown();
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</button>';
-        html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults.toggleView(this)\'>Property View</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSQuery.SQueryEditor.selectAll(this)\'>Select</button>';
+        html += '<button id="SQueryToggleViewButton" class="SQuerySearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSQuery.SQueryResults.toggleView(this)\'>Property View</button>';
         html += '</div>';
 
         html += '<div id="' + SQueryResults._maindiv + '_searchitems" class="SQuerySearchItems">';
@@ -230,7 +230,7 @@ export class SQueryResults {
 
         let amountStrings = SQueryResults.getAmountStrings(sortedStrings);
 
-        let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
+        let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQuery.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
 
         for (let i = 0; i < sortedStrings.length; i++) {
             if (SQueryResults._results.getTableProperty() == sortedStrings[i])
@@ -239,7 +239,7 @@ export class SQueryResults {
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:4px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQueryUI.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';
+        html += '<span style="top:4px;left:0px;position:absolute"><span style="font-family:courier">AMT :</span><select id="SQueryPropSelectAMT" onchange=\'hcSQuery.SQueryResults._propertyAMTSelected();\' class="SQueryPropertyResultsSelect" value="">';
         for (let i = 0; i < amountStrings.length; i++) {
             if (SQueryResults._tablePropertyAMT == amountStrings[i])
                 html += '<option value="' + amountStrings[i] + '" selected>' + amountStrings[i] + '</option>\n';
@@ -247,7 +247,7 @@ export class SQueryResults {
                 html += '<option value="' + amountStrings[i] + '">' + amountStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:4px;left:186px;position:absolute"><span style="font-family:courier"></span><select id="SQueryPropAggType" onchange=\'hcSQueryUI.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';
+        html += '<span style="top:4px;left:186px;position:absolute"><span style="font-family:courier"></span><select id="SQueryPropAggType" onchange=\'hcSQuery.SQueryResults._propertyAggTypeSelected();\' class="SQueryPropertyAggTypeSelect" value="">';
         let choices = ["sum", "avg", "max", "min", "med"];
         for (let i = 0; i < choices.length; i++) {
             if (SQueryResults._aggType == choices[i])
@@ -256,7 +256,7 @@ export class SQueryResults {
                 html += '<option value="' + choices[i] + '">' + choices[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick="hcSQueryUI.SQueryResults.applyColors()">Apply Colors</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick="hcSQuery.SQueryResults.applyColors()">Apply Colors</button>';
         html += '</div>';
 
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
@@ -436,9 +436,9 @@ export class SQueryResults {
         sortedStrings.shift();
 
         let html = '<div style="height:35px;">';
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:-5px;position:absolute;" onclick=\'hcSQueryUI.SQueryResults._generatePropertyView(true)\'>Property View</button>';
-        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:17px;position:absolute;" onclick="hcSQueryUI.SQueryResults.applyExpandedColors()">Apply Colors</button>';
-        html += '<div style="height:25px;"><span style="top:-5px;position:relative"><span style="font-family:courier">Prop1:</span><select id="SQueryPropExpandedSelect0" onchange=\'hcSQueryUI.SQueryResults._propertyExpandedSelected(0);\' class="SQueryPropertyResultsSelect" value="">';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:-5px;position:absolute;" onclick=\'hcSQuery.SQueryResults._generatePropertyView(true)\'>Property View</button>';
+        html += '<button class="SQuerySearchButton" type="button" style="right:5px;top:17px;position:absolute;" onclick="hcSQuery.SQueryResults.applyExpandedColors()">Apply Colors</button>';
+        html += '<div style="height:25px;"><span style="top:-5px;position:relative"><span style="font-family:courier">Prop1:</span><select id="SQueryPropExpandedSelect0" onchange=\'hcSQuery.SQueryResults._propertyExpandedSelected(0);\' class="SQueryPropertyResultsSelect" value="">';
         
         for (let i = 0; i < sortedStrings.length; i++) {
             if (SQueryResults._tablePropertyExpanded0 == sortedStrings[i])
@@ -447,7 +447,7 @@ export class SQueryResults {
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        html += '<span style="top:15px;left:0px;position:absolute"><span style="font-family:courier">Prop2:</span><select id="SQueryPropExpandedSelect1" onchange=\'hcSQueryUI.SQueryResults._propertyExpandedSelected(1);\' class="SQueryPropertyResultsSelect" value="">';
+        html += '<span style="top:15px;left:0px;position:absolute"><span style="font-family:courier">Prop2:</span><select id="SQueryPropExpandedSelect1" onchange=\'hcSQuery.SQueryResults._propertyExpandedSelected(1);\' class="SQueryPropertyResultsSelect" value="">';
         sortedStrings.unshift("--EMPTY--");
 
         for (let i = 0; i < sortedStrings.length; i++) {
@@ -616,17 +616,17 @@ export class SQueryResults {
             if (SQueryResults._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(founditems[i].id))) {
                 let parent = SQueryResults._viewer.model.getNodeParent(founditems[i].id);
                 if (SQueryResults._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
-                    html += '<div onclick=\'hcSQueryUI.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
+                    html += '<div onclick=\'hcSQuery.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
                 }
                 else {
-                    html += '<div onclick=\'hcSQueryUI.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItemselected">';
+                    html += '<div onclick=\'hcSQuery.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItemselected">';
                 }
             }
             else {
                 if (toggle)
-                    html += '<div onclick=\'hcSQueryUI.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItem1">';
+                    html += '<div onclick=\'hcSQuery.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItem1">';
                 else
-                    html += '<div onclick=\'hcSQueryUI.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItem2">';
+                    html += '<div onclick=\'hcSQuery.SQueryResults._select("' + founditems[i].id + '")\' class="SQuerySearchItem2">';
             }
 
             html += '<div class="SQuerySearchItemText">' + SQueryEditor._htmlEncode(founditems[i].name) + '</div>';
@@ -667,19 +667,19 @@ export class SQueryResults {
         let html = "";
         html += '<button id="SQueryResultsDropdown" style="right:56px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">...</button>';
         html += '<ul  id="SQueryResultsDropdownContent" style="right:22px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.selectAll(this)\'>Select</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().isolateAll(this)\'>Isolate</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().makeVisible(true)\'>Show</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().makeVisible(false)\'>Hide</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.resetModel()\'>Reset Model</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.selectAll(this)\'>Select</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().isolateAll(this)\'>Isolate</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().makeVisible(true)\'>Show</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().makeVisible(false)\'>Hide</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.resetModel()\'>Reset Model</li>';
         html += '<li >---</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,0,0))\'>Red</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,255,0))\'>Green</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,0,255))\'>Blue</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().setOpacity(0.7)\'>Transparent</li>';
-        html += '<li onclick=\'hcSQueryUI.SQueryEditor.getFoundItems().setOpacity(1)\'>Opaque</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,0,0))\'>Red</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,255,0))\'>Green</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().colorize(new Communicator.Color(0,0,255))\'>Blue</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().colorize(new Communicator.Color(255,255,0))\'>Yellow</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().setOpacity(0.7)\'>Transparent</li>';
+        html += '<li onclick=\'hcSQuery.SQueryEditor.getFoundItems().setOpacity(1)\'>Opaque</li>';
         html += '</ul>';
         return html;
     }

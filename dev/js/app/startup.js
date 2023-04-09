@@ -10,10 +10,10 @@ async function msready() {
     // mySQueryManager.addModel("hospital",hwv.model.getRootNode(),json);
     mySQueryManager = new hcSQuery.SQueryManager(hwv);
 
-    hcSQueryUI.SQueryEditor.initialize("searchtools", mySQueryManager);
-    hcSQueryUI.SQueryEditor.display();
-    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",mySQueryManager, true);
-    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",mySQueryManager);
+    hcSQuery.SQueryEditor.initialize("searchtools", mySQueryManager);
+    hcSQuery.SQueryEditor.display();
+    hcSQuery.SQueryManagerUI.initialize("squeryfilterscontainer",mySQueryManager, true);
+    hcSQuery.SQueryPropertiesUI.initialize("squerypropertiescontainer",mySQueryManager);
 
 }
 
@@ -129,8 +129,8 @@ function createUILayout() {
 
 function initializeSearch(){
     if(hwv.selectionManager.getLast())   
-        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
+        hcSQuery.SQueryEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
     else
-        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv);
-    hcSQueryUI.SQueryEditor.display();
+        hcSQuery.SQueryEditor.initialize("searchtools",hwv);
+    hcSQuery.SQueryEditor.display();
 }
