@@ -100,7 +100,6 @@ export class SQueryResult {
 
 
      findCategoryFromSearch() {
-
         let query = this._query;
         let searchresults = this.getItems();
         this._categoryHash = [];
@@ -484,12 +483,10 @@ export class SQueryResult {
                 num = parseFloat(rows[i].name);
             }
 
-            if (num < min) {
-                min = num;
-            }
-            if (num > max) {
-                max = num;
-            }
+            if (num < min) min = num;
+            
+            if (num > max) max = num;
+            
         }
         let tdist = (max - min);
 
@@ -516,7 +513,6 @@ export class SQueryResult {
         this._query.setAutoColors(autoColors,this._tableProperty);
     }
 
-
     caculateExpandedColorsGradient(column,nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
         let pname = column;
     
@@ -532,12 +528,10 @@ export class SQueryResult {
                 num = parseFloat(rows[i].prop2);
             }
 
-            if (num < min) {
-                min = num;
-            }
-            if (num > max) {
-                max = num;
-            }
+            if (num < min) min = num;
+            
+            if (num > max) max = num;
+            
         }
 
         let tdist = (max - min);
