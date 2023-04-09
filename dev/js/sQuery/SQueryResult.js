@@ -232,4 +232,158 @@ export class SQueryResult {
             this.findCategoryFromSearch();
         }
     }
+
+    calculateAMT(property, ids, aggType) {
+        if (aggType == "sum") {
+            let amount = 0;
+            for (let i = 0; i < ids.length; i++) {
+                let res = this._manager._propertyHash[ids[i]][property];
+                if (res != undefined) {
+                    amount += parseFloat(res);
+                }
+            }
+            return amount;
+        }
+        else {
+            let numbers = [];
+            for (let i = 0; i < ids.length; i++) {
+                let res = SQueryResults._manager._propertyHash[ids[i]][property];
+                if (res != undefined) {
+                    numbers.push(parseFloat(res));
+                }
+            }
+
+            if (numbers.length === 0) {
+                return 0;
+            }
+
+            if (aggType == "avg") {
+
+                const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
+                const avg = sum / numbers.length;
+                return avg;
+            }
+            else if (aggType == "max") {
+                return Math.max(...numbers);
+            }
+            else if (aggType == "min") {
+                return Math.min(...numbers);
+            }
+            else if (aggType == "med") {
+                numbers.sort((a, b) => a - b);
+                const middle = Math.floor(numbers.length / 2);
+
+                return numbers.length % 2 === 0
+                    ? (numbers[middle - 1] + numbers[middle]) / 2
+                    : numbers[middle];
+            }
+        }
+    }
+
+    getAMTUnit(propstring) {
+        let prop = this._manager._allPropertiesHash[propstring];
+        if (prop != undefined) {
+            for (let j in prop) {
+                if (j.indexOf("mm²") != -1) {
+                    return "mm²";
+                }
+                else if (j.indexOf("m²") != -1) {
+                    return "m²";
+                }
+                else if (j.indexOf("mm³") != -1) {
+                    return "mm³";
+                }
+                else if (j.indexOf("m³") != -1) {
+                    return "m³";
+                }
+                else if (j.indexOf("mm") != -1) {
+                    return "mm";
+                }
+                else if (j.indexOf("m") != -1) {
+                    return "m";
+                }
+                else if (j.indexOf("inch³") != -1) {
+                    return "inch³";
+                }
+                else if (j.indexOf("inch²") != -1) {
+                    return "inch²";
+                }
+                break;
+            }
+        }
+    }
+
+    convertColor(color) {
+        switch (color) {
+            case "red":
+                return new Communicator.Color(255, 0, 0);
+            case "green":
+                return new Communicator.Color(0, 255, 0);
+            case "blue":
+                return new Communicator.Color(0, 0, 255);
+            case "yellow":
+                return new Communicator.Color(255, 255, 0);
+            case "brown":
+                return new Communicator.Color(150, 75, 0);
+            case "black":
+                return new Communicator.Color(0, 0, 0);
+            case "white":
+                return new Communicator.Color(255, 255, 255);
+            case "orange":
+                return new Communicator.Color(255, 165, 0);
+            case "grey":
+                return new Communicator.Color(128, 128, 128);
+        }
+    }
+
+    isNumberProp(ltextin) {
+        let ltext = ltextin.toLowerCase();
+        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
+            return false;
+        }
+
+        let prop = this._manager._allPropertiesHash[ltextin];
+        if (prop != undefined) {
+            for (let j in prop) {
+                if (!isNaN(parseFloat(j))) {
+                    return true;
+                }
+                break;
+            }
+        }
+        return false;
+    }
+
+     getAllProperties() {
+
+        let searchresults = this._items;
+        let propsnames = [];
+        let thash = [];
+        for (let i in this._manager._allPropertiesHash) {
+            propsnames.push(i);
+        }
+
+        for (let j = 0; j < searchresults.length; j++) {
+            let id = searchresults[j].id;
+            for (let k in this._manager._propertyHash[id]) {
+                thash[k] = true;
+            }
+        }
+
+        let propnames2 = [];
+        for (let i = 0; i < propsnames.length; i++) {
+            if (thash[propsnames[i]] != undefined) {
+                propnames2.push(propsnames[i]);
+            }
+        }
+
+        propnames2.sort();
+        propnames2.unshift("Node Parent");
+        propnames2.unshift("Node Type");
+        propnames2.unshift("Node Name (No -Ext)");
+        propnames2.unshift("Node Name (No :Ext)");
+        propnames2.unshift("Node Name");
+        return propnames2;
+    }
+
 }

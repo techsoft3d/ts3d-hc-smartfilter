@@ -70,56 +70,9 @@ export class SQueryResults {
         return amountStrings;
     }
 
-    static isNumberProp(ltextin) {
-        let ltext = ltextin.toLowerCase();
-        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
-            return false;
-        }
+   
 
-        let prop = SQueryResults._manager._allPropertiesHash[ltextin];
-        if (prop != undefined) {
-            for (let j in prop) {
-                if (!isNaN(parseFloat(j))) {
-                    return true;
-                }
-                break;
-            }
-        }
-        return false;
-    }
-
-    static getAllProperties() {
-
-        let searchresults = SQueryEditor._founditems.getItems();
-        let propsnames = [];
-        let thash = [];
-        for (let i in SQueryResults._manager._allPropertiesHash) {
-            propsnames.push(i);
-        }
-
-        for (let j = 0; j < searchresults.length; j++) {
-            let id = searchresults[j].id;
-            for (let k in SQueryResults._manager._propertyHash[id]) {
-                thash[k] = true;
-            }
-        }
-
-        let propnames2 = [];
-        for (let i = 0; i < propsnames.length; i++) {
-            if (thash[propsnames[i]] != undefined) {
-                propnames2.push(propsnames[i]);
-            }
-        }
-
-        propnames2.sort();
-        propnames2.unshift("Node Parent");
-        propnames2.unshift("Node Type");
-        propnames2.unshift("Node Name (No -Ext)");
-        propnames2.unshift("Node Name (No :Ext)");
-        propnames2.unshift("Node Name");
-        return propnames2;
-    }
-
+   
     static _propertySelected() {
         SQueryResults._results.setTableProperty($("#SQueryPropSelect")[0].value);
         SQueryEditor._mainFilter.setAutoColors(null, null);
@@ -162,10 +115,6 @@ export class SQueryResults {
             }
         }
     }
-
-   
-
-
 
     static _assignColorsMainGradient() {    
 
@@ -253,7 +202,7 @@ export class SQueryResults {
     static _assignColorsGradient(column) {
         let pname = column;
         if (column == "name") {
-            if (!SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
+            if (!SQueryResults._results.isNumberProp(SQueryResults._results.getTableProperty())) {
                 SQueryResults._assignColorsMainGradient();
                 return;
             }
@@ -345,7 +294,7 @@ export class SQueryResults {
             SQueryResults._results.setTableProperty(SQueryEditor._mainFilter.getAutoColorProperty());
         }
 
-        let sortedStrings = SQueryResults.getAllProperties();
+        let sortedStrings = SQueryResults._results.getAllProperties();
 
         if (!redrawOnly) {
             let found = false;
@@ -450,9 +399,9 @@ export class SQueryResults {
         ];
 
         let firstColumnTitle = SQueryResults._results.getTableProperty();
-        if (SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
+        if (SQueryResults._results.isNumberProp(SQueryResults._results.getTableProperty())) {
 
-            let unit = SQueryResults._getAMTUnit(SQueryResults._results.getTableProperty());
+            let unit = SQueryResults._results.getAMTUnit(SQueryResults._results.getTableProperty());
             if (unit) {
                 firstColumnTitle = "(" + unit + ")";
             }            
@@ -474,7 +423,7 @@ export class SQueryResults {
 
         if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
 
-            let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyAMT);
+            let unit = SQueryResults._results.getAMTUnit(SQueryResults._tablePropertyAMT);
             let unitTitle = "";
             if (unit) {
                 unitTitle = SQueryResults._aggType + "(" + unit + ")";
@@ -559,12 +508,12 @@ export class SQueryResults {
             for (let i in SQueryResults._results.getCategoryHash()) {
                 let color = autoColors ? autoColors[i] : null;
                 let column1name = i;
-                if (SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
+                if (SQueryResults._results.isNumberProp(SQueryResults._results.getTableProperty())) {
                     column1name = parseFloat(i);
                 }
                 let data = { name: column1name, num: SQueryResults._results.getCategoryHash()[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
                 if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
-                    let amount = SQueryResults._calculateAMT(SQueryResults._results.getCategoryHash()[i].ids);
+                    let amount = SQueryResults._results.calculateAMT(SQueryResults._tablePropertyAMT,SQueryResults._results.getCategoryHash()[i].ids, SQueryResults._aggType);
                     data.amt = amount;
                 }
 
@@ -581,7 +530,7 @@ export class SQueryResults {
                     SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
                 }
                 let data = cell.getRow().getData();
-                autoColors[data.name] = SQueryResults._convertColor(data.color);
+                autoColors[data.name] = SQueryResults._results.convertColor(data.color);
             }
             SQueryManagerUI._table.redraw();
         });      
@@ -609,7 +558,7 @@ export class SQueryResults {
         $("#SQueryResultsFirstRow").css("display", "none");
 
 
-        let sortedStrings = SQueryResults.getAllProperties();
+        let sortedStrings = SQueryResults._results.getAllProperties();
         sortedStrings.shift();
         sortedStrings.shift();
 
@@ -693,8 +642,8 @@ export class SQueryResults {
 
         let unitTitle = "";
         let bcalc = undefined;
-        if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
-            let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded0);
+        if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+            let unit = SQueryResults._results.getAMTUnit(SQueryResults._tablePropertyExpanded0);
             if (unit) {
                 unitTitle = SQueryResults._tablePropertyExpanded0 + "(" + unit + ")";
                 bcalc = "sum";
@@ -715,8 +664,8 @@ export class SQueryResults {
         if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
 
             let unitTitle = "";
-            if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
-                let unit = SQueryResults._getAMTUnit(SQueryResults._tablePropertyExpanded1);
+            if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                let unit = SQueryResults._results.getAMTUnit(SQueryResults._tablePropertyExpanded1);
                 if (unit) {
                     unitTitle = SQueryResults._tablePropertyExpanded1 + "(" + unit + ")";
                     bcalc2 = "sum";
@@ -777,7 +726,7 @@ export class SQueryResults {
                 else if (SQueryResults._tablePropertyExpanded0.indexOf("Node Parent") != -1) {
                     prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
                 }
-                else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
+                else if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
                     prop1 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0]);
                     if (isNaN(prop1)) {
                         prop1 = "Not Defined";
@@ -797,7 +746,7 @@ export class SQueryResults {
                     else if (SQueryResults._tablePropertyExpanded1.indexOf("Node Parent") != -1) {
                         data.prop2 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
                     }
-                    else if (SQueryResults.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
+                    else if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
                         data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1]);
                         if (isNaN(data.prop2)) {
                             data.prop2 = "Not Defined";
@@ -817,110 +766,6 @@ export class SQueryResults {
         });
     }
 
-
-
-    static _getAMTUnit(propstring) {
-        let prop = SQueryResults._manager._allPropertiesHash[propstring];
-        if (prop != undefined) {
-            for (let j in prop) {
-                if (j.indexOf("mm²") != -1) {
-                    return "mm²";
-                }
-                else if (j.indexOf("m²") != -1) {
-                    return "m²";
-                }
-                else if (j.indexOf("mm³") != -1) {
-                    return "mm³";
-                }
-                else if (j.indexOf("m³") != -1) {
-                    return "m³";
-                }
-                else if (j.indexOf("mm") != -1) {
-                    return "mm";
-                }
-                else if (j.indexOf("m") != -1) {
-                    return "m";
-                }
-                else if (j.indexOf("inch³") != -1) {
-                    return "inch³";
-                }
-                else if (j.indexOf("inch²") != -1) {
-                    return "inch²";
-                }
-                break;
-            }
-        }
-    }
-
-    static _calculateAMT(ids) {
-        if (SQueryResults._aggType == "sum") {
-            let amount = 0;
-            for (let i = 0; i < ids.length; i++) {
-                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
-                if (res != undefined) {
-                    amount += parseFloat(res);
-                }
-            }
-            return amount;
-        }
-        else {
-            let numbers = [];
-            for (let i = 0; i < ids.length; i++) {
-                let res = SQueryResults._manager._propertyHash[ids[i]][SQueryResults._tablePropertyAMT];
-                if (res != undefined) {
-                    numbers.push(parseFloat(res));
-                }
-            }
-
-            if (numbers.length === 0) {
-                return 0;
-            }
-
-            if (SQueryResults._aggType == "avg") {
-
-                const sum = numbers.reduce((accumulator, currentValue) => accumulator + currentValue, 0);
-                const avg = sum / numbers.length;
-                return avg;
-            }
-            else if (SQueryResults._aggType == "max") {
-                return Math.max(...numbers);
-            }
-            else if (SQueryResults._aggType == "min") {
-                return Math.min(...numbers);
-            }
-            else if (SQueryResults._aggType == "med") {
-                numbers.sort((a, b) => a - b);
-                const middle = Math.floor(numbers.length / 2);
-
-                return numbers.length % 2 === 0
-                    ? (numbers[middle - 1] + numbers[middle]) / 2
-                    : numbers[middle];
-            }
-        }
-    }
-
-    static _convertColor(color) {
-        switch (color) {
-            case "red":
-                return new Communicator.Color(255, 0, 0);
-            case "green":
-                return new Communicator.Color(0, 255, 0);
-            case "blue":
-                return new Communicator.Color(0, 0, 255);
-            case "yellow":
-                return new Communicator.Color(255, 255, 0);
-            case "brown":
-                return new Communicator.Color(150, 75, 0);
-            case "black":
-                return new Communicator.Color(0, 0, 0);
-            case "white":
-                return new Communicator.Color(255, 255, 255);
-            case "orange":
-                return new Communicator.Color(255, 165, 0);
-            case "grey":
-                return new Communicator.Color(128, 128, 128);
-        }
-    }
 
     static toggleView() {
         SQueryResults._isPropertyView = !SQueryResults._isPropertyView;
@@ -1008,7 +853,6 @@ export class SQueryResults {
         }
     }
 
-
     static _select(id) {
         if (!SQueryEditor.ctrlPressed)
             SQueryResults._viewer.selectionManager.selectNode(parseInt(id), Communicator.SelectionMode.Set);
@@ -1038,15 +882,4 @@ export class SQueryResults {
         html += '</ul>';
         return html;
     }
-
-    // static _generateAssignColorDropdown() {
-    //     let html = "";
-    //     html += '<button id="SQueryResultsDropdown2" style="right:5px;top:3px;position:absolute;" class="SQuerySearchButton SQueryDropdow-button">Set Colors</button>';
-    //     html += '<ul  id="SQueryResultsDropdownContent2" style="right:-20px;top:10px;position:absolute;" class="SQueryDropdow-content">';
-    //     html += '<li style="font-weight:bold" onclick=\'hcSQueryUI.SQueryResults.applyColors()\'>Apply to model</li>';
-    //     html += '</ul>';
-    //     return html;
-    // }
-
-
 }
