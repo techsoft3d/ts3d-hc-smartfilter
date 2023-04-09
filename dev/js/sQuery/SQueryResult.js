@@ -168,11 +168,11 @@ export class SQueryResult {
                 let propname = this._tableProperty
                 for (let j = 0; j < searchresults.length; j++) {
                     let id = searchresults[j].id;
-                    if (SQueryResults._manager._propertyHash[id][propname] != undefined) {
-                        if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] == undefined) {
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = { ids: [] };
+                    if (this._manager._propertyHash[id][propname] != undefined) {
+                        if (this._categoryHash[this._manager._propertyHash[id][propname]] == undefined) {
+                            this._categoryHash[this._manager._propertyHash[id][propname]] = { ids: [] };
                         }
-                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].ids.push(searchresults[j].id);
+                        this._categoryHash[this._manager._propertyHash[id][propname]].ids.push(searchresults[j].id);
                     }
                 }
             }
@@ -464,4 +464,98 @@ export class SQueryResult {
         }
         return tdata;
     }
+
+
+    calculateGradientData(column,tablePropertyAMT,aggType) {
+        let pname = column;
+        let rows = this.getCategoryTableData(tablePropertyAMT, aggType);
+
+        let min = Number.MAX_VALUE;
+        let max = -Number.MAX_VALUE;
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (pname == "num") {
+                num = parseInt(rows[i].num);
+            }
+            else if (pname == "amt") {
+                num = parseFloat(rows[i].amt);
+            }
+            else {
+                num = parseFloat(rows[i].name);
+            }
+
+            if (num < min) {
+                min = num;
+            }
+            if (num > max) {
+                max = num;
+            }
+        }
+        let tdist = (max - min);
+
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (pname == "num") {
+                num = parseInt(rows[i].num);
+            }
+            else if (pname == "amt") {
+                num = parseFloat(rows[i].amt);
+            }
+            else {
+                num = parseFloat(rows[i].name);
+            }
+
+            let m = (num - min) / tdist * 256;
+            this._categoryHash[rows[i].id].color = new Communicator.Color(m, m, m);
+        }
+
+        let autoColors = [];
+        for (let i in this._categoryHash) {
+            autoColors[i] = this._categoryHash[i].color;
+        }
+        this._query.setAutoColors(autoColors,this._tableProperty);
+    }
+
+
+    caculateExpandedColorsGradient(column,nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
+        let pname = column;
+    
+        let rows = this.getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1)
+        let min = Number.MAX_VALUE;
+        let max = -Number.MAX_VALUE;
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+            if (pname == "prop1") {
+                num = parseFloat(rows[i].prop1);
+            }
+            else {
+                num = parseFloat(rows[i].prop2);
+            }
+
+            if (num < min) {
+                min = num;
+            }
+            if (num > max) {
+                max = num;
+            }
+        }
+
+        let tdist = (max - min);
+
+        let tdata = [];
+        for (let i = 0; i < rows.length; i++) {
+            let num;
+             if (pname == "prop1") {
+                num = parseFloat(rows[i].prop1);
+            }
+            else {
+                num = parseFloat(rows[i].prop2);
+            }
+
+            let m = (num - min) / tdist * 256;
+            tdata.push({id: rows[i].id, colorsav:m,color: 'rgba(' + m + ',' + m + ',' + m + ',1)'});
+        }
+        return tdata;
+    }
+
 }

@@ -139,44 +139,9 @@ export class SQueryResults {
     }
 
     static _assignExpandedColorsGradient(column) {
-        let pname = column;
-    
-        let rows = SQueryResults._table.getRows();
-        let min = Number.MAX_VALUE;
-        let max = -Number.MAX_VALUE;
-        for (let i = 0; i < rows.length; i++) {
-            let num;
-            if (pname == "prop1") {
-                num = parseFloat(rows[i].getData().prop1);
-            }
-            else {
-                num = parseFloat(rows[i].getData().prop2);
-            }
 
-            if (num < min) {
-                min = num;
-            }
-            if (num > max) {
-                max = num;
-            }
-        }
-
-        let tdist = (max - min);
-
-        let tdata = [];
-        for (let i = 0; i < rows.length; i++) {
-            let num;
-             if (pname == "prop1") {
-                num = parseFloat(rows[i].getData().prop1);
-            }
-            else {
-                num = parseFloat(rows[i].getData().prop2);
-            }
-
-            let m = (num - min) / tdist * 256;
-            tdata.push({id: rows[i].getData().id, colorsav:m,color: 'rgba(' + m + ',' + m + ',' + m + ',1)'});
-        }
-
+        let tdata = SQueryResults._results.caculateExpandedColorsGradient(column,this._expandedNodeIds,this._tablePropertyExpanded0,this._tablePropertyExpanded1);
+       
         SQueryResults._table.updateData(tdata);
     }
 
@@ -189,6 +154,7 @@ export class SQueryResults {
     }
 
     static _assignColorsGradient(column) {
+     
         let pname = column;
         if (column == "name") {
             if (!SQueryResults._results.isNumberProp(SQueryResults._results.getTableProperty())) {
@@ -197,52 +163,8 @@ export class SQueryResults {
             }
             pname = SQueryResults._results.getTableProperty();
         }
-
-        let rows = SQueryResults._table.getRows();
-        let min = Number.MAX_VALUE;
-        let max = -Number.MAX_VALUE;
-        for (let i = 0; i < rows.length; i++) {
-            let num;
-            if (pname == "num") {
-                num = parseInt(rows[i].getData().num);
-            }
-            else if (pname == "amt") {
-                num = parseFloat(rows[i].getData().amt);
-            }
-            else {
-                num = parseFloat(rows[i].getData().name);
-            }
-
-            if (num < min) {
-                min = num;
-            }
-            if (num > max) {
-                max = num;
-            }
-        }
-        let tdist = (max - min);
-
-        for (let i = 0; i < rows.length; i++) {
-            let num;
-            if (pname == "num") {
-                num = parseInt(rows[i].getData().num);
-            }
-            else if (pname == "amt") {
-                num = parseFloat(rows[i].getData().amt);
-            }
-            else {
-                num = parseFloat(rows[i].getData().name);
-            }
-
-            let m = (num - min) / tdist * 256;
-            SQueryResults._results.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m, m, m);
-        }
-
-        let autoColors = [];
-        for (let i in SQueryResults._results.getCategoryHash()) {
-            autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
-        }
-        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
+        SQueryResults._results.calculateGradientData(pname,SQueryResults._tablePropertyAMT,SQueryResults._aggType);
+      
         SQueryResults._updateColorsInTable();
     }
 
@@ -345,18 +267,13 @@ export class SQueryResults {
         let sorter = undefined;
         if (SQueryResults._results.getTableProperty().indexOf("Date") != -1) {
             sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
-
                 let aDate = new Date(a);
                 let bDate = new Date(b);
 
-                if (aDate > bDate) {
-                    return 1;
-                }
-                if (aDate < bDate) {
-                    return -1;
-                }
+                if (aDate > bDate) return 1;
+                if (aDate < bDate) return -1;
+                
                 return 0;
-
             }
         }
 
@@ -503,6 +420,8 @@ export class SQueryResults {
             nodeids = SQueryResults._expandedNodeIds;
         }
 
+        this._expandedNodeIds = nodeids;
+
         if (SQueryResults._tablePropertyExpanded0.indexOf("Node Name") != -1) {
             SQueryResults._tablePropertyExpanded0 = "Node Type";
         }
@@ -546,24 +465,15 @@ export class SQueryResults {
         let title1 = SQueryResults._tablePropertyExpanded0;
 
         let sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
-
             let aDate = new Date(a);
             let bDate = new Date(b);
-            if (aDate == "Invalid Date") {
-                return -1;
-            }
-            if (bDate == "Invalid Date") {
-                return -1;
-            }
-
-            if (aDate > bDate) {
-                return 1;
-            }
-            if (aDate < bDate) {
-                return -1;
-            }
+            if (aDate == "Invalid Date") return -1;
+            if (bDate == "Invalid Date") return -1;
+            
+            if (aDate > bDate) return 1;
+            if (aDate < bDate) return -1;
+            
             return 0;
-
         }
 
         let columnMenu = [        
@@ -677,9 +587,9 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "auto");
         $("#" + SQueryResults._maindiv + "_found").empty();
-        if (founditems_in == undefined)
+        if (founditems_in == undefined) {
             return;
-
+        }
 
         let founditems = founditems_in.getItems();
 
