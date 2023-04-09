@@ -385,5 +385,5 @@ export class SQueryResult {
         propnames2.unshift("Node Name");
         return propnames2;
     }
-
+    
 }

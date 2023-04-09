@@ -46,7 +46,6 @@ export class SQueryResults {
         });
 
     }
-
     
     static getAmountStrings(items) {
 
@@ -69,9 +68,6 @@ export class SQueryResults {
         }
         return amountStrings;
     }
-
-   
-
    
     static _propertySelected() {
         SQueryResults._results.setTableProperty($("#SQueryPropSelect")[0].value);
@@ -90,7 +86,6 @@ export class SQueryResults {
         SQueryResults.generateExpandedResults();
 
     }
-
 
     static _propertyAggTypeSelected() {
         SQueryResults._aggType = $("#SQueryPropAggType")[0].value;
@@ -143,8 +138,6 @@ export class SQueryResults {
         SQueryResults._table.updateData(tdata);
     }
 
-
-
     static _assignExpandedColorsGradient(column) {
         let pname = column;
     
@@ -182,12 +175,10 @@ export class SQueryResults {
 
             let m = (num - min) / tdist * 256;
             tdata.push({id: rows[i].getData().id, colorsav:m,color: 'rgba(' + m + ',' + m + ',' + m + ',1)'});
-            
         }
 
         SQueryResults._table.updateData(tdata);
     }
-
 
     static applyExpandedColors() {
 
@@ -197,7 +188,6 @@ export class SQueryResults {
             SQueryEditor._viewer.model.setNodesFaceColor([rows[i].getData().id], new Communicator.Color(m, m, m));
         }
     }
-
 
     static _assignColorsGradient(column) {
         let pname = column;
@@ -249,7 +239,6 @@ export class SQueryResults {
             let m = (num - min) / tdist * 256;
             SQueryResults._results.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m, m, m);
         }
-
 
         let autoColors = [];
         for (let i in SQueryResults._results.getCategoryHash()) {
@@ -319,10 +308,7 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
 
-
-
         let amountStrings = SQueryResults.getAmountStrings(sortedStrings);
-
 
         let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
 
@@ -436,7 +422,6 @@ export class SQueryResults {
             });
         }
 
-
         let rowMenu = [
             {
                 label: "<i class='fas fa-user'></i> View Category",
@@ -464,8 +449,6 @@ export class SQueryResults {
             
         ];
 
-   
-
         SQueryResults._table = new Tabulator("#SQueryResultsTabulator", {
             rowHeight: 15,
             selectable: 0,
@@ -491,7 +474,6 @@ export class SQueryResults {
             }
 
         });
-
 
         SQueryResults._table.on("tableBuilt", function () {
 
@@ -551,12 +533,10 @@ export class SQueryResults {
             SQueryResults._tablePropertyExpanded0 = "Node Type";
         }
 
-    
         $("#" + SQueryResults._maindiv + "_searchitems").empty();
         $("#" + SQueryResults._maindiv + "_searchitems").css("overflow", "inherit");
         $("#" + SQueryResults._maindiv + "_found").empty();
         $("#SQueryResultsFirstRow").css("display", "none");
-
 
         let sortedStrings = SQueryResults._results.getAllProperties();
         sortedStrings.shift();
@@ -584,16 +564,10 @@ export class SQueryResults {
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
         }
         html += '</select></span>';
-        
-            
+         
         html += '</div>';
-
-
-
         $("#" + SQueryResults._maindiv + "_searchitems").append(html);
-
         $("#" + SQueryResults._maindiv + "_searchitems").append('<div class = "SQueryResultsTabulator" id = "SQueryResultsTabulator"></div>');
-
 
         let title1 = SQueryResults._tablePropertyExpanded0;
 
@@ -628,7 +602,6 @@ export class SQueryResults {
             
         ];
     
-        
         let tabulatorColumes = [{
             title: "Name", field: "name"
         },
@@ -690,12 +663,6 @@ export class SQueryResults {
             columns: tabulatorColumes,
         });
 
-        SQueryResults._table.on("rowClick", async function (e, row) {
-   //         let data = row.getData();          
-    //        SQueryResults._viewer.selectionManager.selectNode(parseInt(data.id), Communicator.SelectionMode.Set);        
-        });
-
-
         SQueryResults._table.on("rowSelectionChanged", async function (e, row) {
             var rows = SQueryResults._table.getSelectedData();
 
@@ -712,7 +679,6 @@ export class SQueryResults {
             }
                     
         });
-
 
         SQueryResults._table.on("tableBuilt", function () {
 
@@ -766,7 +732,6 @@ export class SQueryResults {
         });
     }
 
-
     static toggleView() {
         SQueryResults._isPropertyView = !SQueryResults._isPropertyView;
         if (SQueryResults._isPropertyView) {
@@ -776,7 +741,6 @@ export class SQueryResults {
             SQueryResults.generateSearchResults(SQueryEditor._founditems);
         }
     }
-
 
     static generateSearchResults(founditems_in) {
         SQueryResults._results = founditems_in;
