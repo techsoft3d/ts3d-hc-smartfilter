@@ -47,142 +47,7 @@ export class SQueryResults {
 
     }
 
-    static _findCategoryFromSearch() {
-
-        let query = SQueryEditor._mainFilter;
-        let searchresults = SQueryEditor._founditems.getItems();
-        SQueryResults._categoryHash = [];
-
-        if (SQueryResults._tableProperty) {
-            if (SQueryResults._tableProperty == "Node Name") {
-                for (let j = 0; j < searchresults.length; j++) {
-                    if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                        SQueryResults._categoryHash[searchresults[j].name] = { ids: [] };
-                    }
-                    SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
-                }
-            }
-            else if (SQueryResults._tableProperty == "Node Name (No :Ext)") {
-                for (let j = 0; j < searchresults.length; j++) {
-                    let name;
-                    let dindex = searchresults[j].name.lastIndexOf(":");
-                    if (dindex > -1) {
-                        name = searchresults[j].name.substring(0,dindex);
-                    }
-                    else {
-                        name = searchresults[j].name;
-                    }
-                    if (SQueryResults._categoryHash[name] == undefined) {
-                        SQueryResults._categoryHash[name] = { ids: [] };
-                    }
-                    SQueryResults._categoryHash[name].ids.push(searchresults[j].id);
-                }
-            }
-            else if (SQueryResults._tableProperty == "Node Name (No -Ext)") {
-                for (let j = 0; j < searchresults.length; j++) {
-                    let name;
-                    let dindex = searchresults[j].name.lastIndexOf("-");
-                    if (dindex > -1) {
-                        name = searchresults[j].name.substring(0,dindex);
-                    }
-                    else {
-                        name = searchresults[j].name;
-                    }
-                    if (SQueryResults._categoryHash[name] == undefined) {
-                        SQueryResults._categoryHash[name] = { ids: [] };
-                    }
-                    SQueryResults._categoryHash[name].ids.push(searchresults[j].id);
-                }
-            }
-            else if (SQueryResults._tableProperty == "Node Parent") {
-                for (let j = 0; j < searchresults.length; j++) {
-                    let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
-                    if (SQueryResults._categoryHash[nodename] == undefined) {
-                        SQueryResults._categoryHash[nodename] = { ids: [] };
-                    }
-                    SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
-                }
-            }
-            else if (SQueryResults._tableProperty == "Node Type") {
-                for (let j = 0; j < searchresults.length; j++) {
-                    let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
-                    if (SQueryResults._categoryHash[nodetype] == undefined) {
-                        SQueryResults._categoryHash[nodetype] = { ids: [] };
-                    }
-                    SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
-                }
-            }
-            else {
-                let propname = SQueryResults._tableProperty
-                for (let j = 0; j < searchresults.length; j++) {
-                    let id = searchresults[j].id;
-                    if (SQueryResults._manager._propertyHash[id][propname] != undefined) {
-                        if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] == undefined) {
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]] = { ids: [] };
-                        }
-                        SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][propname]].ids.push(searchresults[j].id);
-                    }
-                }
-            }
-        }
-        else {
-
-            for (let i = 0; i < query.getNumConditions(); i++) {
-                let condition = query.getCondition(i);
-                if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeName) {
-                    for (let j = 0; j < searchresults.length; j++) {
-                        if (SQueryResults._categoryHash[searchresults[j].name] == undefined) {
-                            SQueryResults._categoryHash[searchresults[j].name] = { ids: [] };
-                        }
-                        SQueryResults._categoryHash[searchresults[j].name].ids.push(searchresults[j].id);
-                    }
-                    SQueryResults._tableProperty = "Node Name";
-                    return;
-                }
-                else if (condition.relationship == hcSQuery.SQueryRelationshipType.nodeParent) {
-                    for (let j = 0; j < searchresults.length; j++) {
-                        let nodename = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(searchresults[j].id));
-                        if (SQueryResults._categoryHash[nodename] == undefined) {
-                            SQueryResults._categoryHash[nodename] = { ids: [] };
-                        }
-                        SQueryResults._categoryHash[nodename].ids.push(searchresults[j].id);
-                    }
-                    SQueryResults._tableProperty = "Node Parent";
-                    return;
-                }
-                else if (condition.propertyType == hcSQuery.SQueryPropertyType.nodeType) {
-                    for (let j = 0; j < searchresults.length; j++) {
-                        let nodetype = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(searchresults[j].id)];
-                        if (SQueryResults._categoryHash[nodetype] == undefined) {
-                            SQueryResults._categoryHash[nodetype] = { ids: [] };
-                        }
-                        SQueryResults._categoryHash[nodetype].ids.push(searchresults[j].id);
-                    }
-                    SQueryResults._tableProperty = "Node Type";
-                    return;
-                }
-                else if (condition.propertyType == hcSQuery.SQueryPropertyType.property) {
-                    let propname = condition.propertyName;
-                    for (let j = 0; j < searchresults.length; j++) {
-                        let id = searchresults[j].id;
-                        if (SQueryResults._manager._propertyHash[id][condition.propertyName] != undefined) {
-                            if (SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] == undefined) {
-                                SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]] = { ids: [] };
-                            }
-                            SQueryResults._categoryHash[SQueryResults._manager._propertyHash[id][condition.propertyName]].ids.push(searchresults[j].id);
-                        }
-                    }
-                    SQueryResults._tableProperty = propname;
-                    return;
-                }
-            }
-            SQueryResults._tableProperty = "Node Name";
-            SQueryResults._findCategoryFromSearch();
-
-        }
-    }
-
-
+    
     static getAmountStrings(items) {
 
         let amountStrings = [];
@@ -256,7 +121,7 @@ export class SQueryResults {
     }
 
     static _propertySelected() {
-        SQueryResults._tableProperty = $("#SQueryPropSelect")[0].value;
+        SQueryResults._results.setTableProperty($("#SQueryPropSelect")[0].value);
         SQueryEditor._mainFilter.setAutoColors(null, null);
         SQueryResults._generatePropertyView();
 
@@ -291,9 +156,9 @@ export class SQueryResults {
         if (!autoColors) {
             return;
         }
-        for (let i in SQueryResults._categoryHash) {
+        for (let i in SQueryResults._results.getCategoryHash()) {
             if (autoColors[i]) {
-                SQueryEditor._viewer.model.setNodesFaceColor(SQueryResults._categoryHash[i].ids, autoColors[i]);
+                SQueryEditor._viewer.model.setNodesFaceColor(SQueryResults._results.getCategoryHash()[i].ids, autoColors[i]);
             }
         }
     }
@@ -308,21 +173,21 @@ export class SQueryResults {
         let delta = 256/rows.length;
         for (let i=0;i<rows.length;i++) {
             let m = delta * rows[i].getPosition();
-            SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m,m,m);
+            SQueryResults._results.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m,m,m);
         }
 
         let autoColors = [];
-        for (let i in SQueryResults._categoryHash) {
-            autoColors[i] = SQueryResults._categoryHash[i].color;
+        for (let i in SQueryResults._results.getCategoryHash()) {
+            autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
         }
-        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
         SQueryResults._updateColorsInTable();
     }
 
     static _updateColorsInTable() {
         let tdata = [];
-        for (let i in SQueryResults._categoryHash) {
-            let color = SQueryResults._categoryHash[i].color;
+        for (let i in SQueryResults._results.getCategoryHash()) {
+            let color = SQueryResults._results.getCategoryHash()[i].color;
             let data = { color: 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)',id: i };
             tdata.push(data);
         }
@@ -388,11 +253,11 @@ export class SQueryResults {
     static _assignColorsGradient(column) {
         let pname = column;
         if (column == "name") {
-            if (!SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+            if (!SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
                 SQueryResults._assignColorsMainGradient();
                 return;
             }
-            pname = SQueryResults._tableProperty;
+            pname = SQueryResults._results.getTableProperty();
         }
 
     
@@ -433,31 +298,31 @@ export class SQueryResults {
             }
 
             let m = (num - min) / tdist * 256;
-            SQueryResults._categoryHash[rows[i].getData().id].color = new Communicator.Color(m, m, m);
+            SQueryResults._results.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m, m, m);
         }
 
 
         let autoColors = [];
-        for (let i in SQueryResults._categoryHash) {
-            autoColors[i] = SQueryResults._categoryHash[i].color;
+        for (let i in SQueryResults._results.getCategoryHash()) {
+            autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
         }
-        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
         SQueryResults._updateColorsInTable();
     }
 
 
     static assignColorsRandom() {
-        for (let i in SQueryResults._categoryHash) {
+        for (let i in SQueryResults._results.getCategoryHash()) {
             let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
-            SQueryResults._categoryHash[i].color = color;
+            SQueryResults._results.getCategoryHash()[i].color = color;
         }
 
         let autoColors = [];
-        for (let i in SQueryResults._categoryHash) {
-            autoColors[i] = SQueryResults._categoryHash[i].color;
+        for (let i in SQueryResults._results.getCategoryHash()) {
+            autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
         }
 
-        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+        SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
         SQueryResults._updateColorsInTable();
 
     }
@@ -465,8 +330,8 @@ export class SQueryResults {
     static _clearColors() {
         SQueryEditor._mainFilter.setAutoColors(null,null);
         let tdata = [];
-        for (let i in SQueryResults._categoryHash) {
-            SQueryResults._categoryHash[i].color = undefined;
+        for (let i in SQueryResults._results.getCategoryHash()) {
+            SQueryResults._results.getCategoryHash()[i].color = undefined;
             let data = { color: null,id: i };
             tdata.push(data);
         }
@@ -477,26 +342,26 @@ export class SQueryResults {
 
         $("#SQueryResultsFirstRow").css("display", "block");
         if (SQueryEditor._mainFilter.getAutoColorProperty()) {
-            SQueryResults._tableProperty = SQueryEditor._mainFilter.getAutoColorProperty();
+            SQueryResults._results.setTableProperty(SQueryEditor._mainFilter.getAutoColorProperty());
         }
 
         let sortedStrings = SQueryResults.getAllProperties();
 
         if (!redrawOnly) {
             let found = false;
-            if (SQueryResults._tableProperty) {
+            if (SQueryResults._results.getTableProperty()) {
                 for (let i = 0; i < sortedStrings.length; i++) {
-                    if (sortedStrings[i] == SQueryResults._tableProperty) {
+                    if (sortedStrings[i] == SQueryResults._results.getTableProperty()) {
                         found = true;
                         break;
                     }
                 }
             }
             if (!found) {
-                SQueryResults._tableProperty = null;
+                SQueryResults._results.setTableProperty(null);
             }
 
-            SQueryResults._findCategoryFromSearch();
+            SQueryResults._results.findCategoryFromSearch();
         }
 
         $("#SQueryToggleViewButton").html("Search View");
@@ -513,7 +378,7 @@ export class SQueryResults {
         let html = '<div style="height:25px;"><span style="top:-16px;position:relative"><span style="font-family:courier">Prop:</span><select id="SQueryPropSelect" onchange=\'hcSQueryUI.SQueryResults._propertySelected();\' class="SQueryPropertyResultsSelect" value="">';
 
         for (let i = 0; i < sortedStrings.length; i++) {
-            if (SQueryResults._tableProperty == sortedStrings[i])
+            if (SQueryResults._results.getTableProperty() == sortedStrings[i])
                 html += '<option value="' + sortedStrings[i] + '" selected>' + sortedStrings[i] + '</option>\n';
             else
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
@@ -545,7 +410,7 @@ export class SQueryResults {
 
 
         let sorter = undefined;
-        if (SQueryResults._tableProperty.indexOf("Date") != -1) {
+        if (SQueryResults._results.getTableProperty().indexOf("Date") != -1) {
             sorter = function(a, b, aRow, bRow, column, dir, sorterParams) {
 
                 let aDate = new Date(a);
@@ -584,10 +449,10 @@ export class SQueryResults {
             
         ];
 
-        let firstColumnTitle = SQueryResults._tableProperty;
-        if (SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+        let firstColumnTitle = SQueryResults._results.getTableProperty();
+        if (SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
 
-            let unit = SQueryResults._getAMTUnit(SQueryResults._tableProperty);
+            let unit = SQueryResults._getAMTUnit(SQueryResults._results.getTableProperty());
             if (unit) {
                 firstColumnTitle = "(" + unit + ")";
             }            
@@ -627,9 +492,9 @@ export class SQueryResults {
             {
                 label: "<i class='fas fa-user'></i> View Category",
                 action: async function (e, row) {
-                    let ids = SQueryResults._categoryHash[row.getData().id].ids;
+                    let ids = SQueryResults._results.getCategoryHash()[row.getData().id].ids;
                     
-                    SQueryResults._tablePropertyExpanded0 = SQueryResults._tableProperty;
+                    SQueryResults._tablePropertyExpanded0 = SQueryResults._results.getTableProperty();
                     SQueryResults._tablePropertyExpanded1 = SQueryResults._tablePropertyAMT;
                     SQueryResults.generateExpandedResults(ids);
                 }
@@ -642,7 +507,7 @@ export class SQueryResults {
                     for (let i = 0; i < searchresults.length; i++) {
                         ids.push(searchresults[i].id);
                     }
-                    SQueryResults._tablePropertyExpanded0 = SQueryResults._tableProperty;
+                    SQueryResults._tablePropertyExpanded0 = SQueryResults._results.getTableProperty();
                     SQueryResults._tablePropertyExpanded1 = SQueryResults._tablePropertyAMT;
                     SQueryResults.generateExpandedResults(ids);
                 }
@@ -663,7 +528,7 @@ export class SQueryResults {
         SQueryResults._table.on("rowClick", async function (e, row) {
             let data = row.getData();
 
-            let ids = SQueryResults._categoryHash[data.id].ids;
+            let ids = SQueryResults._results.getCategoryHash()[data.id].ids;
             SQueryResults._viewer.selectionManager.clear();
             if (ids.length == 1) {
                 SQueryResults._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
@@ -684,22 +549,22 @@ export class SQueryResults {
             let tdata = [];
             let autoColors = SQueryEditor._mainFilter.getAutoColors();
             if (autoColors) {
-                for (let i in SQueryResults._categoryHash) {
+                for (let i in SQueryResults._results.getCategoryHash()) {
                     if (!autoColors[i]) {
-                        autoColors[i] = SQueryResults._categoryHash[i].color;
+                        autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
                     }
                 }
             }
 
-            for (let i in SQueryResults._categoryHash) {
+            for (let i in SQueryResults._results.getCategoryHash()) {
                 let color = autoColors ? autoColors[i] : null;
                 let column1name = i;
-                if (SQueryResults.isNumberProp(SQueryResults._tableProperty)) {
+                if (SQueryResults.isNumberProp(SQueryResults._results.getTableProperty())) {
                     column1name = parseFloat(i);
                 }
-                let data = { name: column1name, num: SQueryResults._categoryHash[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
+                let data = { name: column1name, num: SQueryResults._results.getCategoryHash()[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
                 if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
-                    let amount = SQueryResults._calculateAMT(SQueryResults._categoryHash[i].ids);
+                    let amount = SQueryResults._calculateAMT(SQueryResults._results.getCategoryHash()[i].ids);
                     data.amt = amount;
                 }
 
@@ -713,7 +578,7 @@ export class SQueryResults {
                 let autoColors = SQueryEditor._mainFilter.getAutoColors();
                 if (!autoColors) {
                     autoColors = [];
-                    SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._tableProperty);
+                    SQueryEditor._mainFilter.setAutoColors(autoColors, SQueryResults._results.getTableProperty());
                 }
                 let data = cell.getRow().getData();
                 autoColors[data.name] = SQueryResults._convertColor(data.color);
@@ -1069,6 +934,7 @@ export class SQueryResults {
 
 
     static generateSearchResults(founditems_in) {
+        SQueryResults._results = founditems_in;
         $("#SQueryResultsFirstRow").css("display", "block");
         $("#SQueryToggleViewButton").html("Property View");
         SQueryResults._isPropertyView = false;
@@ -1077,6 +943,7 @@ export class SQueryResults {
         $("#" + SQueryResults._maindiv + "_found").empty();
         if (founditems_in == undefined)
             return;
+
 
         let founditems = founditems_in.getItems();
 
