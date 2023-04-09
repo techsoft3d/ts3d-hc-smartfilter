@@ -954,7 +954,7 @@ export class SQuery {
         if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
             return;
         }
-        let nl = this._viewer.model.getNodeName(id);
+        let nl = this._viewer.model.getNodeName(id) + ">";
         if (id != startid) {
             if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);
