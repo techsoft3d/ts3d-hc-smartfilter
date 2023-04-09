@@ -385,5 +385,83 @@ export class SQueryResult {
         propnames2.unshift("Node Name");
         return propnames2;
     }
-    
+
+    getCategoryTableData(tablePropertyAMT, aggType) {
+
+        let tdata = [];
+        let autoColors = this._query.getAutoColors();
+        if (autoColors) {
+            for (let i in this._categoryHash) {
+                if (!autoColors[i]) {
+                    autoColors[i] = this._categoryHash[i].color;
+                }
+            }
+        }
+
+        for (let i in this._categoryHash) {
+            let color = autoColors ? autoColors[i] : null;
+            let column1name = i;
+            if (this.isNumberProp(this.getTableProperty())) {
+                column1name = parseFloat(i);
+            }
+            let data = { name: column1name, num: this._categoryHash[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
+            if (tablePropertyAMT != "--EMPTY--") {
+                let amount = this.calculateAMT(tablePropertyAMT,this._categoryHash[i].ids, aggType);
+                data.amt = amount;
+            }
+
+            tdata.push(data);
+        }
+
+        return tdata;
+    }
+
+    getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
+        let tdata = [];
+        for (let i=0;i<nodeids.length;i++) {
+            let name = this._viewer.model.getNodeName(nodeids[i]);
+            let prop1;
+            if (tablePropertyExpanded0.indexOf("Node Name") != -1 || tablePropertyExpanded0.indexOf("Node Type") != -1) {
+                prop1 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
+            }
+            else if (tablePropertyExpanded0.indexOf("Node Parent") != -1) {
+                prop1 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
+            }
+            else if (this.isNumberProp(tablePropertyExpanded0)) {
+                prop1 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0]);
+                if (isNaN(prop1)) {
+                    prop1 = "Not Defined";
+                }
+            }
+            else {
+                prop1 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0];
+            }
+            if (prop1 == undefined) {
+                prop1 = "Not Defined";
+            }
+            let data = { name:name , id: nodeids[i], prop1:prop1};
+            if (tablePropertyExpanded1 != "--EMPTY--") {
+                if (tablePropertyExpanded1.indexOf("Node Name") != -1 || tablePropertyExpanded1.indexOf("Node Type") != -1) {
+                    data.prop2 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
+                }
+                else if (tablePropertyExpanded1.indexOf("Node Parent") != -1) {
+                    data.prop2 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
+                }
+                else if (this.isNumberProp(tablePropertyExpanded1)) {
+                    data.prop2 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1]);
+                    if (isNaN(data.prop2)) {
+                        data.prop2 = "Not Defined";
+                    }
+                }
+                else {
+                    data.prop2 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1];
+                    if (data.prop2 == undefined) {
+                        data.prop2 = "Not Defined";
+                    }
+                }                    
+            }
+            tdata.push(data);
+        }
+        return tdata;
+    }
 }

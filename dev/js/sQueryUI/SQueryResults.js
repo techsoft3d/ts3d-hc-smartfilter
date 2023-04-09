@@ -181,7 +181,6 @@ export class SQueryResults {
     }
 
     static applyExpandedColors() {
-
         let rows = SQueryResults._table.getRows();
         for (let i = 0; i < rows.length; i++) {
             let m = rows[i].getData().colorsav;
@@ -199,7 +198,6 @@ export class SQueryResults {
             pname = SQueryResults._results.getTableProperty();
         }
 
-    
         let rows = SQueryResults._table.getRows();
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
@@ -476,31 +474,7 @@ export class SQueryResults {
         });
 
         SQueryResults._table.on("tableBuilt", function () {
-
-            let tdata = [];
-            let autoColors = SQueryEditor._mainFilter.getAutoColors();
-            if (autoColors) {
-                for (let i in SQueryResults._results.getCategoryHash()) {
-                    if (!autoColors[i]) {
-                        autoColors[i] = SQueryResults._results.getCategoryHash()[i].color;
-                    }
-                }
-            }
-
-            for (let i in SQueryResults._results.getCategoryHash()) {
-                let color = autoColors ? autoColors[i] : null;
-                let column1name = i;
-                if (SQueryResults._results.isNumberProp(SQueryResults._results.getTableProperty())) {
-                    column1name = parseFloat(i);
-                }
-                let data = { name: column1name, num: SQueryResults._results.getCategoryHash()[i].ids.length, color: color ? 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)' : "", id: i };
-                if (SQueryResults._tablePropertyAMT != "--EMPTY--") {
-                    let amount = SQueryResults._results.calculateAMT(SQueryResults._tablePropertyAMT,SQueryResults._results.getCategoryHash()[i].ids, SQueryResults._aggType);
-                    data.amt = amount;
-                }
-
-                tdata.push(data);
-            }
+            let tdata = SQueryResults._results.getCategoryTableData(SQueryResults._tablePropertyAMT,SQueryResults._aggType);
             SQueryResults._table.setData(tdata);
         });
 
@@ -599,7 +573,6 @@ export class SQueryResults {
                     SQueryResults._assignExpandedColorsGradient(column.getDefinition().field);
                 }
             },
-            
         ];
     
         let tabulatorColumes = [{
@@ -681,53 +654,7 @@ export class SQueryResults {
         });
 
         SQueryResults._table.on("tableBuilt", function () {
-
-            let tdata = [];
-            for (let i=0;i<nodeids.length;i++) {
-                let name = SQueryResults._viewer.model.getNodeName(nodeids[i]);
-                let prop1;
-                if (SQueryResults._tablePropertyExpanded0.indexOf("Node Name") != -1 || SQueryResults._tablePropertyExpanded0.indexOf("Node Type") != -1) {
-                    prop1 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
-                }
-                else if (SQueryResults._tablePropertyExpanded0.indexOf("Node Parent") != -1) {
-                    prop1 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
-                }
-                else if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded0)) {
-                    prop1 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0]);
-                    if (isNaN(prop1)) {
-                        prop1 = "Not Defined";
-                    }
-                }
-                else {
-                    prop1 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded0];
-                }
-                if (prop1 == undefined) {
-                    prop1 = "Not Defined";
-                }
-                let data = { name:name , id: nodeids[i], prop1:prop1};
-                if (SQueryResults._tablePropertyExpanded1 != "--EMPTY--") {
-                    if (SQueryResults._tablePropertyExpanded1.indexOf("Node Name") != -1 || SQueryResults._tablePropertyExpanded1.indexOf("Node Type") != -1) {
-                        data.prop2 = Communicator.NodeType[SQueryResults._viewer.model.getNodeType(nodeids[i])];
-                    }
-                    else if (SQueryResults._tablePropertyExpanded1.indexOf("Node Parent") != -1) {
-                        data.prop2 = SQueryResults._viewer.model.getNodeName(SQueryResults._viewer.model.getNodeParent(nodeids[i]));
-                    }
-                    else if (SQueryResults._results.isNumberProp(SQueryResults._tablePropertyExpanded1)) {
-                        data.prop2 = parseFloat(SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1]);
-                        if (isNaN(data.prop2)) {
-                            data.prop2 = "Not Defined";
-                        }
-                    }
-                    else {
-                        data.prop2 = SQueryResults._manager._propertyHash[nodeids[i]][SQueryResults._tablePropertyExpanded1];
-                        if (data.prop2 == undefined) {
-                            data.prop2 = "Not Defined";
-                        }
-                    }                    
-                }
-                tdata.push(data);
-            }
-
+            let tdata = SQueryResults._results.getExpandedTableData(nodeids,SQueryResults._tablePropertyExpanded0,SQueryResults._tablePropertyExpanded1);
             SQueryResults._table.setData(tdata);
         });
     }
