@@ -948,14 +948,26 @@ export class SQuery {
                 condition.text = conditions[i].text;
                 condition.conditionType = conditions[i].conditionType;
 
+                let numfound = 0;
                 for (let j = 0; j < conditions[i].wildcardArray.length; j++) {
                     condition.propertyName = conditions[i].wildcardArray[j];
                     res = await this._checkCondition(id, condition, chaintext);
                     if (res == true) {
-                        break;
+                        if (condition.conditionType == SQueryConditionType.contains || condition.conditionType == SQueryConditionType.exists) {
+                            break;
+                        }
+                        numfound++;
                     }
                 }
 
+                if (condition.conditionType == SQueryConditionType.notExists) {
+                    if (numfound == conditions[i].wildcardArray.length) {
+                        res = true;
+                    }
+                    else {
+                        res = false;
+                    }
+                }
             }
             else {
                 if (conditions[i].childFilter) {

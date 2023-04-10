@@ -501,7 +501,7 @@ export class SQueryResultsUI {
         if (SQueryResultsUI._results.isNumberProp(SQueryResultsUI._tablePropertyExpanded0)) {
             let unit = SQueryResultsUI._results.getAMTUnit(SQueryResultsUI._tablePropertyExpanded0);
             if (unit) {
-                unitTitle = SQueryResultsUI._tablePropertyExpanded0 + "(" + unit + ")";
+                unitTitle = "(" + unit + ")";
                 bcalc = "sum";
             }
             else {
@@ -523,7 +523,7 @@ export class SQueryResultsUI {
             if (SQueryResultsUI._results.isNumberProp(SQueryResultsUI._tablePropertyExpanded1)) {
                 let unit = SQueryResultsUI._results.getAMTUnit(SQueryResultsUI._tablePropertyExpanded1);
                 if (unit) {
-                    unitTitle = SQueryResultsUI._tablePropertyExpanded1 + "(" + unit + ")";
+                    unitTitle = "(" + unit + ")";
                     bcalc2 = "sum";
                 }
                 else {
