@@ -105,7 +105,31 @@ export class SQueryResult {
         this._categoryHash = [];
 
         if (this._tableProperty) {
-            if (this._tableProperty == "Node Name") {
+            if (this._tableProperty.slice(-2) == "/*") { 
+                let wildcardString = this._tableProperty.slice(0, -2); 
+                let wildcardArray = [];
+                for (let j in this._manager._allPropertiesHash) {
+
+                    if (j.indexOf(wildcardString) != -1 && j.indexOf("/*") == -1) {
+                        wildcardArray.push(j);
+                    }
+                }
+                for (let k=0;k<wildcardArray.length;k++) {
+                    let propname = wildcardArray[k]
+                    for (let j = 0; j < searchresults.length; j++) {
+                        let id = searchresults[j].id;
+                        
+                        if (this._manager._propertyHash[id][propname] != undefined) {
+                            let pname = propname.substring(wildcardString.length+1) + "/" + this._manager._propertyHash[id][propname];
+                            if (this._categoryHash[pname] == undefined) {
+                                this._categoryHash[pname] = { ids: [] };
+                            }
+                            this._categoryHash[pname].ids.push(searchresults[j].id);
+                        }
+                    }
+                }
+            }
+            else if (this._tableProperty == "Node Name") {
                 for (let j = 0; j < searchresults.length; j++) {
                     if (this._categoryHash[searchresults[j].name] == undefined) {
                         this._categoryHash[searchresults[j].name] = { ids: [] };
@@ -180,7 +204,25 @@ export class SQueryResult {
 
             for (let i = 0; i < query.getNumConditions(); i++) {
                 let condition = query.getCondition(i);
-                if (condition.propertyType == SQueryPropertyType.nodeName) {
+                if (condition.wildcardString) {
+                    for (let k=0;k<condition.wildcardArray.length;k++) {
+                        let propname = condition.wildcardArray[k]
+                        for (let j = 0; j < searchresults.length; j++) {
+                            let id = searchresults[j].id;
+                            
+                            if (this._manager._propertyHash[id][propname] != undefined) {
+                                let pname = propname.substring(condition.wildcardString.length+1) + "/" + this._manager._propertyHash[id][propname];
+                                if (this._categoryHash[pname] == undefined) {
+                                    this._categoryHash[pname] = { ids: [] };
+                                }
+                                this._categoryHash[pname].ids.push(searchresults[j].id);
+                            }
+                        }
+                    }
+                    this._tableProperty = condition.propertyName;
+                    return;
+                }
+                else if (condition.propertyType == SQueryPropertyType.nodeName) {
                     for (let j = 0; j < searchresults.length; j++) {
                         if (this._categoryHash[searchresults[j].name] == undefined) {
                             this._categoryHash[searchresults[j].name] = { ids: [] };
@@ -382,6 +424,13 @@ export class SQueryResult {
         propnames2.unshift("Node Name (No -Ext)");
         propnames2.unshift("Node Name (No :Ext)");
         propnames2.unshift("Node Name");
+
+        for (let i=0;i<propnames2.length;i++) {
+            if (propnames2[i].indexOf("Materials and Finishes/") != -1) {
+                propnames2.splice(i,0,"Materials and Finishes/*");
+                break;
+            }
+        }
         return propnames2;
     }
 

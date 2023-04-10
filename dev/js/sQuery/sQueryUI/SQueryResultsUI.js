@@ -342,8 +342,13 @@ export class SQueryResultsUI {
                 label: "<i class='fas fa-user'></i> View Category",
                 action: async function (e, row) {
                     let ids = SQueryResultsUI._results.getCategoryHash()[row.getData().id].ids;
-                    
-                    SQueryResultsUI._tablePropertyExpanded0 = SQueryResultsUI._results.getTableProperty();
+                    if  (SQueryResultsUI._results.getTableProperty().slice(-2) == "/*") { 
+                        let rd = row.getData().id.split("/");
+                        SQueryResultsUI._tablePropertyExpanded0 = SQueryResultsUI._results.getTableProperty().slice(0, -2) + "/" + rd[0];
+                    }
+                    else {
+                        SQueryResultsUI._tablePropertyExpanded0 = SQueryResultsUI._results.getTableProperty();
+                    }
                     SQueryResultsUI._tablePropertyExpanded1 = SQueryResultsUI._tablePropertyAMT;
                     SQueryResultsUI.generateExpandedResults(ids);
                 }
