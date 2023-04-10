@@ -525,6 +525,15 @@ export class SQueryManager {
         propsnames.unshift("Node Chain");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
+
+     
+        for (let i=0;i<propsnames.length;i++) {
+            if (propsnames[i].indexOf("Materials and Finishes/") != -1) {
+                propsnames.splice(i,0,"Materials and Finishes/*");
+                break;
+
+            }
+        }
         return propsnames;
     }
 

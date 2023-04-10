@@ -291,7 +291,17 @@ export class SQuery {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
+
+            if (conditions[i].propertyName.slice(-2) == "/*") {
+                conditions[i].wildcardString = conditions[i].propertyName.slice(0, -2); 
+            }
+            else {
+                conditions[i].wildcardString = null;
+            }
+            conditions[i].wildcardArray = null;
         }
+       
+
         let matchingnodes = [];
         if (limitlist.length == 0) {
             if (this._startnode == this._viewer.model.getRootNode())
@@ -921,6 +931,31 @@ export class SQuery {
                 if (conditions[i].conditionType == SQueryConditionType.unequal) {
                     res = !res;
                 }
+            }
+            else if (conditions[i].wildcardString) {
+                if (!conditions[i].wildcardArray) {
+                    conditions[i].wildcardArray = [];
+                    for (let j in this._manager._allPropertiesHash) {
+
+                        if (j.indexOf(conditions[i].wildcardString) != -1 && j.indexOf("/*") == -1) {
+                            conditions[i].wildcardArray.push(j);
+                        }
+                    }
+                }
+                let condition = new SQueryCondition();
+
+                condition.propertyType = conditions[i].type;
+                condition.text = conditions[i].text;
+                condition.conditionType = conditions[i].conditionType;
+
+                for (let j = 0; j < conditions[i].wildcardArray.length; j++) {
+                    condition.propertyName = conditions[i].wildcardArray[j];
+                    res = await this._checkCondition(id, condition, chaintext);
+                    if (res == true) {
+                        break;
+                    }
+                }
+
             }
             else {
                 if (conditions[i].childFilter) {
