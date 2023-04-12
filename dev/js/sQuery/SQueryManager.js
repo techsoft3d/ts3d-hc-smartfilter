@@ -544,7 +544,13 @@ export class SQueryManager {
             if (propsnames[i].indexOf("Materials and Finishes/") != -1) {
                 propsnames.splice(i,0,"Materials and Finishes/*");
                 break;
+            }
+        }
 
+        for (let i=0;i<propsnames.length;i++) {
+            if (propsnames[i].indexOf("Other/") != -1) {
+                propsnames.splice(i,0,"Other/*");
+                break;
             }
         }
         return propsnames;

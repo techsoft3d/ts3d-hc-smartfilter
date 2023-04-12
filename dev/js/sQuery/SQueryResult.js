@@ -431,6 +431,12 @@ export class SQueryResult {
                 break;
             }
         }
+        for (let i=0;i<propnames2.length;i++) {
+            if (propnames2[i].indexOf("Other/") != -1) {
+                propnames2.splice(i,0,"Other/*");
+                break;
+            }
+        }
         return propnames2;
     }
 
