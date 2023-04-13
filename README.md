@@ -84,8 +84,9 @@ Add `dist/squery.min.js` to your project
     <script src="./js/squery.min.js"></script>
 ```
 
-If you are using the UI component of the library you also need to add `dist/squeryui.css` to your project:
+If you are using the UI component of the library you also need to include the tabulator library (tested with version 5.4.4) and add `dist/squeryui.css` to your project which contains a custom tabulator theme.
 ```
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="./css/squeryui.css">
 ```
 
