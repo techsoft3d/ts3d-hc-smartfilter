@@ -12,6 +12,14 @@ export class SQueryResultsUI {
         SQueryResultsUI._tablePropertyExpanded1 = "--EMPTY--";
         SQueryResultsUI._tablePropertyExpanded2 = "--EMPTY--";
 
+        SQueryResultsUI._viewer.setCallbacks({
+            selectionArray: function (selarray, removed) {
+                if (!SQueryResultsUI._isPropertyView) {
+                    SQueryResultsUI.generateSearchResults(SQueryEditorUI._founditems);
+                }
+            },
+        });
+
     }
 
     static async display() {
