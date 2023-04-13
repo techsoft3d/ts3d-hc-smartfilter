@@ -408,9 +408,9 @@ export class SQueryResultsUI {
                     SQueryEditorUI._mainFilter.setAutoColors(autoColors, SQueryResultsUI._results.getTableProperty());
                 }
                 let data = cell.getRow().getData();
-                autoColors[data.name] = SQueryResultsUI._results.convertColor(data.color);
+                autoColors[data.id] = SQueryResultsUI._results.convertColor(data.color);
             }
-            SQueryManagerUI._table.redraw();
+            SQueryResultsUI._table.redraw();
         });      
     }
 
@@ -621,17 +621,29 @@ export class SQueryResultsUI {
             if (SQueryResultsUI._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(founditems[i].id))) {
                 let parent = SQueryResultsUI._viewer.model.getNodeParent(founditems[i].id);
                 if (SQueryResultsUI._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(parent))) {
-                    html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
+                    if (toggle) {
+                        html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect">';
+                    }
+                    else {
+                        html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselectedIndirect2">';
+                    }
                 }
                 else {
-                    html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselected">';
+                    if (toggle) {
+                        html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselected">';
+                    }
+                    else {
+                        html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItemselected2">';
+                    }
                 }
             }
             else {
-                if (toggle)
+                if (toggle) {
                     html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItem1">';
-                else
+                }
+                else {
                     html += '<div onclick=\'hcSQuery.SQueryResultsUI._select("' + founditems[i].id + '")\' class="SQuerySearchItem2">';
+                }
             }
 
             html += '<div class="SQuerySearchItemText">' + SQueryEditorUI._htmlEncode(founditems[i].name) + '</div>';

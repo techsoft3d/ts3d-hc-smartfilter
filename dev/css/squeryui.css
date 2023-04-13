@@ -27,9 +27,19 @@
     background-color:rgb(200,200,0); 
   }
 
+  .SQuerySearchItemselected2 {
+    background-color:rgb(200,175,0); 
+  }
+
+
   .SQuerySearchItemselectedIndirect {
     background-color:rgb(255,255,128); 
   }
+
+  .SQuerySearchItemselectedIndirect2 {
+    background-color:rgb(255,232,128); 
+  }
+
 
 
   .SQueryRelationshipTag {
