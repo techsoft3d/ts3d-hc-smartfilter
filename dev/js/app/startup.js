@@ -103,26 +103,6 @@ function createUILayout() {
     });
     myLayout.init();
 
-    var viewermenu = [
-        {
-            name: 'Toggle Allow Body Nodes',
-            fun: function () {
-                myMaterialTool.setDisallowBodyNodes(!myMaterialTool.getDisallowBodyNodes());
-            }
-        },
-        {
-            name: 'Display Stats',
-            fun: function () {
-                hwv.view.setStatisticsDisplayVisibility(true);
-            }
-        },            
-    ];
-
-    $('#viewermenu1button').contextMenu(viewermenu, undefined, {
-        'displayAround': 'trigger',
-        'containment': '#viewerContainer'
-    });
-
 
 }
 

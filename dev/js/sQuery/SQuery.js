@@ -44,7 +44,7 @@ export class SQuery {
     }
 
 
-    setAutoColors(autoColors, property) {
+    setAutoColors(autoColors = null, property=null) {
         this._autoColors = autoColors;
         this._autoColorsProperty = property;
     }
