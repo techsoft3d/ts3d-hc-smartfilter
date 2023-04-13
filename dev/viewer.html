@@ -46,7 +46,7 @@
 
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
      
-    <link rel="stylesheet" href="css/squeryui.css" type="text/css" />
+    <link rel="stylesheet" href="css/hcSmartSearchUI.css" type="text/css" />
     
     <link rel="stylesheet" href="css/Relationships.css" type="text/css" />
 
@@ -56,10 +56,10 @@
     
     <script type="module" id="viewerStartup">
 
-      import * as hcSQuery from './js/sQuery/hcSQuery.js';
+      import * as hcSmartSearch from './js/SmartSearch/hcSmartSearch.js';
     
 
-      window.hcSQuery = hcSQuery;
+      window.hcSmartSearch = hcSmartSearch;
     
 
       let md = new MobileDetect(window.navigator.userAgent);
@@ -1208,8 +1208,8 @@
     </div>
 </div>
 
-<div id="squeryfilterscontainer" style="width:100%;height:100%;position:relative"></div>
-<div id="squerypropertiescontainer" style="width:100%;height:100%;position:relative"></div>
+<div id="SmartSearchfilterscontainer" style="width:100%;height:100%;position:relative"></div>
+<div id="SmartSearchpropertiescontainer" style="width:100%;height:100%;position:relative"></div>
 
   </body>
 </html>
