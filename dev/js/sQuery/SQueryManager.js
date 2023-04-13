@@ -8,8 +8,16 @@ export class SQueryManager {
         this._modelHash = [];
         this._keepSearchingChildren = true;
         this._searchVisible = false;
+        this._ignoreBodies = false;
     }
 
+    setIgnoreBodies(ignoreBodies) {
+        this._ignoreBodies = ignoreBodies;
+    }
+
+    getIgnoreBodies() {
+        return this._ignoreBodies;
+    }
 
     setSearchVisible(onoff) {
         this._searchVisible = onoff;        
@@ -156,8 +164,13 @@ export class SQueryManager {
 
     _getModelTreeIdsRecursive(nodeid,proms, ids) {
 
+        if (this._ignoreBodies && this._viewer.model.getNodeType(nodeid) == Communicator.NodeType.BodyInstance) {
+            return;
+        }
+
         proms.push(this._viewer.model.getNodeProperties(nodeid));
         ids.push(nodeid);
+
         let children = this._viewer.model.getNodeChildren(nodeid);
         for (let i = 0; i < children.length; i++) {
             this._getModelTreeIdsRecursive(children[i],proms, ids);
@@ -393,10 +406,10 @@ export class SQueryManager {
             let ids = [];
 
             this._getModelTreeIdsRecursive(this._viewer.model.getRootNode(), proms, ids);
-            let res = await Promise.all(proms);
-            this._updateHashes(ids, res, layernames);
-
+            let res = await Promise.all(proms);  
+            this._updateHashes(ids, res, layernames);         
             this._consolidateBodies();
+          
         }
         else {
             for (let i = 0; i < this._modelHash.length; i++) {
@@ -525,6 +538,21 @@ export class SQueryManager {
         propsnames.unshift("Node Chain");
         propsnames.unshift("Nodeid");
         propsnames.unshift("Node Name");
+
+     
+        for (let i=0;i<propsnames.length;i++) {
+            if (propsnames[i].indexOf("Materials and Finishes/") != -1) {
+                propsnames.splice(i,0,"Materials and Finishes/*");
+                break;
+            }
+        }
+
+        for (let i=0;i<propsnames.length;i++) {
+            if (propsnames[i].indexOf("Other/") != -1) {
+                propsnames.splice(i,0,"Other/*");
+                break;
+            }
+        }
         return propsnames;
     }
 

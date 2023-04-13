@@ -1,5 +1,8 @@
 # SQuerys
 
+## Version Update (1.1.0)
+* UI included in main library
+* Many other improvements and fixes
 
 ## Version Update (1.0.0)
 * Support for picking categories
@@ -76,18 +79,14 @@ For questions/feedback please send an email to guido@techsoft3d.com or post in o
 * Improved Documentation
 
 ## Install
-Add `dist/squery.min.js` to your project for the core search functionality without any UI. If you include only this library into your project, you need to provide your own search UI.
+Add `dist/squery.min.js` to your project 
 ```
     <script src="./js/squery.min.js"></script>
 ```
 
-Add `dist/squeryui.min.js` for the optional UI functionality. 
+If you are using the UI component of the library you also need to include the tabulator library (tested with version 5.4.4) and add `dist/squeryui.css` to your project which contains a custom tabulator theme.
 ```
-    <script src="./js/squeryui.min.js"></script>
-```
-
-If you are using the UI library you also need to add `dist/squeryui.css` to your project:
-```
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
     <link rel="stylesheet" href="./css/squeryui.css">
 ```
 
@@ -103,8 +102,8 @@ Here is how to start the demo with the provided sample model locally when using 
 
 ```
 let manager = new hcSQuery.SQueryManager(hwv);
-hcSQueryUI.SQueryEditor.initialize("searcheditor", manager);
-hcSQueryUI.SQueryEditor.display();
+hcSQuery.SQueryEditorUI.initialize("searcheditor", manager);
+hcSQuery.SQueryEditorUI.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
@@ -173,13 +172,13 @@ If this option is selected the search will be performed on the specified Query
 ### Advanced Usage:
 
 ```
- hcSQueryUI.SQueryEditor.setChainSkip(1);
+ hcSQuery.SQueryEditorUI.setChainSkip(1);
 ```
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
- hcSQueryUI.SQueryEditor.setShowLimitOption(true);
+ hcSQuery.SQueryEditorUI.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
 
@@ -187,7 +186,7 @@ Controls if the Limit checkbox should be visible in the UI.
 ### Initialization
 
 ```
-    hcSQueryUI.SQueryManagerUI.initialize("squerymanagercontainer",manager, true);
+    hcSQuery.SQueryManagerUI.initialize("squerymanagercontainer",manager, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
@@ -206,7 +205,7 @@ With the optional Load/Export buttons the user can load and save the current lis
 
 A callback function can be provided that gets triggered on any change of the list of squeries. In the callback the list of queries can then be retrieved from the SQueryManager object and further processed (pushed to a server, etc.). See example below:
 ```
-    hcSQueryUI.SQueryManagerUI.setUpdatedCallback(squeryupdated);        
+    hcSQuery.SQueryManagerUI.setUpdatedCallback(squeryupdated);        
     async function squeryupdated() {
         let text = JSON.stringify({filtersarray:hcSQuery.SQueryManager.toJSON()});
 
@@ -225,7 +224,7 @@ The JSON object representing a list of squeries can be added to the SQueryManage
 
 ```
     hcSQuery.SQueryManager.fromJSON(data.filtersarray);
-    hcSQueryUI.SQueryManagerUI.refreshUI();
+    hcSQuery.SQueryManagerUI.refreshUI();
 ```
 
 
@@ -235,7 +234,7 @@ The JSON object representing a list of squeries can be added to the SQueryManage
 
 
 ```
-  hcSQueryUI.SQueryPropertiesUI.initialize("spropertiescontainer",manager);
+  hcSQuery.SQueryPropertiesUI.initialize("spropertiescontainer",manager);
 ```
 
 

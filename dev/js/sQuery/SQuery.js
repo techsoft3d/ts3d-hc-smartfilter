@@ -2,6 +2,7 @@ import { SQueryCondition } from './SQueryCondition.js';
 import { SQueryConditionType } from './SQueryCondition.js';
 import { SQueryRelationshipType } from './SQueryCondition.js';
 import { SQueryPropertyType } from './SQueryCondition.js';
+import { SQueryResult } from './SQueryResult.js';
 
 export class SQuery {
     constructor(manager, startnode) {
@@ -10,7 +11,7 @@ export class SQuery {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
-        this._action = "";
+        this._action = ["",""];
         this._keepSearchingChildren = false;
         this._prop = false;
         this._autoColors = null;
@@ -24,16 +25,26 @@ export class SQuery {
     }
 
 
-    getAction() {
-        return this._action;
+    getAction(slot=0) {
+        return this._action[slot];
     }
 
-    setAction(action) {
-        this._action = action;
+    setAction(action,slot=0) {
+        this._action[slot] = action;
+    }
+
+    hasAction() {
+        if (this._action[0] == "" && this._action[1] == "") {
+            return false;
+        }
+        else {
+            return true;
+        }
+
     }
 
 
-    setAutoColors(autoColors, property) {
+    setAutoColors(autoColors = null, property=null) {
         this._autoColors = autoColors;
         this._autoColorsProperty = property;
     }
@@ -48,7 +59,7 @@ export class SQuery {
 
     async performAction(nodeids_in, ignoreVisibility = true) {
 
-        if (this._action == "") {
+        if (this._action[0] == "" && this._action[1] == "") {
             return;
         }
         let nodeidst;
@@ -59,60 +70,63 @@ export class SQuery {
             nodeidst = await this.apply();
         }
 
-        let nodeids = [];
-        if (ignoreVisibility || this._action == "Isolate") {
-            nodeids = nodeidst;
-        }
-        else {
-            for (let i = 0; i < nodeidst.length; i++) {
-                if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
-                    nodeids.push(nodeidst[i]);
+
+        for (let currentAction = 0; currentAction < 2; currentAction++) {
+            let nodeids = [];
+            if (ignoreVisibility || this._action[currentAction] == "Isolate") {
+                nodeids = nodeidst;
+            }
+            else {
+                for (let i = 0; i < nodeidst.length; i++) {
+                    if (this._viewer.model.getBranchVisibility(nodeidst[i])) {
+                        nodeids.push(nodeidst[i]);
+                    }
                 }
             }
-        }
 
-        switch (this._action) {
-            case "red":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
-                break;
-            case "green":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
-                break;
-            case "blue":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
-                break;
-            case "yellow":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
-                break;
-            case "grey":
-                await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
-                break;
-            case "Transparent":
-                await this._viewer.model.setNodesOpacity(nodeids, 0.5);
-                break;
-            case "Opaque":
-                await this._viewer.model.setNodesOpacity(nodeids, 1.0);
-                break;
-    
-            case "Isolate":
-                await this._viewer.view.isolateNodes(nodeids, 0, false);
-                break;
-            case "Show":
-                await this._viewer.model.setNodesVisibility(nodeids, true);
-                break;
-            case "Hide":
-                await this._viewer.model.setNodesVisibility(nodeids, false);
-                break;
-            case "Auto Color":
-                await this.autoColorAction(nodeids);
-                break;
-            case "Select":
-                let selections = [];
-                for (let i = 0; i < nodeids.length; i++) {
-                    selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
-                }
-                await this._viewer.selectionManager.add(selections);
-                break;
+            switch (this._action[currentAction]) {
+                case "red":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 0, 0));
+                    break;
+                case "green":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 255, 0));
+                    break;
+                case "blue":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(0, 0, 255));
+                    break;
+                case "yellow":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(255, 255, 0));
+                    break;
+                case "grey":
+                    await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
+                    break;
+                case "Transparent":
+                    await this._viewer.model.setNodesOpacity(nodeids, 0.25);
+                    break;
+                case "Opaque":
+                    await this._viewer.model.setNodesOpacity(nodeids, 1.0);
+                    break;
+
+                case "Isolate":
+                    await this._viewer.view.isolateNodes(nodeids, 0, false);
+                    break;
+                case "Show":
+                    await this._viewer.model.setNodesVisibility(nodeids, true);
+                    break;
+                case "Hide":
+                    await this._viewer.model.setNodesVisibility(nodeids, false);
+                    break;
+                case "Auto Color":
+                    await this.autoColorAction(nodeids);
+                    break;
+                case "Select":
+                    let selections = [];
+                    for (let i = 0; i < nodeids.length; i++) {
+                        selections.push(new Communicator.Selection.SelectionItem(nodeids[i]));
+                    }
+                    await this._viewer.selectionManager.add(selections);
+                    break;
+            }
         }
     }
 
@@ -200,10 +214,10 @@ export class SQuery {
         }
 
         if (json.action == undefined) {
-            this._action = "";
+            this._action = ["",""];
         }
         else {
-            this._action = json.action;
+            this._action = JSON.parse(JSON.stringify(json.action));
         }
 
 
@@ -277,7 +291,17 @@ export class SQuery {
 
         for (let i = 0; i < conditions.length; i++) {
             conditions[i].text = conditions[i].text.replace(/&quot;/g, '"');
+
+            if (conditions[i].propertyName.slice(-2) == "/*") {
+                conditions[i].wildcardString = conditions[i].propertyName.slice(0, -2); 
+            }
+            else {
+                conditions[i].wildcardString = null;
+            }
+            conditions[i].wildcardArray = null;
         }
+       
+
         let matchingnodes = [];
         if (limitlist.length == 0) {
             if (this._startnode == this._viewer.model.getRootNode())
@@ -295,25 +319,7 @@ export class SQuery {
         return matchingnodes;
     }
 
-    createChainText(id, startid, chainskip) {
-        let current = id;
-        let chain = [];
-        while (1) {
-            let newone = this._viewer.model.getNodeParent(current);
-            if (newone == null || newone == startid)
-                break;
-            chain.push(this._viewer.model.getNodeName(newone));
-            current = newone;
-        }
-        let chaintext = "";
-        for (let j = chain.length - 1 - chainskip; j >= 0; j--) {
-            if (j > 0)
-                chaintext += chain[j] + "->";
-            else
-                chaintext += chain[j];
-        }
-        return chaintext;
-    }
+  
     async testOneNodeAgainstConditions(id) {
         let conditions = this._conditions;
         for (let i = 0; i < conditions.length; i++) {
@@ -763,7 +769,7 @@ export class SQuery {
                     searchAgainst = chaintext;
                 }
                 else {
-                    searchAgainst = this.createChainText(id, this._viewer.model.getRootNode(), 0);
+                    searchAgainst = SQueryResult.createChainText(this._viewer,id, this._viewer.model.getRootNode(), 0);
 
                 }
             }
@@ -926,6 +932,43 @@ export class SQuery {
                     res = !res;
                 }
             }
+            else if (conditions[i].wildcardString) {
+                if (!conditions[i].wildcardArray) {
+                    conditions[i].wildcardArray = [];
+                    for (let j in this._manager._allPropertiesHash) {
+
+                        if (j.indexOf(conditions[i].wildcardString) != -1 && j.indexOf("/*") == -1) {
+                            conditions[i].wildcardArray.push(j);
+                        }
+                    }
+                }
+                let condition = new SQueryCondition();
+
+                condition.propertyType = conditions[i].type;
+                condition.text = conditions[i].text;
+                condition.conditionType = conditions[i].conditionType;
+
+                let numfound = 0;
+                for (let j = 0; j < conditions[i].wildcardArray.length; j++) {
+                    condition.propertyName = conditions[i].wildcardArray[j];
+                    res = await this._checkCondition(id, condition, chaintext);
+                    if (res == true) {
+                        if (condition.conditionType == SQueryConditionType.contains || condition.conditionType == SQueryConditionType.exists) {
+                            break;
+                        }
+                        numfound++;
+                    }
+                }
+
+                if (condition.conditionType == SQueryConditionType.notExists) {
+                    if (numfound == conditions[i].wildcardArray.length) {
+                        res = true;
+                    }
+                    else {
+                        res = false;
+                    }
+                }
+            }
             else {
                 if (conditions[i].childFilter) {
                     res = await this._testNodeAgainstConditions(id, conditions[i].childFilter._conditions, chaintext);
@@ -958,7 +1001,7 @@ export class SQuery {
         if (this._manager.getSearchVisible() && !this._viewer.model.getBranchVisibility(id)) {
             return;
         }
-        let nl = this._viewer.model.getNodeName(id);
+        let nl = this._viewer.model.getNodeName(id) + ">";
         if (id != startid) {
             if (await this._testNodeAgainstConditions(id, conditions, chaintext)) {
                 matchingnodes.push(id);

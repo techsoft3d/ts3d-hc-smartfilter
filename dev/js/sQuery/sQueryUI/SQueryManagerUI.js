@@ -1,6 +1,4 @@
-import { dummy } from './tabulator_esm.min.js';
-
-import { SQueryEditor } from './SQueryEditor.js';
+import { SQueryEditorUI } from './SQueryEditorUI.js';
 
 export class SQueryManagerUI {
 
@@ -81,8 +79,8 @@ export class SQueryManagerUI {
     }
 
     static async _addCurrentFilter() {
-        SQueryEditor.updateFilterFromUI();
-        let filter = SQueryEditor.getFilter();
+        SQueryEditorUI.updateFilterFromUI();
+        let filter = SQueryEditorUI.getFilter();
         let jfilter = filter.toJSON();
 
         let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);
@@ -123,32 +121,32 @@ export class SQueryManagerUI {
                     label: "<i class='fas fa-user'></i> Select",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.selectAll();
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.selectAll();
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Isolate",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.isolateAll();
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().isolateAll();
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Show",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.makeVisible(true);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().makeVisible(true);
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Hide",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.makeVisible(false);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().makeVisible(false);
                     }
                 },
                 {
@@ -158,56 +156,56 @@ export class SQueryManagerUI {
                     label: "<i class='fas fa-user'></i> Red",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(255,0,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(255,0,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Green",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(0,255,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(0,255,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Blue",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(0,0,255));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(0,0,255));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Yellow",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(255,255,0));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(255,255,0));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Grey",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.colorize(new Communicator.Color(128,128,128));
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().colorize(new Communicator.Color(128,128,128));
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Transparent",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.setOpacity(0.5);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().setOpacity(0.25);
                     }
                 },
                 {
                     label: "<i class='fas fa-user'></i> Opaque",
                     action: async function (e, row) {
                         await SQueryManagerUI._updateEditor(row.getData().id);
-                        await SQueryEditor.search();
-                        SQueryEditor.setOpacity(1.0);
+                        await SQueryEditorUI.search();
+                        SQueryEditorUI.getFoundItems().setOpacity(1.0);
                     }
                 },
                 {
@@ -221,10 +219,10 @@ export class SQueryManagerUI {
                         let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
                         let filterjson = SQuery.toJSON();
                 
-                        let editorfilter = SQueryEditor.getFilter();
+                        let editorfilter = SQueryEditorUI.getFilter();
                         editorfilter.fromJSON(filterjson);                
-                        SQueryEditor.clearSearchResults();                
-                        await SQueryEditor.refreshUI();               
+                        SQueryEditorUI.clearSearchResults();                
+                        await SQueryEditorUI.refreshUI();               
                     }
                 },
                 {
@@ -250,94 +248,108 @@ export class SQueryManagerUI {
                     }
                 },
             ];
+
+            let actionFormatter = function(cell, formatterParams, onRendered){
+                //cell - the cell component
+                //formatterParams - parameters set for the column
+                //onRendered - function to call when the formatter has been rendered
+                
+                if (cell.getValue() == undefined) {
+                    return cell.getValue();
+                }
+                else {
+                    switch(cell.getValue()) {
+                        case "red":
+                            return '<div style="background:red;color:red;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                        break;
+                        case "green":
+                            return '<div style="background:green;color:green;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                        break;
+                        case "blue":
+                            return '<div style="background:blue;color:blue;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                        break;
+                        case "yellow":
+                            return '<div style="background:yellow;color:yellow;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                        break;
+                        case "grey":
+                            return '<div style="background:grey;color:grey;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
+                        break;
+                        default:
+                            return cell.getValue();
+                    }
+                }
+            };
+
+            let actionItemFormatter = function (label, value, item, element){
+                //label - the text lable for the item
+                //value - the value for the item
+                //item - the original value object for the item
+                //element - the DOM element for the item
+        
+                //return the initial label as a bold line and then second line in regular font weight containing the value of the custom "subtitle" prop set on the value item object.
+                switch(value) {
+                    case "red":
+                        return '<span style="background:red;color:red">XXXXXXXXX</span>';
+                    break;
+                    case "green":
+                        return '<span style="background:green;color:green">XXXXXXXXX</span>';
+                    break;
+                    case "blue":
+                        return '<span style="background:blue;color:blue">XXXXXXXXX</span>';
+                    break;
+                    case "yellow":
+                        return '<span style="background:yellow;color:yellow">XXXXXXXXX</span>';
+                    break;
+                    case "grey":
+                        return '<span style="background:grey;color:grey">XXXXXXXXX</span>';
+                    break;
+                    case "":
+                        return 'None';
+                    break;
+                    default:
+                        return value;
+                };
+            };
+
+            let actionValues = ["", "Isolate", "Show", "Hide", "Select", "Auto Color", "red", "green", "blue", "yellow", "grey", "Transparent", "Opaque"];
            
 
             SQueryManagerUI._table = new Tabulator("#" + SQueryManagerUI._uidiv + "Tabulator", {
-                data: [],                             
-                selectable:0,
-                rowHeight:17,
+                data: [],
+                selectable: 0,
+                rowHeight: 17,
                 movableRows: true,
                 layout: "fitColumns",
-                rowContextMenu: rowMenu,             
-                columns: [                                   
+                rowContextMenu: rowMenu,
+                columns: [
                     {
-                        title: "Name", headerSort : false,field: "description", formatter:"textarea", editor:"input",editable: SQueryManagerUI.editCheck,tooltip:SQueryManagerUI.formatTooltip
-                    },  
+                        title: "Name", headerSort: false, field: "description", formatter: "textarea", editor: "input", editable: SQueryManagerUI.editCheck, tooltip: SQueryManagerUI.formatTooltip
+                    },
                     {
                         title: "ID", field: "id", width: 20, visible: false
                     },
-                    {title:"Action",  headerSort : false,field:"action", editor:"list", width:70,formatter:function(cell, formatterParams, onRendered){
-                        //cell - the cell component
-                        //formatterParams - parameters set for the column
-                        //onRendered - function to call when the formatter has been rendered
-                        
-                        if (cell.getValue() == undefined) {
-                            return cell.getValue();
-                        }
-                        else {
-                            switch(cell.getValue()) {
-                                case "red":
-                                    return '<div style="background:red;color:red;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
-                                break;
-                                case "green":
-                                    return '<div style="background:green;color:green;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
-                                break;
-                                case "blue":
-                                    return '<div style="background:blue;color:blue;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
-                                break;
-                                case "yellow":
-                                    return '<div style="background:yellow;color:yellow;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
-                                break;
-                                case "grey":
-                                    return '<div style="background:grey;color:grey;width:100%;height:calc(100% - 4px);margin-bottom:3px"></div>';
-                                break;
-                                default:
-                                    return cell.getValue();
-                            }
+                    {
+                        title: "Action1", headerSort: false, field: "action0", editor: "list", width: 50, formatter: actionFormatter,
+                        editorParams: {
+                            values: actionValues,
+                            itemFormatter: actionItemFormatter
                         }
                     },
-                     editorParams:{values:["","Isolate","Show","Hide","Select","Auto Color","red", "green", "blue", "yellow", "grey", "Transparent", "Opaque"],
-                
-                    itemFormatter:function (label, value, item, element){
-                        //label - the text lable for the item
-                        //value - the value for the item
-                        //item - the original value object for the item
-                        //element - the DOM element for the item
-                
-                        //return the initial label as a bold line and then second line in regular font weight containing the value of the custom "subtitle" prop set on the value item object.
-                        switch(value) {
-                            case "red":
-                                return '<span style="background:red;color:red">XXXXXXXXX</span>';
-                            break;
-                            case "green":
-                                return '<span style="background:green;color:green">XXXXXXXXX</span>';
-                            break;
-                            case "blue":
-                                return '<span style="background:blue;color:blue">XXXXXXXXX</span>';
-                            break;
-                            case "yellow":
-                                return '<span style="background:yellow;color:yellow">XXXXXXXXX</span>';
-                            break;
-                            case "grey":
-                                return '<span style="background:grey;color:grey">XXXXXXXXX</span>';
-                            break;
-                            case "":
-                                return 'None';
-                            break;
-                            default:
-                                return value;
-                        };
+                    {
+                        title: "Action2", headerSort: false, field: "action1", editor: "list", width: 50, formatter: actionFormatter,
+                        editorParams: {
+                            values: actionValues,
+                            itemFormatter: actionItemFormatter
+                        }
+                    },
+                    {
+                        title: "Prop", headerSort: false, field: "prop", width: 50, hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true,
+                        editorParams: {
+
+                            tristate: false,
+
+                        }
                     }
-                    }},
-
-                    {title:"Prop", headerSort : false, field:"prop", width:50,  hozAlign:"center", formatter:"tickCross", sorter:"boolean", editor:true,
-                    editorParams:{
-                       
-                        tristate:false,
-                      
-                    }},
-
-
                 ],
             });
 
@@ -346,15 +358,15 @@ export class SQueryManagerUI {
                 let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
                 let filterjson = SQuery.toJSON();
-                let editorfilter = SQueryEditor.getFilter();
+                let editorfilter = SQueryEditorUI.getFilter();
                 editorfilter.fromJSON(filterjson);
-                SQueryEditor.clearSearchResults();                
-                await SQueryEditor.refreshUI();                
-                if (SQuery.getAction() == "") {
-                    await SQueryEditor.search();
+                SQueryEditorUI.clearSearchResults();                
+                await SQueryEditorUI.refreshUI();                
+                if (!SQuery.hasAction()) {
+                    await SQueryEditorUI.search();
                 }       
                 else {
-                    await SQueryEditor.search(true);
+                    await SQueryEditorUI.search(true);
                 }         
             });
 
@@ -382,9 +394,11 @@ export class SQueryManagerUI {
                 else if (cell.getField() == "prop") {                
                     SQueryManagerUI._handleSQueryIsPropEdit(cell.getRow());
                 }
-                else {
-                    SQueryManagerUI._handleSQueryIsActionEdit(cell.getRow());
-
+                else if (cell.getField() == "action0") {           
+                    SQueryManagerUI._handleSQueryIsActionEdit(cell.getRow(),0);
+                }
+                else if (cell.getField() == "action1") {           
+                    SQueryManagerUI._handleSQueryIsActionEdit(cell.getRow(),1);
                 }
                 SQueryManagerUI._table.redraw();
             });
@@ -410,7 +424,8 @@ export class SQueryManagerUI {
             text = text.replace(/&quot;/g, '"');
             prop.id =  SQueryManagerUI._manager.getSQueryID(i);;
             prop.description = text;
-            prop.action = filter.getAction();
+            prop.action0 = filter.getAction(0);
+            prop.action1 = filter.getAction(1);         
             prop.prop = SQueryManagerUI._manager.getSQuery(i).getProp();
             await SQueryManagerUI._table.addRow(prop);
         }     
@@ -420,9 +435,9 @@ export class SQueryManagerUI {
         
         let SQuery = SQueryManagerUI._manager.getSQueryByID(id);
         let filterjson = SQuery.toJSON();
-        let editorfilter = SQueryEditor.getFilter();
+        let editorfilter = SQueryEditorUI.getFilter();
         editorfilter.fromJSON(filterjson);
-        await SQueryEditor.refreshUI();
+        await SQueryEditorUI.refreshUI();
 
     }
 
@@ -450,10 +465,15 @@ export class SQueryManagerUI {
     }
 
 
-    static async _handleSQueryIsActionEdit(row) {
+    static async _handleSQueryIsActionEdit(row, actionnum) {
         let data = row.getData();
         let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
-        SQuery.setAction(data.action);
+        if (actionnum == 0) {
+            SQuery.setAction(data.action0,0);
+        }
+        else {
+            SQuery.setAction(data.action1,1);
+        }
         if (SQueryManagerUI._updatedCallback) {
             SQueryManagerUI._updatedCallback();
         }
@@ -463,8 +483,8 @@ export class SQueryManagerUI {
         let data = row.getData();
         let SQuery = SQueryManagerUI._manager.getSQueryByID(data.id);
 
-        SQueryEditor.updateFilterFromUI();
-        let filter = SQueryEditor.getFilter();
+        SQueryEditorUI.updateFilterFromUI();
+        let filter = SQueryEditorUI.getFilter();
         let jfilter = filter.toJSON();
 
         let sf = new hcSQuery.SQuery(SQueryManagerUI._manager);

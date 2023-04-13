@@ -1,5 +1,3 @@
-import { dummy } from './tabulator_esm.min.js';
-
 export class SQueryPropertiesUI {
 
     static initialize(div, manager) {
@@ -26,7 +24,7 @@ export class SQueryPropertiesUI {
             SQueryPropertiesUI._table = new Tabulator("#" + SQueryPropertiesUI._uidiv + "Tabulator", {
                 data: [],                 
                 dataTree: true,
-                dataTreeStartExpanded: false,            
+                dataTreeStartExpanded: true,            
                 selectable:1,
                 layout: "fitColumns",
                 columns: [                                   

@@ -8,14 +8,12 @@ async function msready() {
     // let json = await res.json();
     // mySQueryManager = new hcSQuery.SQueryManager(hwv);
     // mySQueryManager.addModel("hospital",hwv.model.getRootNode(),json);
-
-
     mySQueryManager = new hcSQuery.SQueryManager(hwv);
 
-    hcSQueryUI.SQueryEditor.initialize("searchtools", mySQueryManager);
-    hcSQueryUI.SQueryEditor.display();
-    hcSQueryUI.SQueryManagerUI.initialize("squeryfilterscontainer",mySQueryManager, true);
-    hcSQueryUI.SQueryPropertiesUI.initialize("squerypropertiescontainer",mySQueryManager);
+    hcSQuery.SQueryEditorUI.initialize("searchtools", mySQueryManager);
+    hcSQuery.SQueryEditorUI.display();
+    hcSQuery.SQueryManagerUI.initialize("squeryfilterscontainer",mySQueryManager, true);
+    hcSQuery.SQueryPropertiesUI.initialize("squerypropertiescontainer",mySQueryManager);
 
 }
 
@@ -105,34 +103,14 @@ function createUILayout() {
     });
     myLayout.init();
 
-    var viewermenu = [
-        {
-            name: 'Toggle Allow Body Nodes',
-            fun: function () {
-                myMaterialTool.setDisallowBodyNodes(!myMaterialTool.getDisallowBodyNodes());
-            }
-        },
-        {
-            name: 'Display Stats',
-            fun: function () {
-                hwv.view.setStatisticsDisplayVisibility(true);
-            }
-        },            
-    ];
-
-    $('#viewermenu1button').contextMenu(viewermenu, undefined, {
-        'displayAround': 'trigger',
-        'containment': '#viewerContainer'
-    });
-
 
 }
 
 
 function initializeSearch(){
     if(hwv.selectionManager.getLast())   
-        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
+        hcSQuery.SQueryEditorUI.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
     else
-        hcSQueryUI.SQueryEditor.initialize("searchtools",hwv);
-    hcSQueryUI.SQueryEditor.display();
+        hcSQuery.SQueryEditorUI.initialize("searchtools",hwv);
+    hcSQuery.SQueryEditorUI.display();
 }
