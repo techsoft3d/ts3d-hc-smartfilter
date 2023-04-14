@@ -321,21 +321,28 @@ export class SmartSearchManagerUI {
                         title: "ID", field: "id", width: 20, visible: false
                     },
                     {
-                        title: "Action1", headerSort: false, field: "action0", editor: "list", width: 50, formatter: actionFormatter,
+                        title: "Action1", headerSort: false, field: "action0", editor: "list", width: 47, formatter: actionFormatter,
                         editorParams: {
                             values: actionValues,
                             itemFormatter: actionItemFormatter
                         }
                     },
                     {
-                        title: "Action2", headerSort: false, field: "action1", editor: "list", width: 50, formatter: actionFormatter,
+                        title: "Action2", headerSort: false, field: "action1", editor: "list", width: 47, formatter: actionFormatter,
                         editorParams: {
                             values: actionValues,
                             itemFormatter: actionItemFormatter
                         }
                     },
                     {
-                        title: "Prop", headerSort: false, field: "prop", width: 50, hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true,
+                        title: "Action3", headerSort: false, field: "action2", editor: "list", width: 47, formatter: actionFormatter,
+                        editorParams: {
+                            values: actionValues,
+                            itemFormatter: actionItemFormatter
+                        }
+                    },
+                    {
+                        title: "Prop", headerSort: false, field: "prop", width: 20, hozAlign: "center", formatter: "tickCross", sorter: "boolean", editor: true,
                         editorParams: {
 
                             tristate: false,
@@ -392,6 +399,9 @@ export class SmartSearchManagerUI {
                 else if (cell.getField() == "action1") {           
                     SmartSearchManagerUI._handleSmartSearchIsActionEdit(cell.getRow(),1);
                 }
+                else if (cell.getField() == "action2") {           
+                    SmartSearchManagerUI._handleSmartSearchIsActionEdit(cell.getRow(),2);
+                }
                 SmartSearchManagerUI._table.redraw();
             });
         }
@@ -418,6 +428,7 @@ export class SmartSearchManagerUI {
             prop.description = text;
             prop.action0 = filter.getAction(0);
             prop.action1 = filter.getAction(1);         
+            prop.action2 = filter.getAction(2);         
             prop.prop = SmartSearchManagerUI._manager.getSmartSearch(i).getProp();
             await SmartSearchManagerUI._table.addRow(prop);
         }     
@@ -463,8 +474,11 @@ export class SmartSearchManagerUI {
         if (actionnum == 0) {
             SmartSearch.setAction(data.action0,0);
         }
-        else {
+        else if (actionnum == 1){
             SmartSearch.setAction(data.action1,1);
+        }
+        else {
+            SmartSearch.setAction(data.action2,2);
         }
         if (SmartSearchManagerUI._updatedCallback) {
             SmartSearchManagerUI._updatedCallback();

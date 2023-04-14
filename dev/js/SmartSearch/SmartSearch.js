@@ -11,7 +11,7 @@ export class SmartSearch {
         this._limitselectionlist = [];
         this._conditions = [];
         this._name = "";
-        this._action = ["",""];
+        this._action = ["","",""];
         this._keepSearchingChildren = false;
         this._prop = false;
         this._autoColors = null;
@@ -34,7 +34,7 @@ export class SmartSearch {
     }
 
     hasAction() {
-        if (this._action[0] == "" && this._action[1] == "") {
+        if (this._action[0] == "" && this._action[1] == "" && this._action[2] == "") {
             return false;
         }
         else {
@@ -58,7 +58,7 @@ export class SmartSearch {
 
     async performAction(nodeids_in, ignoreVisibility = true) {
 
-        if (this._action[0] == "" && this._action[1] == "") {
+        if (this._action[0] == "" && this._action[1] == "" && this._action[2] == "") {
             return;
         }
         let nodeidst;
@@ -70,7 +70,7 @@ export class SmartSearch {
         }
 
 
-        for (let currentAction = 0; currentAction < 2; currentAction++) {
+        for (let currentAction = 0; currentAction < 3; currentAction++) {
             let nodeids = [];
             if (ignoreVisibility || this._action[currentAction] == "Isolate") {
                 nodeids = nodeidst;
