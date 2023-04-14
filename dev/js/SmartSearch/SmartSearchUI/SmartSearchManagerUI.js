@@ -79,6 +79,7 @@ export class SmartSearchManagerUI {
         let sf = new hcSmartSearch.SmartSearch(SmartSearchManagerUI._manager);
 
         sf.fromJSON(jfilter);
+        sf.clearActions();
         
         sf._id =  SmartSearchManagerUI._manager.generateGUID();
         sf.setName("");

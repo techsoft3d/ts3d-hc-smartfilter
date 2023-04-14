@@ -42,6 +42,9 @@ export class SmartSearch {
         }
 
     }
+    clearActions() {
+        this._action = ["","",""];
+    }
 
     setAutoColors(autoColors = null, property=null) {
         this._autoColors = autoColors;
@@ -72,7 +75,7 @@ export class SmartSearch {
 
         for (let currentAction = 0; currentAction < 3; currentAction++) {
             let nodeids = [];
-            if (ignoreVisibility || this._action[currentAction] == "Isolate") {
+            if (ignoreVisibility || (this._action[currentAction] == "Isolate" || this._action[currentAction] == "Show")) {
                 nodeids = nodeidst;
             }
             else {
