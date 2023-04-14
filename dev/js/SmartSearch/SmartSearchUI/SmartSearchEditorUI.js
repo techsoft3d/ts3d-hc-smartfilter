@@ -89,7 +89,7 @@ export class SmartSearchEditorUI {
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._toggleLighting()\'>Toggle Lighting</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesFaceColor([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],Communicator.Color.white())\'>Set Model to White</li>';              
         html +='<li>---</li>';              
-        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesOpacity([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],0.5)\'>Set Model Transparent (Low)</li>';              
+        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesOpacity([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],0.75)\'>Set Model Transparent (Low)</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesOpacity([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],0.15)\'>Set Model Transparent (High)</li>';           
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesOpacity([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],1)\'>Set Model Opaque</li>';           
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._transparencyMode ? hcSmartSearch.SmartSearchEditorUI._transparencyMode = 0 : hcSmartSearch.SmartSearchEditorUI._transparencyMode = 1; hcSmartSearch.SmartSearchEditorUI._viewer.view.setTransparencyMode(hcSmartSearch.SmartSearchEditorUI._transparencyMode)\'>Toggle Transparency Mode</li>';                 

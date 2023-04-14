@@ -220,7 +220,7 @@ export class SmartSearch {
         }
 
         if (json.action == undefined) {
-            this._action = ["",""];
+            this._action = ["","",""];
         }
         else {
             this._action = JSON.parse(JSON.stringify(json.action));
