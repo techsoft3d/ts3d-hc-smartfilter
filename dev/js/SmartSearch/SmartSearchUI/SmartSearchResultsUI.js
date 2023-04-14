@@ -704,6 +704,8 @@ export class SmartSearchResultsUI {
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().colorize(new Communicator.Color(128,128,128))\'>Grey</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().setOpacity(0.7)\'>Transparent</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().setOpacity(1)\'>Opaque</li>';
+        html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().setSelectable(false)\'>Not Selectable</li>';
+        html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().setSelectable(true)\'>Selectable</li>';
         html += '</ul>';
         return html;
     }

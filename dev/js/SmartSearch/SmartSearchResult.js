@@ -73,6 +73,14 @@ export class SmartSearchResult {
 
         this._viewer.model.setNodesOpacity(selections, opacity);
     }
+
+    async setSelectable(isSelectable) {        
+                   
+        let selections = this._itemsToSelections();
+
+        this._viewer.model.setInstanceModifier(Communicator.InstanceModifier.DoNotSelect, selections, !isSelectable);
+    }
+
     async colorize(color) {        
                    
         let selections = this._itemsToSelections();
