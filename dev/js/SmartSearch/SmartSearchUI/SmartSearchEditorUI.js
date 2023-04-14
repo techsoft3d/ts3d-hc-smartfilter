@@ -634,7 +634,7 @@ export class SmartSearchEditorUI {
         }
         else {
             html = '<input type="search" class = "valueinput" list="datalist' + filterpos + "-" + SmartSearch.tempId +'" id="' + SmartSearchEditorUI._maindiv + 
-            '_modeltreesearchtext' + filterpos + "-" + SmartSearch.tempId + '" value="' + condition.text + '">\n';
+            '_modeltreesearchtext' + filterpos + "-" + SmartSearch.tempId + '" value="' + SmartSearchEditorUI._htmlEncode(condition.text) + '">\n';
 
         }
         html += '<datalist id="datalist' + filterpos + "-" + SmartSearch.tempId +'">\n';
