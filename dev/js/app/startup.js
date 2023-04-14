@@ -14,11 +14,15 @@ async function msready() {
     hcSmartSearch.SmartSearchEditorUI.display();
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);
+    hwv.selectionManager.setSelectionFilter(function (nodeid) {
+        return nodeid;
+    }
+    );
 
 }
 
 function startup()
-{
+{   
     createUILayout();
 } 
 

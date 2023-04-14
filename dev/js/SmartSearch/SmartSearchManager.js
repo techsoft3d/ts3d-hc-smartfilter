@@ -358,7 +358,7 @@ export class SmartSearchManager {
     _consolidateBodies() {
         let lbs = [];
         for (let i in  this._propertyHash) {
-            if (this._viewer.model.getNodeType(parseInt(i)) == 3 && this._propertyHash[i]["Volume"]) {
+            if (this._viewer.model.getNodeType(parseInt(i)) == 3 && this._propertyHash[i] && this._propertyHash[i]["Volume"]) {
                 let p = this._viewer.model.getNodeParent(parseInt(i));
                 lbs[p] = true;
             }
@@ -399,6 +399,7 @@ export class SmartSearchManager {
         this._containedInSpatialStructureHash = [];
         this._aggregateHash = [];
         this._spaceBoundaryHash = [];
+        this._totalNodes = 0;
         let layernames = this._viewer.model.getLayers();
 
         if (this._modelHash.length == 0) {
@@ -409,6 +410,7 @@ export class SmartSearchManager {
             let res = await Promise.all(proms);  
             this._updateHashes(ids, res, layernames);         
             this._consolidateBodies();
+            this._totalNodes = ids.length;
           
         }
         else {
@@ -444,11 +446,15 @@ export class SmartSearchManager {
                     res = model.properties;
 
                 }
+                this._totalNodes += ids.length;
                 this._updateHashes(ids, res, layernames);
             }
         }
     }
 
+    getTotalNodes() {
+        return this._totalNodes-1;
+    }
     getAllOptionsForProperty(propertyname) {
 
         return this._allPropertiesHash[propertyname];

@@ -33,6 +33,12 @@ export class SmartSearchResult {
 
     }
 
+    getTotalSearchCount() {
+        return this._query.getSearchCounter();
+    }
+
+
+
     setTableProperty(property) {
         this._tableProperty = property;
     }

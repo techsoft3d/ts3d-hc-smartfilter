@@ -607,10 +607,10 @@ export class SmartSearchResultsUI {
         let founditems = founditems_in.getItems();
 
         if (founditems.length == 1) {
-            $("#" + SmartSearchResultsUI._maindiv + "_found").append(founditems.length + " item found");
+            $("#" + SmartSearchResultsUI._maindiv + "_found").append(founditems.length + " item found / " + SmartSearchEditorUI._founditems.getTotalSearchCount() + " searched");
         }
         else {
-            $("#" + SmartSearchResultsUI._maindiv + "_found").append(founditems.length + " items found");
+            $("#" + SmartSearchResultsUI._maindiv + "_found").append(founditems.length + " items found / " + SmartSearchEditorUI._founditems.getTotalSearchCount() + " searched");
         }
 
         let html = "";

@@ -269,6 +269,7 @@ export class SmartSearch {
 
     limitToNodes(nodeids) {
         this._limitselectionlist = [];
+        this._searchCounter = 0;
         for (let i = 0; i < nodeids.length; i++)
             this._limitselectionlist.push(nodeids[i]);
 
@@ -280,6 +281,14 @@ export class SmartSearch {
 
     getStartNode() {
         return this._startnode;
+    }
+
+    getSearchCounter() {
+        if (this._limitselectionlist.length == 0)
+            return this._searchCounter-1;
+        else {
+            return this._searchCounter;
+        }
     }
 
     async apply() {
@@ -583,18 +592,33 @@ export class SmartSearch {
 
     async _checkCondition(id, condition, chaintext) {
         if (condition.conditionType != SmartSearchConditionType.contains) {
-            if (condition.conditionType == SmartSearchConditionType.exists) {
-                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] != undefined)
-                    return true;
-                else
-                    return false;
-            }
-
-            if (condition.conditionType == SmartSearchConditionType.notExists) {
-                if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] == undefined)
-                    return true;
-                else
-                    return false;
+            if (condition.conditionType == SmartSearchConditionType.exists || condition.conditionType == SmartSearchConditionType.notExists) {
+                let res = false;
+                let invert = false;
+                if (condition.conditionType == SmartSearchConditionType.notExists) {
+                    invert = true;
+                }
+                
+                if (condition.propertyType == SmartSearchPropertyType.property) {
+                    if (this._manager._propertyHash[id] && this._manager._propertyHash[id][condition.propertyName] != undefined) res = true;
+                }
+                else if (condition.propertyType == SmartSearchPropertyType.nodeName) { 
+                    if (this._viewer.model.getNodeName(id) != "") res = true;
+                }
+                else if (condition.propertyType == SmartSearchPropertyType.nodeId || condition.propertyType == SmartSearchPropertyType.nodeType) {
+                    res = true;
+                }
+                else if (condition.propertyType == SmartSearchPropertyType.ifcglobalid) {
+                    if(this._viewer.model.getGenericIdFromBimId(id, id.toString()) != null) res = true;
+                }
+                else if (condition.propertyType == SmartSearchPropertyType.nodeColor) {
+                    let children = this._viewer.model.getNodeChildren(id);
+                    if (children.length == 0) {
+                        let color = await this._viewer.model.getNodesEffectiveFaceColor([id]);
+                        if (color[0]) res = true;
+                    }
+                }
+                return invert ? !res : res;
             }
 
             let searchAgainstNumber;
@@ -801,7 +825,7 @@ export class SmartSearch {
                 searchAgainst = id.toString();
             }
             else if (condition.propertyType == SmartSearchPropertyType.ifcglobalid) {
-                searchAgainst = hwv.model.getGenericIdFromBimId(id, id.toString());
+                searchAgainst = this._viewer.model.getGenericIdFromBimId(id, id.toString());
             }
             else {
                 if (this._manager._propertyHash[id] == undefined || this._manager._propertyHash[id][condition.propertyName] == undefined) {
