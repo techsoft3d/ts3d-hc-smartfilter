@@ -15,7 +15,7 @@ export class SmartSearch {
         this._keepSearchingChildren = false;
         this._prop = false;
         this._autoColors = null;
-        this._id = this._generateGUID();
+        this._id = manager.generateGUID();
         this._searchCounter = 0;
         this._autoColorsProperty = null;
         if (startnode)
@@ -293,7 +293,6 @@ export class SmartSearch {
     async apply() {
         this._selectionBounds = null;
         this._searchCounter = 0;
-        //      let t1 = new Date();
         let conditions = this._conditions;
         let limitlist = this._limitselectionlist;
 
@@ -321,15 +320,13 @@ export class SmartSearch {
             for (let i = 0; i < limitlist.length; i++) {
                 await this._gatherMatchingNodesRecursive(conditions, limitlist[i], matchingnodes, this._viewer.model.getNodeParent(limitlist[i]), "");
             }
-        }
-        //        let t2 = new Date();
-        //        console.log("SmartSearch: " + (t2 - t1) + "ms");
+        }    
         if (this._manager.getFilterBodies()) {
             let filteredNodes = []; 
             let fnhash = [];
             for (let i = 0; i < matchingnodes.length; i++) {
                 if (this._viewer.model.getNodeType(matchingnodes[i]) != Communicator.NodeType.BodyInstance) {
-                    if (!fnhash[nodeid]) {
+                    if (!fnhash[matchingnodes[i]]) {
                         filteredNodes.push(matchingnodes[i]);
                         fnhash[matchingnodes[i]] = true;
                     }
@@ -346,7 +343,6 @@ export class SmartSearch {
         }
         return matchingnodes;
     }
-
   
     async testOneNodeAgainstConditions(id) {
         let conditions = this._conditions;
@@ -1058,13 +1054,6 @@ export class SmartSearch {
             await this._gatherMatchingNodesRecursive(conditions, children[i], matchingnodes, startid, chaintext + nl);
 
         }
-    }
-
-    _generateGUID() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-            return v.toString(16);
-        });
     }
 
     async autoColorAction(searchresults) {
