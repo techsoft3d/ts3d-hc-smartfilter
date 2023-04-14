@@ -45,6 +45,7 @@ export class SmartSearchManager {
         this._viewer.pauseRendering();
         await this._viewer.model.reset();
         await this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
+        await this._viewer.model.setInstanceModifier(Communicator.InstanceModifier.DoNotSelect, [this._viewer.model.getAbsoluteRootNode()], false);
         await this._viewer.selectionManager.clear();
                      
         for (let i = 0; i < this._SmartSearchs.length; i++) {

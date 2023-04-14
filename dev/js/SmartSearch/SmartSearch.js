@@ -100,7 +100,7 @@ export class SmartSearch {
                     await this._viewer.model.setNodesFaceColor(nodeids, new Communicator.Color(128, 128, 128));
                     break;
                 case "Transparent":
-                    await this._viewer.model.setNodesOpacity(nodeids, 0.25);
+                    await this._viewer.model.setNodesOpacity(nodeids, 0.3);
                     break;
                 case "Opaque":
                     await this._viewer.model.setNodesOpacity(nodeids, 1.0);
@@ -118,6 +118,13 @@ export class SmartSearch {
                 case "Auto Color":
                     await this.autoColorAction(nodeids);
                     break;
+                case "Not Selectable":
+                    await this._viewer.model.setInstanceModifier(Communicator.InstanceModifier.DoNotSelect, nodeids, true);
+
+                    break;
+                case "Selectable":
+                    await this._viewer.model.setInstanceModifier(Communicator.InstanceModifier.DoNotSelect, nodeids, false);
+                break;
                 case "Select":
                     let selections = [];
                     for (let i = 0; i < nodeids.length; i++) {

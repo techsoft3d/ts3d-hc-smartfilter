@@ -304,7 +304,7 @@ export class SmartSearchManagerUI {
                 };
             };
 
-            let actionValues = ["", "Isolate", "Show", "Hide", "Select", "Auto Color", "red", "green", "blue", "yellow", "grey", "Transparent", "Opaque"];
+            let actionValues = ["", "Isolate", "Show", "Hide", "Select", "Auto Color", "red", "green", "blue", "yellow", "grey", "Transparent", "Opaque", "Not Selectable", "Selectable"];
            
 
             SmartSearchManagerUI._table = new Tabulator("#" + SmartSearchManagerUI._uidiv + "Tabulator", {
