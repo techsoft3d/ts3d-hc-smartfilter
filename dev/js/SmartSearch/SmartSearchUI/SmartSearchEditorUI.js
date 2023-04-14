@@ -86,7 +86,8 @@ export class SmartSearchEditorUI {
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setFilterBodies(this)\'>Filter Bodies</li>';              
         html +='<li>---</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._toggleLighting()\'>Toggle Lighting</li>';              
-        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesFaceColor([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],Communicator.Color.white())\'>Set to White</li>';              
+        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesFaceColor([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],Communicator.Color.white())\'>Set Model to White</li>';              
+        html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.resetModel()\'>Reset Model</li>';
         html += '</ul>';
         return html;
     }

@@ -696,7 +696,6 @@ export class SmartSearchResultsUI {
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().isolateAll(this)\'>Isolate</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().makeVisible(true)\'>Show</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().makeVisible(false)\'>Hide</li>';
-        html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.resetModel()\'>Reset Model</li>';
         html += '<li >---</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().colorize(new Communicator.Color(255,0,0))\'>Red</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().colorize(new Communicator.Color(0,255,0))\'>Green</li>';
