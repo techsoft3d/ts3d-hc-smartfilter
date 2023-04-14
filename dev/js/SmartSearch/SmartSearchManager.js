@@ -42,6 +42,7 @@ export class SmartSearchManager {
     }
 
     async executeSQueries() {
+        this._viewer.pauseRendering();
         await this._viewer.model.reset();
         await this._viewer.model.unsetNodesFaceColor([this._viewer.model.getAbsoluteRootNode()]);
         await this._viewer.selectionManager.clear();
@@ -49,6 +50,8 @@ export class SmartSearchManager {
         for (let i = 0; i < this._SmartSearchs.length; i++) {
             await this._SmartSearchs[i].performAction(null,false);
         }
+        this._viewer.resumeRendering();
+
     }
 
     setSQueries(SmartSearchs) {
