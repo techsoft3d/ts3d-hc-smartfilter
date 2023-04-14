@@ -9,6 +9,7 @@ export class SmartSearchManager {
         this._keepSearchingChildren = true;
         this._searchVisible = false;
         this._ignoreBodies = false;
+        this._filterBodies = false;
     }
 
     setIgnoreBodies(ignoreBodies) {
@@ -18,6 +19,15 @@ export class SmartSearchManager {
     getIgnoreBodies() {
         return this._ignoreBodies;
     }
+
+    setFilterBodies(filterBodies) {
+        this._filterBodies = filterBodies;
+    }
+
+    getFilterBodies() {
+        return this._filterBodies;
+    }
+
 
     setSearchVisible(onoff) {
         this._searchVisible = onoff;        

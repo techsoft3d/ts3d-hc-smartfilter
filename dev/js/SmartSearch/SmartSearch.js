@@ -43,7 +43,6 @@ export class SmartSearch {
 
     }
 
-
     setAutoColors(autoColors = null, property=null) {
         this._autoColors = autoColors;
         this._autoColorsProperty = property;
@@ -325,6 +324,26 @@ export class SmartSearch {
         }
         //        let t2 = new Date();
         //        console.log("SmartSearch: " + (t2 - t1) + "ms");
+        if (this._manager.getFilterBodies()) {
+            let filteredNodes = []; 
+            let fnhash = [];
+            for (let i = 0; i < matchingnodes.length; i++) {
+                if (this._viewer.model.getNodeType(matchingnodes[i]) != Communicator.NodeType.BodyInstance) {
+                    if (!fnhash[nodeid]) {
+                        filteredNodes.push(matchingnodes[i]);
+                        fnhash[matchingnodes[i]] = true;
+                    }
+                }
+                else {
+                    let nodeid = this._viewer.model.getNodeParent(matchingnodes[i]);
+                    if (!fnhash[nodeid]) {
+                        filteredNodes.push(nodeid);
+                        fnhash[nodeid] = true;
+                    }
+                }
+            }
+            return filteredNodes;
+        }
         return matchingnodes;
     }
 

@@ -83,6 +83,7 @@ export class SmartSearchEditorUI {
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SmartSearchDropdow-content">';
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchVisible(this)\'>Search Visible</li>';              
+        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setFilterBodies(this)\'>Filter Bodies</li>';              
         html +='<li>---</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._toggleLighting()\'>Toggle Lighting</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesFaceColor([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],Communicator.Color.white())\'>Set to White</li>';              
@@ -398,6 +399,17 @@ export class SmartSearchEditorUI {
         }
         $(el).html(text);
     }
+
+    static _setFilterBodies(el) {
+        
+        SmartSearchEditorUI._manager.setFilterBodies(!SmartSearchEditorUI._manager.getFilterBodies());
+        let text = "Filter Bodies";
+        if (SmartSearchEditorUI._manager.getFilterBodies()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
+    }
+
 
 
     static _limitSelectionShow() {
