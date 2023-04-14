@@ -1,4 +1,7 @@
-# SQuerys
+# Advanced Search for HOOPS Communicator
+
+## Version Update (1.1.2)
+* renamed to SmartSearch
 
 ## Version Update (1.1.0)
 * UI included in main library
@@ -40,9 +43,6 @@
 * Display of property stats (nummber of options, number of occurences) in editor
 * Various other improvements and fixes
 
-## Version Update (0.8.0)
-* Renamed to SQuery
-
 ## Version Update (0.7.7)
 * Ability to search Dates
 * Ability to search past found nodes
@@ -65,8 +65,8 @@
 * Abiltity to hide top row UI buttons
 * Update to HOOPS Communicator 2023 U1
 
-![alt text](https://github.com/techsoft3d/ts3d-hc-squery/blob/master/readme_images/image1.png?raw=true)
-## Advanced Search for HOOPS Communicator
+## Overview
+![alt text](https://github.com/techsoft3d/ts3d-hc-smartsearch/blob/master/readme_images/image1.png?raw=true)  
 This library provides advanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
@@ -79,15 +79,15 @@ For questions/feedback please send an email to guido@techsoft3d.com or post in o
 * Improved Documentation
 
 ## Install
-Add `dist/squery.min.js` to your project 
+Add `dist/hcSmartSearch.min.js` to your project 
 ```
-    <script src="./js/squery.min.js"></script>
+    <script src="./js/hcSmartSearch.min.js"></script>
 ```
 
-If you are using the UI component of the library you also need to include the tabulator library (tested with version 5.4.4) and add `dist/squeryui.css` to your project which contains a custom tabulator theme.
+If you are using the UI component of the library you also need to include the tabulator library (tested with version 5.4.4) and add `dist/hcSmartSearchUI.css` to your project which contains a custom tabulator theme.
 ```
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables@5.4.4/dist/js/tabulator.min.js"></script>
-    <link rel="stylesheet" href="./css/squeryui.css">
+    <link rel="stylesheet" href="./css/hcSmartSearchUI.css">
 ```
 
 ## Demo
@@ -101,9 +101,9 @@ Here is how to start the demo with the provided sample model locally when using 
 ## Initialization
 
 ```
-let manager = new hcSQuery.SQueryManager(hwv);
-hcSQuery.SQueryEditorUI.initialize("searcheditor", manager);
-hcSQuery.SQueryEditorUI.display();
+let manager = new hcSmartSearch.SmartSearchManager(hwv);
+hcSmartSearch.SmartSearchEditorUI.initialize("searcheditor", manager);
+hcSmartSearch.SmartSearchEditorUI.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
@@ -165,28 +165,28 @@ This will find all elements that are related to all IFCSPACE's which contain kit
 **Rel: Contained Property**  
 If this option is selected the search will be performed on the elements "contained in" the nodes with the specified text.
 
-**SQuery**  
+**SmartSearch**  
 If this option is selected the search will be performed on the specified Query
 
 
 ### Advanced Usage:
 
 ```
- hcSQuery.SQueryEditorUI.setChainSkip(1);
+ hcSmartSearch.SmartSearchEditorUI.setChainSkip(1);
 ```
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
 ```
- hcSQuery.SQueryEditorUI.setShowLimitOption(true);
+ hcSmartSearch.SmartSearchEditorUI.setShowLimitOption(true);
 ```
 Controls if the Limit checkbox should be visible in the UI.
 
-## SQueryManager UI
+## SmartSearchManager UI
 ### Initialization
 
 ```
-    hcSQuery.SQueryManagerUI.initialize("squerymanagercontainer",manager, true);
+    hcSmartSearch.SmartSearchManagerUI.initialize("searchmanagercontainer",manager, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 
@@ -203,13 +203,13 @@ With the optional Load/Export buttons the user can load and save the current lis
 
 ### Advanced Usage:
 
-A callback function can be provided that gets triggered on any change of the list of squeries. In the callback the list of queries can then be retrieved from the SQueryManager object and further processed (pushed to a server, etc.). See example below:
+A callback function can be provided that gets triggered on any change of the list of squeries. In the callback the list of queries can then be retrieved from the SmartSearchManager object and further processed (pushed to a server, etc.). See example below:
 ```
-    hcSQuery.SQueryManagerUI.setUpdatedCallback(squeryupdated);        
-    async function squeryupdated() {
-        let text = JSON.stringify({filtersarray:hcSQuery.SQueryManager.toJSON()});
+    hcSmartSearch.SmartSearchManagerUI.setUpdatedCallback(searchupdated);        
+    async function searchupdated() {
+        let text = JSON.stringify({filtersarray:hcSmartSearch.SmartSearchManager.toJSON()});
 
-        var res = await fetch(serveraddress + '/api/sQueries', {
+        var res = await fetch(serveraddress + '/api/smartsearches', {
             method: 'POST', // *GET, POST, PUT, DELETE, etc.
             headers: {
             'Content-Type': 'application/json'      
@@ -220,37 +220,37 @@ A callback function can be provided that gets triggered on any change of the lis
 }
 ```
 
-The JSON object representing a list of squeries can be added to the SQueryManager with the code below:
+The JSON object representing a list of squeries can be added to the SmartSearchManager with the code below:
 
 ```
-    hcSQuery.SQueryManager.fromJSON(data.filtersarray);
-    hcSQuery.SQueryManagerUI.refreshUI();
+    hcSmartSearch.SmartSearchManager.fromJSON(data.filtersarray);
+    hcSmartSearch.SmartSearchManagerUI.refreshUI();
 ```
 
 
 
-## SQueryProperties UI
+## SmartSearchProperties UI
 ### Initialization
 
 
 ```
-  hcSQuery.SQueryPropertiesUI.initialize("spropertiescontainer",manager);
+  hcSmartSearch.SmartSearchPropertiesUI.initialize("spropertiescontainer",manager);
 ```
 
 
-Initializes the SQueryProperties UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. 
+Initializes the SmartSearchProperties UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. 
 
 
 ### Usage
 
-The SQuery Manager UI can turn a query into a property which means that it will be evaluated whenever the user selects an object in the webviewer. It basically becomes a dynamic user defined property. 
+The SmartSearch Manager UI can turn a query into a property which means that it will be evaluated whenever the user selects an object in the webviewer. It basically becomes a dynamic user defined property. 
 
 
 ## Performance and handling of Federated Models
-In order to ensure fast client-side search performance, the SQuery library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SQuery after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
+In order to ensure fast client-side search performance, the SmartSearch library generates an acceleration structure for the loaded model during initialization. This can take a few seconds for large models. The structure also needs to be regenerated whenever a new model is added to the scene. To improve the performance for this workflow it is possible to provide the startnode of the newly loaded model as well as a unique identifier (e.g. the name of the model) to the SmartSearch after the model has been loaded (make sure that the provided nodeid is part of the new model, in most cases this will be the child node of the node the model has been loaded into).
 
 ```
-  hcSQuery.SQuery.addModel("arboleda",nodeid);
+  hcSmartSearch.SmartSearch.addModel("arboleda",nodeid);
 ```
 
 When calling this function whenever a new model is added to the webviewer the acceleration structure only has to be generated for the newly added model and not the already existing models which  significantly improves initialization performance.
@@ -262,5 +262,5 @@ When calling this function whenever a new model is added to the webviewer the ac
 ### Demo:
 * [GoldenLayout](https://golden-layout.com/)
 
-### SQuery UI:
+### SmartSearch UI:
 * [Tabulator](http://tabulator.info/)
