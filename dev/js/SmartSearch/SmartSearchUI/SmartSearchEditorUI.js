@@ -520,7 +520,7 @@ export class SmartSearchEditorUI {
             choices =  ["contains","evaluate", "exists"];
         }
         else {
-            choices =  ["contains", "exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
+            choices =  ["contains", "regex","exists","!exists", ">=", "<=",">=(Date)", "<=(Date)", "=", "\u2260"];
         }
 
 

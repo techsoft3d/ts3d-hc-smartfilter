@@ -616,7 +616,7 @@ export class SmartSearch {
 
 
     async _checkCondition(id, condition, chaintext) {
-        if (condition.conditionType != SmartSearchConditionType.contains) {
+        if (condition.conditionType != SmartSearchConditionType.contains && condition.conditionType != SmartSearchConditionType.regex) {          
             if (condition.conditionType == SmartSearchConditionType.exists || condition.conditionType == SmartSearchConditionType.notExists) {
                 let res = false;
                 let invert = false;
@@ -805,7 +805,14 @@ export class SmartSearch {
             }
         }
         else {
-            let searchTerms = condition.text.split(",");
+            let searchTerms;
+            if (condition.conditionType == SmartSearchConditionType.contains) {            
+                    searchTerms = condition.text.split(",");
+            }
+            else {
+                searchTerms = condition.text;
+            }
+
             let searchAgainst = "";
             if (condition.propertyType == SmartSearchPropertyType.nodeName) {
                 searchAgainst = this._viewer.model.getNodeName(id);
@@ -863,6 +870,18 @@ export class SmartSearch {
 
             if (searchAgainst == undefined)
                 searchAgainst = "";
+
+            if (condition.conditionType != SmartSearchConditionType.contains)  {               
+                    const regex = new RegExp(searchTerms, 'gi'); // Removed the 'i' flag for case-sensitive matching
+                    const matches = searchAgainst.match(regex);
+                    if (matches) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                  
+            }               
             let foundmust = 0;
             let must = 0;
             let mustnot = 0;
