@@ -1,6 +1,9 @@
 # Advanced Search for HOOPS Communicator
 
-## Version Update (1.1.2)
+## Version Update (1.1.4)
+* regex support for searches
+
+## Version Update (1.1.4)
 * renamed to SmartSearch
 
 ## Version Update (1.1.0)

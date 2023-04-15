@@ -616,7 +616,8 @@ export class SmartSearch {
 
 
     async _checkCondition(id, condition, chaintext) {
-        if (condition.conditionType != SmartSearchConditionType.contains && condition.conditionType != SmartSearchConditionType.regex) {          
+        if (condition.conditionType != SmartSearchConditionType.contains && condition.conditionType != SmartSearchConditionType.regex 
+            && condition.conditionType != SmartSearchConditionType.notregex) {          
             if (condition.conditionType == SmartSearchConditionType.exists || condition.conditionType == SmartSearchConditionType.notExists) {
                 let res = false;
                 let invert = false;
@@ -871,16 +872,26 @@ export class SmartSearch {
             if (searchAgainst == undefined)
                 searchAgainst = "";
 
-            if (condition.conditionType != SmartSearchConditionType.contains)  {               
-                    const regex = new RegExp(searchTerms, 'gi'); // Removed the 'i' flag for case-sensitive matching
-                    const matches = searchAgainst.match(regex);
-                    if (matches) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                  
+            if (condition.conditionType != SmartSearchConditionType.contains) {
+                let regex;
+                try {
+                    regex = new RegExp(searchTerms, 'gi'); // Removed the 'i' flag for case-sensitive matching
+                }
+                catch (e) {
+                    return false;
+                }
+
+                const matches = searchAgainst.match(regex);
+                let res;
+                matches ? res = true : res = false;
+
+                if (condition.conditionType == SmartSearchConditionType.regex) {
+                    return res;
+                }
+                else {
+                    return !res;
+                }
+
             }               
             let foundmust = 0;
             let must = 0;

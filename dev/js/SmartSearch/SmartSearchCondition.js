@@ -9,7 +9,8 @@ const SmartSearchConditionType = {
     greaterOrEqualDate:7,
     lessOrEqualDate:8,
     evaluate:9,
-    regex:10
+    regex:10,
+    notregex:11
 
 };
 
@@ -73,7 +74,9 @@ export class SmartSearchCondition {
             case SmartSearchConditionType.unequal:
                 return "\u2260";
             case SmartSearchConditionType.regex:
-                return "regex";                  
+                return "regex";      
+            case SmartSearchConditionType.notregex:
+                return "!regex";                                  
         }
     }
 
@@ -101,7 +104,9 @@ export class SmartSearchCondition {
             case "evaluate":
                 return SmartSearchConditionType.evaluate;    
             case "regex":
-                 return SmartSearchConditionType.regex;                                                        
+                 return SmartSearchConditionType.regex;      
+             case "!regex":
+                return SmartSearchConditionType.notregex;                                                                         
         }
     }
 
