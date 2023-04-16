@@ -14,6 +14,8 @@ async function msready() {
     hcSmartSearch.SmartSearchEditorUI.display();
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);
+    hcSmartSearch.SmartSearchReportsUI.initialize("SmartSearchReportContainer",mySmartSearchManager);
+
     // hwv.selectionManager.setSelectionFilter(function (nodeid) {
     //     return nodeid;
     // }
@@ -44,6 +46,13 @@ function createUILayout() {
                             componentName: 'Viewer',
                             isClosable: false,
                             width: 80,
+                            componentState: { label: 'A' }
+                        },
+                        {
+                            type: 'component',
+                            componentName: 'Search Report',
+                            isClosable: false,
+                            height: 20,
                             componentState: { label: 'A' }
                         }],
                     },                 
@@ -98,6 +107,11 @@ function createUILayout() {
     myLayout.registerComponent('Search Properties', function (container, componentState) {
         $(container.getElement()).append($("#SmartSearchpropertiescontainer"));
     });
+
+    myLayout.registerComponent('Search Report', function (container, componentState) {
+        $(container.getElement()).append($("#SmartSearchReportContainer"));
+    });
+
 
     myLayout.on('stateChanged', function () {
         if (hwv != null) {
