@@ -114,11 +114,13 @@ export class SmartSearchReport {
     }
 
 
-    _getTableParamData(propname, ids) {
+    _getTableParamData(prop, ids) {
+        let propname = prop.prop;
         let isSame = true;
         let isNumber = true;
         let hasNumber = false;
         let lastValue = undefined;
+        let isAggregate = false;
         let sum = 0;
         for (let i=0;i<ids.length;i++) {
             let value = this._findPropValue2(propname, ids[i]);
@@ -140,7 +142,8 @@ export class SmartSearchReport {
 
         let res;
 
-        if (hasNumber && isNumber) {
+        if (hasNumber && isNumber && (!prop.aggtype || prop.aggtype == "sum")) {
+            isAggregate = true;
             res =  sum;
         }
         else if (isSame) {
@@ -155,7 +158,7 @@ export class SmartSearchReport {
             res =  "[Multiple]";
         }
 
-        return {isSame:isSame,isNumber:hasNumber && isNumber,result:res};
+        return {isSame:isSame,isNumber:hasNumber && isNumber,isAggregate: isAggregate,result:res};
     }
 
     determineColumnTypes() {
@@ -164,13 +167,13 @@ export class SmartSearchReport {
             let isNumber = false;
             for (let i in this._categoryHash) {
                 let res = this._getTableParamData(this._tableParams[j], this._categoryHash[i].ids);
-                if (res.isNumber) {
+                if (res.isNumber && res.isAggregate) {
                     isNumber = true;
                     break;
                 }
             }
             if (isNumber) {
-                tdata.push({isNumber:true,unit:this.getAMTUnit( this._tableParams[j])});
+                tdata.push({isNumber:true,unit:this.getAMTUnit( this._tableParams[j].prop)});
             }
             else {
                 tdata.push({isNumber:false,unit:""});
@@ -214,9 +217,11 @@ export class SmartSearchReport {
     }
 
     deleteTableParams(propname) {
-        let index = this._tableParams.indexOf(propname);
-        if (index > -1) {
-            this._tableParams.splice(index, 1);
+        for (let i=0;i<this._tableParams.length;i++) {
+            if (this._tableParams[i].prop == propname) {
+                this._tableParams.splice(i, 1);
+                break;
+            }
         }        
     }
 

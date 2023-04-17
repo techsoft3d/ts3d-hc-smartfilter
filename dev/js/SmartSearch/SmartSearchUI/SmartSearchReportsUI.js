@@ -53,7 +53,7 @@ export class SmartSearchReportsUI {
     }
 
     static _tablePropertySelected() {
-        SmartSearchReportsUI._report._tableParams.push($("#SmartSearchTablePropSelect")[0].value);
+        SmartSearchReportsUI._report._tableParams.push({prop:$("#SmartSearchTablePropSelect")[0].value});
         SmartSearchReportsUI._generateSettingsWindow();
     }
 
@@ -196,6 +196,16 @@ export class SmartSearchReportsUI {
     
     }
 
+    static _setColumnAggregator(propname,aggtype) {
+
+        if (propname.indexOf("tableParams") != -1) {
+            let tableParamIndex = parseInt(propname.split("tableParams")[1]);
+            let tableParam =  SmartSearchReportsUI._report.getTableParams()[tableParamIndex];
+            tableParam.aggtype = aggtype;
+            SmartSearchReportsUI._generateTable(false);
+        }
+    }
+
     static _generateOrgButton(text,type) {
         let html = "";
         html += '<button class="rectangular-button">';
@@ -204,9 +214,26 @@ export class SmartSearchReportsUI {
         return html;
     }
 
-    static _generateTable() {
-        SmartSearchReportsUI._report.generateTableHash();
-        let columnMenu = [        
+    static _generateTable(regenerateTable = true) {
+        if (regenerateTable) {
+            SmartSearchReportsUI._report.generateTableHash();
+        }
+        let columnMenu = [ 
+            {
+                label: "<i class='fas fa-user'></i> Single",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._setColumnAggregator(column.getDefinition().field,"single");
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Sum",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._setColumnAggregator(column.getDefinition().field,"sum");
+                }
+            },
+            {
+                separator:true,
+            },       
             {
                 label: "<i class='fas fa-user'></i> Assign Random Colors",
                 action: async function (e, column) {
@@ -240,9 +267,9 @@ export class SmartSearchReportsUI {
 
         let columnTypes = SmartSearchReportsUI._report.determineColumnTypes();
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
-            let title =  SmartSearchReportsUI._report._tableParams[i];
+            let title =  SmartSearchReportsUI._report._tableParams[i].prop;
             if (columnTypes[i].isNumber) {
-                title  += "(" + columnTypes[i].unit + ")";
+                title  += "(" + columnTypes[i].unit + ") Σ";
             }
 
             let colum = { title: title, field: "tableParams" + i, headerMenu: columnMenu };
@@ -327,7 +354,7 @@ export class SmartSearchReportsUI {
         html += '</select></span>';
         
         for (let i=0;i<SmartSearchReportsUI._report._tableParams.length;i++) {
-            html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._tableParams[i],1);
+            html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._tableParams[i].prop,1);
         }
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateTable()">Generate</button>';
         html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI.applyColors()">Apply Colors</button>';
