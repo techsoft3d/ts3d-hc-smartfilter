@@ -48,12 +48,12 @@ export class SmartSearchReportsUI {
     }
 
     static _orgPropertySelected() {
-        SmartSearchReportsUI._report._orgProperties.push($("#SmartSearchPropSelect")[0].value);
+        SmartSearchReportsUI._report._orgProperties.push($("#SmartSearchOrgPropSelect")[0].value);
         SmartSearchReportsUI._generateSettingsWindow();
     }
 
     static _tablePropertySelected() {
-        SmartSearchReportsUI._report._tableParams.push($("#SmartSearchPropSelect")[0].value);
+        SmartSearchReportsUI._report._tableParams.push($("#SmartSearchTablePropSelect")[0].value);
         SmartSearchReportsUI._generateSettingsWindow();
     }
 
@@ -209,13 +209,17 @@ export class SmartSearchReportsUI {
         return html;
     }
 
+    static _generateTable() {
+        SmartSearchReportsUI._report.generateTableHash();
+    }
+
     static _generateSettingsWindow() {
         let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
         sortedStrings.unshift("Choose Property");
         $("#SmartSearchReportsUIOptions").empty();
 
         let html = '<div style="height:55px;">';
-        html += '<span style="top:0px;position:relative"><span style="font-family:courier">Organize by:</span><select id="SmartSearchPropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._orgPropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
+        html += '<span style="top:0px;position:relative"><span style="font-family:courier">Organize by:</span><select id="SmartSearchOrgPropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._orgPropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
 
         for (let i = 0; i < sortedStrings.length; i++) {
                 html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
@@ -226,7 +230,7 @@ export class SmartSearchReportsUI {
             html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._orgProperties[i],0);
         }
 
-        html += '<br><br><span style="top:0px;position:relative"><span style="font-family:courier">Params:</span><select id="SmartSearchPropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._tablePropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
+        html += '<br><br><span style="top:0px;position:relative"><span style="font-family:courier">Params:</span><select id="SmartSearchTablePropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._tablePropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
 
         for (let i = 0; i < sortedStrings.length; i++) {
             html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
@@ -236,6 +240,7 @@ export class SmartSearchReportsUI {
         for (let i=0;i<SmartSearchReportsUI._report._tableParams.length;i++) {
             html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._tableParams[i],1);
         }
+        html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateTable()">Generate</button>';
         html += '</div>';
         $("#SmartSearchReportsUIOptions").append(html);
     }

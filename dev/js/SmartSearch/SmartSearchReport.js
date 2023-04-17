@@ -6,9 +6,75 @@ export class SmartSearchReport {
         this._manager = manager;
         this._viewer = this._manager._viewer;
         this._result = result;
-        this._orgProperties = ["test"];
-        this._tableParams = ["test"];
+        this._orgProperties = [];
+        this._tableParams = [];
     }
+
+
+    _findPropValue(propname, searchResult) {
+        if (propname == "Node Name") {
+            return searchResult.name;
+        }
+        else if (propname == "Node Name (No :Ext)") {
+            let name;
+            let dindex = searchResult.name.lastIndexOf(":");
+            if (dindex > -1) {
+                name = searchResult.name.substring(0,dindex);
+            }
+            else {
+                name = searchResult.name;
+            }
+            return name;
+        }
+        else if (propname == "Node Name (No -Ext)") {
+            let name;
+            let dindex = searchResult.name.lastIndexOf("-");
+            if (dindex > -1) {
+                name = searchResult.name.substring(0,dindex);
+            }
+            else {
+                name = searchResult.name;
+            }
+            return name;
+        }
+        else if (propname == "Node Parent") {
+             return this._viewer.model.getNodeName(this._viewer.model.getNodeParent(searchResult.id));
+        }
+        else if (propname == "Node Type") {
+           return Communicator.NodeType[this._viewer.model.getNodeType(searchResult.id)];
+        }
+        else {
+            let id = searchResult.id;
+            return this._manager._propertyHash[id][propname] 
+        }
+    }
+
+    generateTableHash() {
+
+        let searchresults = this._result.getItems();
+
+        this._categoryHash = [];
+
+        for (let i = 0; i < searchresults.length; i++) {
+
+            let propvalues = "";
+            for (let j=0;j<this._orgProperties.length;j++) {
+                let propname = this._orgProperties[j];
+                let propvalue = this._findPropValue(propname, searchresults[i]);
+                if (propvalue != undefined) {
+                    propvalues += "[" + propvalue + "]";
+                }
+                else {
+                    propvalues += "[]";
+                }
+            }
+            if (this._categoryHash[propvalues] == undefined) {
+                this._categoryHash[propvalues] = { ids: [] };
+            }
+            this._categoryHash[propvalues].ids.push(searchresults[i].id);
+        }
+    }
+
 
     getTableProperty() {
         return this._tableProperty;
