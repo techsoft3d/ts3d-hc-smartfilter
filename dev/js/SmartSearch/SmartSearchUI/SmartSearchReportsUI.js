@@ -87,14 +87,10 @@ export class SmartSearchReportsUI {
 
     }
 
-    static applyColors() {
-        let autoColors = SmartSearchEditorUI._mainFilter.getAutoColors();
-        if (!autoColors) {
-            return;
-        }
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
-            if (autoColors[i]) {
-                SmartSearchEditorUI._viewer.model.setNodesFaceColor(SmartSearchReportsUI._results.getCategoryHash()[i].ids, autoColors[i]);
+    static applyColors() {        
+        for (let i in SmartSearchReportsUI._report.getCategoryHash()) {
+            if (SmartSearchReportsUI._report.getCategoryHash()[i].color) {
+                SmartSearchEditorUI._viewer.model.setNodesFaceColor(SmartSearchReportsUI._report.getCategoryHash()[i].ids, SmartSearchReportsUI._report.getCategoryHash()[i].color);
             }
         }
     }
@@ -118,9 +114,15 @@ export class SmartSearchReportsUI {
 
     static _updateColorsInTable() {
         let tdata = [];
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
-            let color = SmartSearchReportsUI._results.getCategoryHash()[i].color;
-            let data = { color: 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)',id: i };
+        for (let i in SmartSearchReportsUI._report.getCategoryHash()) {
+            let color = SmartSearchReportsUI._report.getCategoryHash()[i].color;
+            let data;
+            if (color) {
+                data = { color: 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)',id: i };
+            }
+            else {
+                data = { color:null,id: i };
+            }
             tdata.push(data);
         }
         SmartSearchReportsUI._table.updateData(tdata);
@@ -158,26 +160,19 @@ export class SmartSearchReportsUI {
 
 
     static assignColorsRandom() {
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
+        for (let i in SmartSearchReportsUI._report.getCategoryHash()) {
             let color = new Communicator.Color(Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256));
-            SmartSearchReportsUI._results.getCategoryHash()[i].color = color;
+            SmartSearchReportsUI._report.getCategoryHash()[i].color = color;
         }
 
-        let autoColors = [];
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
-            autoColors[i] = SmartSearchReportsUI._results.getCategoryHash()[i].color;
-        }
-
-        SmartSearchEditorUI._mainFilter.setAutoColors(autoColors, SmartSearchReportsUI._results.getTableProperty());
         SmartSearchReportsUI._updateColorsInTable();
 
     }
 
     static _clearColors() {
-        SmartSearchEditorUI._mainFilter.setAutoColors(null,null);
         let tdata = [];
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
-            SmartSearchReportsUI._results.getCategoryHash()[i].color = undefined;
+        for (let i in SmartSearchReportsUI._report.getCategoryHash()) {
+            SmartSearchReportsUI._report.getCategoryHash()[i].color = undefined;
             let data = { color: null,id: i };
             tdata.push(data);
         }
@@ -247,7 +242,7 @@ export class SmartSearchReportsUI {
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
             let title =  SmartSearchReportsUI._report._tableParams[i];
             if (columnTypes[i].isNumber) {
-                title  += SmartSearchReportsUI._report._tableParams[i] + "(" + columnTypes[i].unit + ")";
+                title  += "(" + columnTypes[i].unit + ")";
             }
 
             let colum = { title: title, field: "tableParams" + i, headerMenu: columnMenu };
@@ -258,7 +253,7 @@ export class SmartSearchReportsUI {
             tabulatorColumnes.push(colum);
         }      
         tabulatorColumnes.push({title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 45,
-            formatter: "color", editorParams: { values: ["red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
+            formatter: "color", editorParams: { values: ["empty","red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
         });
 
         tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
@@ -292,6 +287,19 @@ export class SmartSearchReportsUI {
             }
 
         });
+
+        SmartSearchReportsUI._table.on("cellEdited", function (cell) {
+            if (cell.getField() == "color") {
+                let data = cell.getRow().getData();
+                if (data.color != "empty") {
+                    SmartSearchReportsUI._report.getCategoryHash()[data.id].color = SmartSearchReportsUI._report.convertColor(data.color);
+                }
+                else {
+                    SmartSearchReportsUI._report.getCategoryHash()[data.id].color = null;
+                }
+                SmartSearchReportsUI._updateColorsInTable();
+            }
+        });      
     }
 
     static _generateSettingsWindow() {
@@ -322,6 +330,8 @@ export class SmartSearchReportsUI {
             html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._tableParams[i],1);
         }
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateTable()">Generate</button>';
+        html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI.applyColors()">Apply Colors</button>';
+
         html += '</div>';
         $("#SmartSearchReportsUIOptions").append(html);
     }

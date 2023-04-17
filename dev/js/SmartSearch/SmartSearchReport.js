@@ -672,4 +672,27 @@ export class SmartSearchReport {
         }
         return tdata;
     }
+
+    convertColor(color) {
+        switch (color) {
+            case "red":
+                return new Communicator.Color(255, 0, 0);
+            case "green":
+                return new Communicator.Color(0, 255, 0);
+            case "blue":
+                return new Communicator.Color(0, 0, 255);
+            case "yellow":
+                return new Communicator.Color(255, 255, 0);
+            case "brown":
+                return new Communicator.Color(150, 75, 0);
+            case "black":
+                return new Communicator.Color(0, 0, 0);
+            case "white":
+                return new Communicator.Color(255, 255, 255);
+            case "orange":
+                return new Communicator.Color(255, 165, 0);
+            case "grey":
+                return new Communicator.Color(128, 128, 128);
+        }
+    }
 }
