@@ -6,6 +6,8 @@ export class SmartSearchReport {
         this._manager = manager;
         this._viewer = this._manager._viewer;
         this._result = result;
+        this._orgProperties = ["test"];
+        this._tableParams = ["test"];
     }
 
     getTableProperty() {
@@ -15,6 +17,20 @@ export class SmartSearchReport {
 
     setTableProperty(property) {
         this._tableProperty = property;
+    }
+
+    deleteOrgProperty(propname) {
+        let index = this._orgProperties.indexOf(propname);
+        if (index > -1) {
+            this._orgProperties.splice(index, 1);
+        }        
+    }
+
+    deleteTableParams(propname) {
+        let index = this._tableParams.indexOf(propname);
+        if (index > -1) {
+            this._tableParams.splice(index, 1);
+        }        
     }
 
     getCategoryHash() {

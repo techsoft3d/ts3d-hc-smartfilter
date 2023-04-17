@@ -17,8 +17,8 @@ export class SmartSearchReportsUI {
     static async display() {     
         let html = "";
         html += '<div id = "SmartSearchReportsUIMain" style="position:absolute;width:100%;height:100%;font-size:12px">';
-        html += '<div id = "SmartSearchReportsUIOptions" style="position:absolute;width:300px;height:100%"></div>';
-        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:300px;width:calc(100% - 300px);height:100%"></div>';
+        html += '<div id = "SmartSearchReportsUIOptions" style="background:white;position:absolute;width:325px;height:100%"></div>';
+        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:300px;width:calc(100% - 325px);height:100%"></div>';
         html += '</div>';
 
         $("#" + SmartSearchReportsUI._maindiv).empty();
@@ -46,7 +46,17 @@ export class SmartSearchReportsUI {
         }
         return amountStrings;
     }
-   
+
+    static _orgPropertySelected() {
+        SmartSearchReportsUI._report._orgProperties.push($("#SmartSearchPropSelect")[0].value);
+        SmartSearchReportsUI._generateSettingsWindow();
+    }
+
+    static _tablePropertySelected() {
+        SmartSearchReportsUI._report._tableParams.push($("#SmartSearchPropSelect")[0].value);
+        SmartSearchReportsUI._generateSettingsWindow();
+    }
+
     static _propertySelected() {
         SmartSearchReportsUI._results.setTableProperty($("#SmartSearchPropSelect")[0].value);
         SmartSearchEditorUI._mainFilter.setAutoColors(null, null);
@@ -176,7 +186,58 @@ export class SmartSearchReportsUI {
 
     static generateReport(report) {
         SmartSearchReportsUI._report = report;
-        SmartSearchReportsUI._generatePropertyView();
+        SmartSearchReportsUI._generateSettingsWindow();
+    }
+
+    static _deleteFromButton(c,type) {
+        let propname = $(c).prev()[0].innerHTML;
+        if (type == 0) {
+            SmartSearchReportsUI._report.deleteOrgProperty(propname);
+        }
+        else {
+            SmartSearchReportsUI._report.deleteTableParams(propname);
+        }
+        SmartSearchReportsUI._generateSettingsWindow();
+    
+    }
+
+    static _generateOrgButton(text,type) {
+        let html = "";
+        html += '<button class="rectangular-button">';
+        html += '<span>' + text + '</span><span onclick = "hcSmartSearch.SmartSearchReportsUI._deleteFromButton(this,' + type + ')" class="x">&times;</span>';
+        html += '</button>';
+        return html;
+    }
+
+    static _generateSettingsWindow() {
+        let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
+        sortedStrings.unshift("Choose Property");
+        $("#SmartSearchReportsUIOptions").empty();
+
+        let html = '<div style="height:55px;">';
+        html += '<span style="top:0px;position:relative"><span style="font-family:courier">Organize by:</span><select id="SmartSearchPropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._orgPropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
+
+        for (let i = 0; i < sortedStrings.length; i++) {
+                html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+
+        for (let i=0;i<SmartSearchReportsUI._report._orgProperties.length;i++) {
+            html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._orgProperties[i],0);
+        }
+
+        html += '<br><br><span style="top:0px;position:relative"><span style="font-family:courier">Params:</span><select id="SmartSearchPropSelect" onchange=\'hcSmartSearch.SmartSearchReportsUI._tablePropertySelected();\' class="SmartSearchPropertyResultsSelect" value="">';
+
+        for (let i = 0; i < sortedStrings.length; i++) {
+            html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+        
+        for (let i=0;i<SmartSearchReportsUI._report._tableParams.length;i++) {
+            html += SmartSearchReportsUI._generateOrgButton(SmartSearchReportsUI._report._tableParams[i],1);
+        }
+        html += '</div>';
+        $("#SmartSearchReportsUIOptions").append(html);
     }
 
     static _generatePropertyView(redrawOnly = false) {

@@ -52,7 +52,7 @@ function createUILayout() {
                             type: 'component',
                             componentName: 'Search Report',
                             isClosable: false,
-                            height: 20,
+                            height: 25,
                             componentState: { label: 'A' }
                         }],
                     },                 
