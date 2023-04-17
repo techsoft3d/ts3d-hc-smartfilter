@@ -598,52 +598,43 @@ export class SmartSearchReport {
     }
 
 
-    calculateGradientData(column,tablePropertyAMT,aggType) {
-        let pname = column;
-        let rows = this.getCategoryTableData(tablePropertyAMT, aggType);
+    calculateGradientData(column) {
 
+        let rows = this.getTableData();
+        
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
         for (let i = 0; i < rows.length; i++) {
             let num;
-            if (pname == "num") {
+            if (column == "num") {
                 num = parseInt(rows[i].num);
             }
-            else if (pname == "amt") {
-                num = parseFloat(rows[i].amt);
-            }
             else {
-                num = parseFloat(rows[i].name);
+                num = parseFloat(rows[i][column]);
             }
 
-            if (num < min) min = num;
-            
-            if (num > max) max = num;
+            if (!isNaN(num)) {
+                if (num < min) min = num;
+
+                if (num > max) max = num;
+            }
             
         }
         let tdist = (max - min);
 
         for (let i = 0; i < rows.length; i++) {
             let num;
-            if (pname == "num") {
+            if (column == "num") {
                 num = parseInt(rows[i].num);
-            }
-            else if (pname == "amt") {
-                num = parseFloat(rows[i].amt);
-            }
+            }       
             else {
-                num = parseFloat(rows[i].name);
+                num = parseFloat(rows[i][column]);
             }
-
-            let m = (num - min) / tdist * 256;
-            this._categoryHash[rows[i].id].color = new Communicator.Color(m, m, m);
-        }
-
-        let autoColors = [];
-        for (let i in this._categoryHash) {
-            autoColors[i] = this._categoryHash[i].color;
-        }
-        this._query.setAutoColors(autoColors,this._tableProperty);
+            if (!isNaN(num)) {
+                let m = (num - min) / tdist * 255;
+                this._categoryHash[rows[i].id].color = new Communicator.Color(m, m, m);
+            }
+        }      
     }
 
     caculateExpandedColorsGradient(column,nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {

@@ -18,7 +18,7 @@ export class SmartSearchReportsUI {
         let html = "";
         html += '<div id = "SmartSearchReportsUIMain" style="position:absolute;width:100%;height:100%;font-size:12px">';
         html += '<div id = "SmartSearchReportsUIOptions" style="background:white;position:absolute;width:325px;height:100%"></div>';
-        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:325px;width:calc(100% - 325px);height:100%"></div>';
+        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:325px;width:calc(100% - 325px);height:100%;font-size:12px"></div>';
         html += '</div>';
 
         $("#" + SmartSearchReportsUI._maindiv).empty();
@@ -101,14 +101,10 @@ export class SmartSearchReportsUI {
         let delta = 256/rows.length;
         for (let i=0;i<rows.length;i++) {
             let m = delta * rows[i].getPosition();
-            SmartSearchReportsUI._results.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m,m,m);
+            SmartSearchReportsUI._report.getCategoryHash()[rows[i].getData().id].color = new Communicator.Color(m,m,m);
         }
 
-        let autoColors = [];
-        for (let i in SmartSearchReportsUI._results.getCategoryHash()) {
-            autoColors[i] = SmartSearchReportsUI._results.getCategoryHash()[i].color;
-        }
-        SmartSearchEditorUI._mainFilter.setAutoColors(autoColors, SmartSearchReportsUI._results.getTableProperty());
+          
         SmartSearchReportsUI._updateColorsInTable();
     }
 
@@ -146,15 +142,13 @@ export class SmartSearchReportsUI {
     static _assignColorsGradient(column) {
      
         let pname = column;
-        if (column == "name") {
-            if (!SmartSearchReportsUI._results.isNumberProp(SmartSearchReportsUI._results.getTableProperty())) {
+        if (column == "org") {
+            if (!SmartSearchReportsUI._report._orgProperties.length > 1 || !SmartSearchReportsUI._report.isNumberProp(SmartSearchReportsUI._report._orgProperties[0])) {
                 SmartSearchReportsUI._assignColorsMainGradient();
                 return;
             }
-            pname = SmartSearchReportsUI._results.getTableProperty();
         }
-        SmartSearchReportsUI._results.calculateGradientData(pname,SmartSearchReportsUI._tablePropertyAMT,SmartSearchReportsUI._aggType);
-      
+        SmartSearchReportsUI._report.calculateGradientData(pname);      
         SmartSearchReportsUI._updateColorsInTable();
     }
 
@@ -292,7 +286,7 @@ export class SmartSearchReportsUI {
         tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
 
         SmartSearchReportsUI._table = new Tabulator("#SmartSearchReportsUITabulator", {
-            rowHeight: 15,
+            rowHeight: 16,
             selectable: 0,
             layout: "fitColumns",
             columns: tabulatorColumnes,
