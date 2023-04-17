@@ -10,6 +10,18 @@ export class SmartSearchReport {
         this._tableParams = [];
     }
 
+    getTableParams() {
+        return this._tableParams;
+    }
+
+    getOrgString() {
+        let orgString = "";
+        for (let i=0;i<this._orgProperties.length;i++) {
+            orgString += "[" + this._orgProperties[i] + "]";
+        }
+        return orgString;
+    }
+
 
     _findPropValue(propname, searchResult) {
         if (propname == "Node Name") {
@@ -49,6 +61,22 @@ export class SmartSearchReport {
         }
     }
 
+    _findPropValue2(propname, nodeid) {
+        if (propname.indexOf("Node Name") != -1) {
+            return this._viewer.model.getNodeName(nodeid);
+        }
+        else if (propname == "Node Parent") {
+             return this._viewer.model.getNodeName(this._viewer.model.getNodeParent(searchResult.id));
+        }
+        else if (propname == "Node Type") {
+           return Communicator.NodeType[this._viewer.model.getNodeType(nodeid)];
+        }
+        else {
+            return this._manager._propertyHash[nodeid][propname] 
+        }
+    }
+    
+
     generateTableHash() {
 
         let searchresults = this._result.getItems();
@@ -73,6 +101,61 @@ export class SmartSearchReport {
             }
             this._categoryHash[propvalues].ids.push(searchresults[i].id);
         }
+    }
+    _getTableParamData(propname, ids) {
+        let isSame = true;
+        let isNumber = true;
+        let hasNumber = false;
+        let lastValue = undefined;
+        let sum = 0;
+        for (let i=0;i<ids.length;i++) {
+            let value = this._findPropValue2(propname, ids[i]);
+            if (value != undefined) {
+                let fValue = parseFloat(value);
+                if (!isNaN(fValue)) {
+                    sum += fValue;
+                    hasNumber = true;
+                }
+                else {
+                    isNumber = false;
+                }
+            }
+            if (i>0 && lastValue != value) {
+                isSame = false;
+            }
+            lastValue = value;
+        }
+
+        if (hasNumber && isNumber) {
+            return sum;
+        }
+        if (isSame) {
+            if (lastValue == undefined) {
+                return "";
+            }
+            else {
+                return lastValue;
+            }
+        }
+        else {
+            return "";
+        }
+    }
+
+
+    getTableData() {
+        let tdata = [];
+        for (let i in this._categoryHash) {
+
+            let data = { org: i, num: this._categoryHash[i].ids.length, color:""};
+            for (let j=0;j<this._tableParams.length;j++) {
+                let res = this._getTableParamData(this._tableParams[j],this._categoryHash[i].ids);
+                data["tableParams" + j] = res;
+            }
+            tdata.push(data);
+        }
+
+        return tdata;
     }
 
 

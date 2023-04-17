@@ -18,7 +18,7 @@ export class SmartSearchReportsUI {
         let html = "";
         html += '<div id = "SmartSearchReportsUIMain" style="position:absolute;width:100%;height:100%;font-size:12px">';
         html += '<div id = "SmartSearchReportsUIOptions" style="background:white;position:absolute;width:325px;height:100%"></div>';
-        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:300px;width:calc(100% - 325px);height:100%"></div>';
+        html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:325px;width:calc(100% - 325px);height:100%"></div>';
         html += '</div>';
 
         $("#" + SmartSearchReportsUI._maindiv).empty();
@@ -211,6 +211,57 @@ export class SmartSearchReportsUI {
 
     static _generateTable() {
         SmartSearchReportsUI._report.generateTableHash();
+        let columnMenu = [        
+            {
+                label: "<i class='fas fa-user'></i> Assign Random Colors",
+                action: async function (e, column) {
+                    SmartSearchReportsUI.assignColorsRandom();
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Assign Gradient",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._assignColorsGradient(column.getDefinition().field);
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Clear Colors",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._clearColors();
+                }
+            },
+            
+        ];
+
+
+        $("#SmartSearchReportsUITabulator").empty();
+        $("#SmartSearchReportsUITabulator").css("overflow", "inherit");
+
+        $("#SmartSearchReportsUITabulator").append('<div class = "SmartSearchReportsUITabulator" id = "SmartSearchReportsUITabulator"></div>');
+        let tabulatorColumnes = [];
+        
+        tabulatorColumnes.push({ title: SmartSearchReportsUI._report.getOrgString(), field: "org", sorter: "string", headerMenu: columnMenu });
+        tabulatorColumnes.push({title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu});        
+        for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
+            tabulatorColumnes.push({ title: SmartSearchReportsUI._report._tableParams[i], field: "tableParams" + i, sorter: "string", headerMenu: columnMenu });
+        }      
+        tabulatorColumnes.push({title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 45,
+            formatter: "color", editorParams: { values: ["red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
+        });
+
+        tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
+
+        SmartSearchReportsUI._table = new Tabulator("#SmartSearchReportsUITabulator", {
+            rowHeight: 15,
+            selectable: 0,
+            layout: "fitColumns",
+            columns: tabulatorColumnes,
+        });
+
+        SmartSearchReportsUI._table.on("tableBuilt", function () {
+            let tdata = SmartSearchReportsUI._report.getTableData();
+            SmartSearchReportsUI._table.setData(tdata);
+        });
     }
 
     static _generateSettingsWindow() {
