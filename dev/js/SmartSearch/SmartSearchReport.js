@@ -16,10 +16,15 @@ export class SmartSearchReport {
 
     getOrgString() {
         let orgString = "";
-        for (let i=0;i<this._orgProperties.length;i++) {
-            orgString += "[" + this._orgProperties[i] + "]";
+        if (this._orgProperties.length == 1) {
+            return this._orgProperties[0];
         }
-        return orgString;
+        else {
+            for (let i = 0; i < this._orgProperties.length; i++) {
+                orgString += "[" + this._orgProperties[i] + "]";
+            }
+            return orgString;
+        }
     }
 
 
@@ -66,7 +71,7 @@ export class SmartSearchReport {
             return this._viewer.model.getNodeName(nodeid);
         }
         else if (propname == "Node Parent") {
-             return this._viewer.model.getNodeName(this._viewer.model.getNodeParent(searchResult.id));
+             return this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeid));
         }
         else if (propname == "Node Type") {
            return Communicator.NodeType[this._viewer.model.getNodeType(nodeid)];
@@ -86,14 +91,19 @@ export class SmartSearchReport {
         for (let i = 0; i < searchresults.length; i++) {
 
             let propvalues = "";
-            for (let j=0;j<this._orgProperties.length;j++) {
+            for (let j = 0; j < this._orgProperties.length; j++) {
                 let propname = this._orgProperties[j];
                 let propvalue = this._findPropValue(propname, searchresults[i]);
-                if (propvalue != undefined) {
-                    propvalues += "[" + propvalue + "]";
+                if (this._orgProperties.length == 1) {
+                    propvalue != undefined ? propvalues = propvalue : propvalues = "";
                 }
                 else {
-                    propvalues += "[]";
+                    if (propvalue != undefined) {
+                        propvalues += "[" + propvalue + "]";
+                    }
+                    else {
+                        propvalues += "[]";
+                    }
                 }
             }
             if (this._categoryHash[propvalues] == undefined) {
@@ -102,6 +112,8 @@ export class SmartSearchReport {
             this._categoryHash[propvalues].ids.push(searchresults[i].id);
         }
     }
+
+
     _getTableParamData(propname, ids) {
         let isSame = true;
         let isNumber = true;
@@ -126,31 +138,57 @@ export class SmartSearchReport {
             lastValue = value;
         }
 
+        let res;
+
         if (hasNumber && isNumber) {
-            return sum;
+            res =  sum;
         }
-        if (isSame) {
+        else if (isSame) {
             if (lastValue == undefined) {
-                return "";
+                res = "";
             }
             else {
-                return lastValue;
+                res =  lastValue;
             }
         }
         else {
-            return "";
+            res =  "[Multiple]";
         }
+
+        return {isSame:isSame,isNumber:hasNumber && isNumber,result:res};
     }
+
+    determineColumnTypes() {
+        let tdata = [];
+        for (let j = 0; j < this._tableParams.length; j++) {
+            let isNumber = false;
+            for (let i in this._categoryHash) {
+                let res = this._getTableParamData(this._tableParams[j], this._categoryHash[i].ids);
+                if (res.isNumber) {
+                    isNumber = true;
+                    break;
+                }
+            }
+            if (isNumber) {
+                tdata.push({isNumber:true,unit:this.getAMTUnit( this._tableParams[j])});
+            }
+            else {
+                tdata.push({isNumber:false,unit:""});
+            }
+        }
+        return tdata;
+    }
+
 
 
     getTableData() {
         let tdata = [];
         for (let i in this._categoryHash) {
 
-            let data = { org: i, num: this._categoryHash[i].ids.length, color:""};
+            let data = { org: i, num: this._categoryHash[i].ids.length, color:"",id:i};
             for (let j=0;j<this._tableParams.length;j++) {
                 let res = this._getTableParamData(this._tableParams[j],this._categoryHash[i].ids);
-                data["tableParams" + j] = res;
+                data["tableParams" + j] = res.result;
             }
             tdata.push(data);
         }

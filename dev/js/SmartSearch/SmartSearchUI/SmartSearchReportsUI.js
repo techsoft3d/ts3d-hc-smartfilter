@@ -242,8 +242,20 @@ export class SmartSearchReportsUI {
         
         tabulatorColumnes.push({ title: SmartSearchReportsUI._report.getOrgString(), field: "org", sorter: "string", headerMenu: columnMenu });
         tabulatorColumnes.push({title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu});        
+
+        let columnTypes = SmartSearchReportsUI._report.determineColumnTypes();
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
-            tabulatorColumnes.push({ title: SmartSearchReportsUI._report._tableParams[i], field: "tableParams" + i, sorter: "string", headerMenu: columnMenu });
+            let title =  SmartSearchReportsUI._report._tableParams[i];
+            if (columnTypes[i].isNumber) {
+                title  += SmartSearchReportsUI._report._tableParams[i] + "(" + columnTypes[i].unit + ")";
+            }
+
+            let colum = { title: title, field: "tableParams" + i, headerMenu: columnMenu };
+            if (columnTypes[i].isNumber) {
+                colum.bottomCalc = "sum";
+            }
+
+            tabulatorColumnes.push(colum);
         }      
         tabulatorColumnes.push({title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 45,
             formatter: "color", editorParams: { values: ["red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
@@ -261,6 +273,24 @@ export class SmartSearchReportsUI {
         SmartSearchReportsUI._table.on("tableBuilt", function () {
             let tdata = SmartSearchReportsUI._report.getTableData();
             SmartSearchReportsUI._table.setData(tdata);
+        });
+
+        SmartSearchReportsUI._table.on("rowClick", async function (e, row) {
+            let data = row.getData();
+
+            let ids = SmartSearchReportsUI._report.getCategoryHash()[data.id].ids;
+            SmartSearchReportsUI._viewer.selectionManager.clear();
+            if (ids.length == 1) {
+                SmartSearchReportsUI._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
+            }
+            else {
+                let selections = [];
+                for (let i = 0; i < ids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+                }
+                SmartSearchReportsUI._viewer.selectionManager.add(selections);
+            }
+
         });
     }
 
