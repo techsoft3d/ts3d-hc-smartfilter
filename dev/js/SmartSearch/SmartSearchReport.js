@@ -120,7 +120,7 @@ export class SmartSearchReport {
         let isNumber = true;
         let hasNumber = false;
         let lastValue = undefined;
-        let isAggregate = false;
+       
         let sum = 0;
         for (let i=0;i<ids.length;i++) {
             let value = this._findPropValue2(propname, ids[i]);
@@ -142,9 +142,16 @@ export class SmartSearchReport {
 
         let res;
 
-        if (hasNumber && isNumber && (!prop.aggtype || prop.aggtype == "sum")) {
-            isAggregate = true;
-            res =  sum;
+        if (hasNumber && isNumber) {
+            if (!prop.aggtype || prop.aggtype == "sum") {
+                res =  sum;
+            }
+            else if (isSame) {
+                res= parseFloat(lastValue);
+            }
+            else {
+                res =  "[Multiple]";
+            }
         }
         else if (isSame) {
             if (lastValue == undefined) {
@@ -158,7 +165,7 @@ export class SmartSearchReport {
             res =  "[Multiple]";
         }
 
-        return {isSame:isSame,isNumber:hasNumber && isNumber,isAggregate: isAggregate,result:res};
+        return {isSame:isSame,isNumber:hasNumber && isNumber,result:res};
     }
 
     determineColumnTypes() {
@@ -167,7 +174,7 @@ export class SmartSearchReport {
             let isNumber = false;
             for (let i in this._categoryHash) {
                 let res = this._getTableParamData(this._tableParams[j], this._categoryHash[i].ids);
-                if (res.isNumber && res.isAggregate) {
+                if (res.isNumber) {
                     isNumber = true;
                     break;
                 }

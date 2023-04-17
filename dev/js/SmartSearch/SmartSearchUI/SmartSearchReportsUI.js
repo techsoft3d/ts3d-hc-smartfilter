@@ -269,15 +269,21 @@ export class SmartSearchReportsUI {
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
             let title =  SmartSearchReportsUI._report._tableParams[i].prop;
             if (columnTypes[i].isNumber) {
-                title  += "(" + columnTypes[i].unit + ") Σ";
+                title  += "(" + columnTypes[i].unit + ")";
+                if (!SmartSearchReportsUI._report._tableParams[i].aggtype || SmartSearchReportsUI._report._tableParams[i].aggtype == "sum") {
+                    title += 'Σ';
+                }
             }
 
-            let colum = { title: title, field: "tableParams" + i, headerMenu: columnMenu };
+            let column = { title: title, field: "tableParams" + i, headerMenu: columnMenu };
             if (columnTypes[i].isNumber) {
-                colum.bottomCalc = "sum";
+                column.sorter = "number";
+            }
+            if (!SmartSearchReportsUI._report._tableParams[i].aggtype || columnTypes[i].isNumber && SmartSearchReportsUI._report._tableParams[i].aggtype == "sum" ) {
+                column.bottomCalc = "sum";
             }
 
-            tabulatorColumnes.push(colum);
+            tabulatorColumnes.push(column);
         }      
         tabulatorColumnes.push({title: "Color", field: "color", headerSort: false, field: "color", editor: "list", width: 45,
             formatter: "color", editorParams: { values: ["empty","red", "green", "blue", "yellow", "brown", "orange", "grey", "black", "white"] }
