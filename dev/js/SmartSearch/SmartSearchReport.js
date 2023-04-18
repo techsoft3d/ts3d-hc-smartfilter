@@ -32,6 +32,9 @@ export class SmartSearchReport {
         if (propname == "Node Name") {
             return searchResult.name;
         }
+        else if (propname == "Nodeid") {
+            return searchResult.id;
+        }
         else if (propname == "Node Name (No :Ext)") {
             let name;
             let dindex = searchResult.name.lastIndexOf(":");
@@ -69,6 +72,9 @@ export class SmartSearchReport {
     _findPropValue2(propname, nodeid) {
         if (propname.indexOf("Node Name") != -1) {
             return this._viewer.model.getNodeName(nodeid);
+        }
+        else if (propname == "Nodeid") {
+            return nodeid;
         }
         else if (propname == "Node Parent") {
              return this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeid));
@@ -180,7 +186,12 @@ export class SmartSearchReport {
                 }
             }
             if (isNumber) {
-                tdata.push({isNumber:true,unit:this.getAMTUnit( this._tableParams[j].prop)});
+                if (!this.isNumberProp(this._tableParams[j].prop)) {
+                        tdata.push({isNumber:false,unit:""});
+                }
+                else {
+                    tdata.push({isNumber:true,unit:this.getAMTUnit( this._tableParams[j].prop)});
+                }
             }
             else {
                 tdata.push({isNumber:false,unit:""});
@@ -457,7 +468,7 @@ export class SmartSearchReport {
 
     isNumberProp(ltextin) {
         let ltext = ltextin.toLowerCase();
-        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
+        if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("nodeid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
             return false;
         }
 
@@ -497,6 +508,7 @@ export class SmartSearchReport {
         }
 
         propnames2.sort();
+        propnames2.unshift("Nodeid");
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
         propnames2.unshift("Node Name (No -Ext)");

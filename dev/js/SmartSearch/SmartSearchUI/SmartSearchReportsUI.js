@@ -249,6 +249,28 @@ export class SmartSearchReportsUI {
             
         ];
 
+        let columnMenu2 = [         
+            {
+                label: "<i class='fas fa-user'></i> Assign Random Colors",
+                action: async function (e, column) {
+                    SmartSearchReportsUI.assignColorsRandom();
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Assign Gradient",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._assignColorsGradient(column.getDefinition().field);
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Clear Colors",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._clearColors();
+                }
+            },
+            
+        ];
+
 
         $("#SmartSearchReportsUITabulator").empty();
         $("#SmartSearchReportsUITabulator").css("overflow", "inherit");
@@ -256,14 +278,18 @@ export class SmartSearchReportsUI {
         $("#SmartSearchReportsUITabulator").append('<div class = "SmartSearchReportsUITabulator" id = "SmartSearchReportsUITabulator"></div>');
         let tabulatorColumnes = [];
         
-        tabulatorColumnes.push({ title: SmartSearchReportsUI._report.getOrgString(), field: "org", sorter: "string", headerMenu: columnMenu });
-        tabulatorColumnes.push({title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu});        
+        let orgColumn = { title: SmartSearchReportsUI._report.getOrgString(), field: "org", sorter: "string", headerMenu: columnMenu2 };
+        if (SmartSearchReportsUI._report.isNumberProp(orgColumn.title)) {
+            orgColumn.sorter = "number";
+        }
+        tabulatorColumnes.push(orgColumn);
+        tabulatorColumnes.push({title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu2});        
 
         let columnTypes = SmartSearchReportsUI._report.determineColumnTypes();
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
             let title =  SmartSearchReportsUI._report._tableParams[i].prop;
             if (columnTypes[i].isNumber) {
-                title  += "(" + columnTypes[i].unit + ")";
+                title += "(" + columnTypes[i].unit + ")";
                 if (!SmartSearchReportsUI._report._tableParams[i].aggtype || SmartSearchReportsUI._report._tableParams[i].aggtype == "sum") {
                     title += 'Σ';
                 }
@@ -273,8 +299,11 @@ export class SmartSearchReportsUI {
             if (columnTypes[i].isNumber) {
                 column.sorter = "number";
             }
-            if (!SmartSearchReportsUI._report._tableParams[i].aggtype || columnTypes[i].isNumber && SmartSearchReportsUI._report._tableParams[i].aggtype == "sum" ) {
-                column.bottomCalc = "sum";
+
+            if (columnTypes[i].isNumber) {
+                if (!SmartSearchReportsUI._report._tableParams[i].aggtype || SmartSearchReportsUI._report._tableParams[i].aggtype == "sum") {
+                    column.bottomCalc = "sum";
+                }
             }
 
             tabulatorColumnes.push(column);
