@@ -519,7 +519,7 @@ export class SmartSearchReportsUI {
 
 
     static _generateSettingsWindowExpanded(ids) {
-        let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
+        let sortedStrings = SmartSearchReportsUI._report.getAllPropertiesExpanded();
         sortedStrings.unshift("Choose Property");
         $("#SmartSearchReportsUIOptions").empty();
 

@@ -115,6 +115,10 @@ export class SmartSearchReport {
             return this._manager._propertyHash[nodeid][propname] 
         }
     }
+
+
+
+    
     
 
     generateTableHash() {
@@ -533,6 +537,53 @@ export class SmartSearchReport {
             }
         }
         return false;
+    }
+
+
+    getAllPropertiesExpanded() {
+
+        let searchresults = this.expandedIds;
+        let propsnames = [];
+        let thash = [];
+        for (let i in this._manager._allPropertiesHash) {
+            propsnames.push(i);
+        }
+
+        for (let j = 0; j < searchresults.length; j++) {
+            let id = searchresults[j];
+            for (let k in this._manager._propertyHash[id]) {
+                thash[k] = true;
+            }
+        }
+
+        let propnames2 = [];
+        for (let i = 0; i < propsnames.length; i++) {
+            if (thash[propsnames[i]] != undefined) {
+                propnames2.push(propsnames[i]);
+            }
+        }
+
+        propnames2.sort();
+        propnames2.unshift("Nodeid");
+        propnames2.unshift("Node Parent");
+        propnames2.unshift("Node Type");
+        propnames2.unshift("Node Name (No -Ext)");
+        propnames2.unshift("Node Name (No :Ext)");
+        propnames2.unshift("Node Name");
+
+        for (let i=0;i<propnames2.length;i++) {
+            if (propnames2[i].indexOf("Materials and Finishes/") != -1) {
+                propnames2.splice(i,0,"Materials and Finishes/*");
+                break;
+            }
+        }
+        for (let i=0;i<propnames2.length;i++) {
+            if (propnames2[i].indexOf("Other/") != -1) {
+                propnames2.splice(i,0,"Other/*");
+                break;
+            }
+        }
+        return propnames2;
     }
 
      getAllProperties() {
