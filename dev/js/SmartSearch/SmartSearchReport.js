@@ -29,7 +29,17 @@ export class SmartSearchReport {
     }
 
     initializeExpanded(category) {
-        this.expandedIds = this.getCategoryHash()[category].ids;  
+        if (!category) {
+            let searchresults = this._result.getItems();
+            let ids = [];
+            for (let i = 0; i < searchresults.length; i++) {
+                ids.push(searchresults[i].id);
+            }
+            this.expandedIds = ids;
+        }
+        else {
+            this.expandedIds = this.getCategoryHash()[category].ids;  
+        }
         this._tableParamsExpanded = JSON.parse(JSON.stringify(this._tableParams));
     }
 

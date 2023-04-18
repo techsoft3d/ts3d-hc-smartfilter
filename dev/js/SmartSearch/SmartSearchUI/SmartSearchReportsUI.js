@@ -300,19 +300,15 @@ export class SmartSearchReportsUI {
                 action: async function (e, row) {
                     SmartSearchReportsUI._report.initializeExpanded(row.getData().id);
                     SmartSearchReportsUI._generateSettingsWindowExpanded();
+                    SmartSearchReportsUI._generateExpandedTable()
                 }
             },
             {
                 label: "<i class='fas fa-user'></i> View All",
                 action: async function (e, row) {
-                    let searchresults = SmartSearchEditorUI._founditems.getItems();
-                    let ids = [];
-                    for (let i = 0; i < searchresults.length; i++) {
-                        ids.push(searchresults[i].id);
-                    }
-                    SmartSearchReportsUI._tablePropertyExpanded0 = SmartSearchReportsUI._report.getTableProperty();
-                    SmartSearchReportsUI._tablePropertyExpanded1 = SmartSearchReportsUI._tablePropertyAMT;
-                    SmartSearchReportsUI.generateExpandedResults(ids);
+                    SmartSearchReportsUI._report.initializeExpanded();
+                    SmartSearchReportsUI._generateSettingsWindowExpanded();
+                    SmartSearchReportsUI._generateExpandedTable()
                 }
             },          
             
@@ -468,7 +464,7 @@ export class SmartSearchReportsUI {
         });
 
         SmartSearchReportsUI._table.on("tableBuilt", function () {
-            let tdata = SmartSearchReportsUI._report.getExpandedTableData(SmartSearchReportsUI._expandedIDs);
+            let tdata = SmartSearchReportsUI._report.getExpandedTableData();
             SmartSearchReportsUI._table.setData(tdata);
         });
 
@@ -510,6 +506,8 @@ export class SmartSearchReportsUI {
             html += SmartSearchReportsUI._generateExpandedButton(SmartSearchReportsUI._report.getTableParamsExpanded()[i].prop);
         }
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateExpandedTable()">Generate</button>';
+        html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateSettingsWindow();hcSmartSearch.SmartSearchReportsUI._generateTable()">Full Report</button>';
+
         html += '</div>';
         $("#SmartSearchReportsUIOptions").append(html);
     }
