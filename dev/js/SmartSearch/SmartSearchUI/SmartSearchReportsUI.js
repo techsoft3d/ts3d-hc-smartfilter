@@ -524,7 +524,7 @@ export class SmartSearchReportsUI {
         $("#SmartSearchReportsUIOptions").empty();
 
         let html = '<div style="height:55px;">';
-        html+= '<span style="font-weight:700">Expanded Category:' + (SmartSearchReportsUI._report.getExpandedCategory() ?  SmartSearchReportsUI._report.getExpandedCategory() : "All") + '</span><br><br>';
+        html+= '<span style="font-weight:700">Expanded Category:' + (SmartSearchReportsUI._report.getExpandedCategory() != undefined ?  SmartSearchReportsUI._report.getExpandedCategory() : "All") + '</span><br><br>';
         html += '<span style="top:0px;position:relative"><span style="font-family:courier">Params:</span><select id="SmartSearchTablePropSelectExpanded" onchange=\'hcSmartSearch.SmartSearchReportsUI._tablePropertySelectedExpanded();\' class="SmartSearchPropertyResultsSelect" value="">';
 
         for (let i = 0; i < sortedStrings.length; i++) {

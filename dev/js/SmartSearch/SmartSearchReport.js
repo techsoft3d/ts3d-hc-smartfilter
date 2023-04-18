@@ -30,7 +30,7 @@ export class SmartSearchReport {
 
     initializeExpanded(category) {
         this._expandedCategory = category;
-        if (!category) {
+        if (category == undefined) {
             let searchresults = this._result.getItems();
             let ids = [];
             for (let i = 0; i < searchresults.length; i++) {
@@ -42,6 +42,9 @@ export class SmartSearchReport {
             this.expandedIds = this.getCategoryHash()[category].ids;  
         }
         this._tableParamsExpanded = JSON.parse(JSON.stringify(this._tableParams));
+        if (this._tableParamsExpanded.length == 0) {
+            this._tableParamsExpanded.push({prop: "Node Name"});
+        }
     }
 
     getExpandedIds() {
