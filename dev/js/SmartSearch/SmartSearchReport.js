@@ -29,6 +29,7 @@ export class SmartSearchReport {
     }
 
     initializeExpanded(category) {
+        this._expandedCategory = category;
         if (!category) {
             let searchresults = this._result.getItems();
             let ids = [];
@@ -49,6 +50,10 @@ export class SmartSearchReport {
 
     getTableParamsExpanded() {
         return this._tableParamsExpanded;
+    }
+
+    getExpandedCategory() {
+        return this._expandedCategory;
     }
 
 
@@ -143,6 +148,7 @@ export class SmartSearchReport {
         }
     }
 
+    
 
     _getTableParamData(prop, ids) {
         let propname = prop.prop;
