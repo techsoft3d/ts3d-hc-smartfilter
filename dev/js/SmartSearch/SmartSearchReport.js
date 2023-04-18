@@ -8,6 +8,7 @@ export class SmartSearchReport {
         this._result = result;
         this._orgProperties = [];
         this._tableParams = [];
+        this._tableParamsExpanded = [];
     }
 
     getTableParams() {
@@ -25,6 +26,19 @@ export class SmartSearchReport {
             }
             return orgString;
         }
+    }
+
+    initializeExpanded(category) {
+        this.expandedIds = this.getCategoryHash()[category].ids;  
+        this._tableParamsExpanded = JSON.parse(JSON.stringify(this._tableParams));
+    }
+
+    getExpandedIds() {
+        return this.expandedIds;
+    }
+
+    getTableParamsExpanded() {
+        return this._tableParamsExpanded;
     }
 
 
@@ -200,6 +214,18 @@ export class SmartSearchReport {
         return tdata;
     }
 
+    getExpandedTableData() {
+        let tdata = [];
+        for (let i=0;i<this.expandedIds.length;i++) {
+            let data = { id:this.expandedIds[i]};
+            for (let j=0;j<this._tableParamsExpanded.length;j++) {
+                let res = this._getTableParamData(this._tableParamsExpanded[j],[this.expandedIds[i]]);
+                data["tableParams" + j] = res.result;
+            }
+            tdata.push(data);
+        }
+        return tdata;
+    }
 
 
     getTableData() {
@@ -238,6 +264,15 @@ export class SmartSearchReport {
         for (let i=0;i<this._tableParams.length;i++) {
             if (this._tableParams[i].prop == propname) {
                 this._tableParams.splice(i, 1);
+                break;
+            }
+        }        
+    }
+
+    deleteTableParamsExpanded(propname) {
+        for (let i=0;i<this._tableParamsExpanded.length;i++) {
+            if (this._tableParamsExpanded[i].prop == propname) {
+                this._tableParamsExpanded.splice(i, 1);
                 break;
             }
         }        
@@ -560,54 +595,54 @@ export class SmartSearchReport {
         return tdata;
     }
 
-    getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
-        let tdata = [];
-        for (let i=0;i<nodeids.length;i++) {
-            let name = this._viewer.model.getNodeName(nodeids[i]);
-            let prop1;
-            if (tablePropertyExpanded0.indexOf("Node Name") != -1 || tablePropertyExpanded0.indexOf("Node Type") != -1) {
-                prop1 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
-            }
-            else if (tablePropertyExpanded0.indexOf("Node Parent") != -1) {
-                prop1 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
-            }
-            else if (this.isNumberProp(tablePropertyExpanded0)) {
-                prop1 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0]);
-                if (isNaN(prop1)) {
-                    prop1 = "Not Defined";
-                }
-            }
-            else {
-                prop1 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0];
-            }
-            if (prop1 == undefined) {
-                prop1 = "Not Defined";
-            }
-            let data = { name:name , id: nodeids[i], prop1:prop1};
-            if (tablePropertyExpanded1 != "--EMPTY--") {
-                if (tablePropertyExpanded1.indexOf("Node Name") != -1 || tablePropertyExpanded1.indexOf("Node Type") != -1) {
-                    data.prop2 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
-                }
-                else if (tablePropertyExpanded1.indexOf("Node Parent") != -1) {
-                    data.prop2 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
-                }
-                else if (this.isNumberProp(tablePropertyExpanded1)) {
-                    data.prop2 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1]);
-                    if (isNaN(data.prop2)) {
-                        data.prop2 = "Not Defined";
-                    }
-                }
-                else {
-                    data.prop2 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1];
-                    if (data.prop2 == undefined) {
-                        data.prop2 = "Not Defined";
-                    }
-                }                    
-            }
-            tdata.push(data);
-        }
-        return tdata;
-    }
+    // getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
+    //     let tdata = [];
+    //     for (let i=0;i<nodeids.length;i++) {
+    //         let name = this._viewer.model.getNodeName(nodeids[i]);
+    //         let prop1;
+    //         if (tablePropertyExpanded0.indexOf("Node Name") != -1 || tablePropertyExpanded0.indexOf("Node Type") != -1) {
+    //             prop1 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
+    //         }
+    //         else if (tablePropertyExpanded0.indexOf("Node Parent") != -1) {
+    //             prop1 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
+    //         }
+    //         else if (this.isNumberProp(tablePropertyExpanded0)) {
+    //             prop1 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0]);
+    //             if (isNaN(prop1)) {
+    //                 prop1 = "Not Defined";
+    //             }
+    //         }
+    //         else {
+    //             prop1 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded0];
+    //         }
+    //         if (prop1 == undefined) {
+    //             prop1 = "Not Defined";
+    //         }
+    //         let data = { name:name , id: nodeids[i], prop1:prop1};
+    //         if (tablePropertyExpanded1 != "--EMPTY--") {
+    //             if (tablePropertyExpanded1.indexOf("Node Name") != -1 || tablePropertyExpanded1.indexOf("Node Type") != -1) {
+    //                 data.prop2 = Communicator.NodeType[this._viewer.model.getNodeType(nodeids[i])];
+    //             }
+    //             else if (tablePropertyExpanded1.indexOf("Node Parent") != -1) {
+    //                 data.prop2 = this._viewer.model.getNodeName(this._viewer.model.getNodeParent(nodeids[i]));
+    //             }
+    //             else if (this.isNumberProp(tablePropertyExpanded1)) {
+    //                 data.prop2 = parseFloat(this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1]);
+    //                 if (isNaN(data.prop2)) {
+    //                     data.prop2 = "Not Defined";
+    //                 }
+    //             }
+    //             else {
+    //                 data.prop2 = this._manager._propertyHash[nodeids[i]][tablePropertyExpanded1];
+    //                 if (data.prop2 == undefined) {
+    //                     data.prop2 = "Not Defined";
+    //                 }
+    //             }                    
+    //         }
+    //         tdata.push(data);
+    //     }
+    //     return tdata;
+    // }
 
 
     calculateGradientData(column) {

@@ -19,6 +19,8 @@ export class SmartSearchReportsUI {
         html += '<div id = "SmartSearchReportsUIMain" style="position:absolute;width:100%;height:100%;font-size:12px">';
         html += '<div id = "SmartSearchReportsUIOptions" style="background:white;position:absolute;width:325px;height:100%"></div>';
         html += '<div id = "SmartSearchReportsUITabulator" style="position:absolute;left:325px;width:calc(100% - 325px);height:100%;font-size:12px"></div>';
+        html += '<div id = "SmartSearchReportsUIOptionsExpanded" style="background:white;position:absolute;width:325px;height:100%;display:none"></div>';
+        html += '<div id = "SmartSearchReportsUITabulatorExpanded" style="position:absolute;left:325px;width:calc(100% - 325px);height:100%;font-size:12px;display:none"></div>';
         html += '</div>';
 
         $("#" + SmartSearchReportsUI._maindiv).empty();
@@ -55,6 +57,11 @@ export class SmartSearchReportsUI {
     static _tablePropertySelected() {
         SmartSearchReportsUI._report._tableParams.push({prop:$("#SmartSearchTablePropSelect")[0].value});
         SmartSearchReportsUI._generateSettingsWindow();
+    }
+
+    static _tablePropertySelectedExpanded() {
+        SmartSearchReportsUI._report._tableParamsExpanded.push({prop:$("#SmartSearchTablePropSelectExpanded")[0].value});
+        SmartSearchReportsUI._generateSettingsWindowExpanded();
     }
 
     static _propertySelected() {
@@ -190,6 +197,13 @@ export class SmartSearchReportsUI {
     
     }
 
+    static _deleteFromButtonExpanded(c) {
+        let propname = $(c).prev()[0].innerHTML;
+        SmartSearchReportsUI._report.deleteTableParamsExpanded(propname);
+        SmartSearchReportsUI._generateSettingsWindowExpanded();
+    
+    }
+
     static _setColumnAggregator(propname,aggtype) {
 
         if (propname.indexOf("tableParams") != -1) {
@@ -207,6 +221,15 @@ export class SmartSearchReportsUI {
         html += '</button>';
         return html;
     }
+
+    static _generateExpandedButton(text) {
+        let html = "";
+        html += '<button class="rectangular-button">';
+        html += '<span>' + text + '</span><span onclick = "hcSmartSearch.SmartSearchReportsUI._deleteFromButtonExpanded(this)" class="x">&times;</span>';
+        html += '</button>';
+        return html;
+    }
+
 
     static _generateTable(regenerateTable = true) {
         if (regenerateTable) {
@@ -271,6 +294,30 @@ export class SmartSearchReportsUI {
             
         ];
 
+        let rowMenu = [
+            {
+                label: "<i class='fas fa-user'></i> View Category",
+                action: async function (e, row) {
+                    SmartSearchReportsUI._report.initializeExpanded(row.getData().id);
+                    SmartSearchReportsUI._generateSettingsWindowExpanded();
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> View All",
+                action: async function (e, row) {
+                    let searchresults = SmartSearchEditorUI._founditems.getItems();
+                    let ids = [];
+                    for (let i = 0; i < searchresults.length; i++) {
+                        ids.push(searchresults[i].id);
+                    }
+                    SmartSearchReportsUI._tablePropertyExpanded0 = SmartSearchReportsUI._report.getTableProperty();
+                    SmartSearchReportsUI._tablePropertyExpanded1 = SmartSearchReportsUI._tablePropertyAMT;
+                    SmartSearchReportsUI.generateExpandedResults(ids);
+                }
+            },          
+            
+        ];
+
 
         $("#SmartSearchReportsUITabulator").empty();
         $("#SmartSearchReportsUITabulator").css("overflow", "inherit");
@@ -319,6 +366,7 @@ export class SmartSearchReportsUI {
             selectable: 0,
             layout: "fitColumns",
             columns: tabulatorColumnes,
+            rowContextMenu: rowMenu
         });
 
         SmartSearchReportsUI._table.on("tableBuilt", function () {
@@ -388,6 +436,80 @@ export class SmartSearchReportsUI {
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateTable()">Generate</button>';
         html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI.applyColors()">Apply Colors</button>';
 
+        html += '</div>';
+        $("#SmartSearchReportsUIOptions").append(html);
+    }
+
+
+    static _generateExpandedTable() {
+       
+    
+        $("#SmartSearchReportsUITabulator").empty();
+        $("#SmartSearchReportsUITabulator").css("overflow", "inherit");
+
+        $("#SmartSearchReportsUITabulator").append('<div class = "SmartSearchReportsUITabulator" id = "SmartSearchReportsUITabulator"></div>');
+        let tabulatorColumnes = [];
+        
+
+        for (let i = 0;i< SmartSearchReportsUI._report.getTableParamsExpanded().length;i++) {
+            let title =  SmartSearchReportsUI._report.getTableParamsExpanded()[i].prop;
+
+            let column = { title: title, field: "tableParams" + i};
+            tabulatorColumnes.push(column);
+        }      
+
+        tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
+
+        SmartSearchReportsUI._table = new Tabulator("#SmartSearchReportsUITabulator", {
+            rowHeight: 16,
+            selectable: 0,
+            layout: "fitColumns",
+            columns: tabulatorColumnes,
+        });
+
+        SmartSearchReportsUI._table.on("tableBuilt", function () {
+            let tdata = SmartSearchReportsUI._report.getExpandedTableData(SmartSearchReportsUI._expandedIDs);
+            SmartSearchReportsUI._table.setData(tdata);
+        });
+
+        SmartSearchReportsUI._table.on("rowClick", async function (e, row) {
+            let data = row.getData();
+
+            let ids = SmartSearchReportsUI._report.getCategoryHash()[data.id].ids;
+            SmartSearchReportsUI._viewer.selectionManager.clear();
+            if (ids.length == 1) {
+                SmartSearchReportsUI._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
+            }
+            else {
+                let selections = [];
+                for (let i = 0; i < ids.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+                }
+                SmartSearchReportsUI._viewer.selectionManager.add(selections);
+            }
+
+        });       
+    }
+
+
+    static _generateSettingsWindowExpanded(ids) {
+        let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
+        sortedStrings.unshift("Choose Property");
+        $("#SmartSearchReportsUIOptions").empty();
+
+        let html = '<div style="height:55px;">';
+
+        html += '<span style="top:0px;position:relative"><span style="font-family:courier">Params:</span><select id="SmartSearchTablePropSelectExpanded" onchange=\'hcSmartSearch.SmartSearchReportsUI._tablePropertySelectedExpanded();\' class="SmartSearchPropertyResultsSelect" value="">';
+
+        for (let i = 0; i < sortedStrings.length; i++) {
+            html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
+        }
+        html += '</select></span>';
+        
+        for (let i=0;i<SmartSearchReportsUI._report.getTableParamsExpanded().length;i++) {
+            html += SmartSearchReportsUI._generateExpandedButton(SmartSearchReportsUI._report.getTableParamsExpanded()[i].prop);
+        }
+        html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateExpandedTable()">Generate</button>';
         html += '</div>';
         $("#SmartSearchReportsUIOptions").append(html);
     }
