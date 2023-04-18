@@ -471,6 +471,8 @@ export class SmartSearchReportsUI {
             rowHeight: 16,
             selectable: 0,
             layout: "fitColumns",
+            selectable: true,
+            selectableRangeMode:"click",
             columns: tabulatorColumnes,
         });
 
@@ -495,7 +497,24 @@ export class SmartSearchReportsUI {
                 SmartSearchReportsUI._viewer.selectionManager.add(selections);
             }
 
-        });       
+        });    
+        
+        SmartSearchReportsUI._table.on("rowSelectionChanged", async function (e, row) {
+            var rows = SmartSearchReportsUI._table.getSelectedData();
+
+            SmartSearchReportsUI._viewer.selectionManager.clear();
+            let selections = [];
+            if (rows.length == 1) { 
+                SmartSearchReportsUI._viewer.selectionManager.selectNode(rows[0].id, Communicator.SelectionMode.Set);
+            }
+            else {
+                for (let i = 0; i < rows.length; i++) {
+                    selections.push(new Communicator.Selection.SelectionItem(rows[i].id));
+                }
+                SmartSearchReportsUI._viewer.selectionManager.add(selections);
+            }
+                    
+        });
     }
 
 
