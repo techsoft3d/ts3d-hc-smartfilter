@@ -1,6 +1,30 @@
 var myLayout;
 var mySmartSearchManager;
 
+
+
+function generateReportCallback() {
+
+    let newItemConfig = {
+        type: 'component',
+        componentName: 'Search Report',
+        isClosable: true,
+        id: "Search Report",
+        height: 20,
+        componentState: { label: 'A' }
+    };
+
+
+    if (myLayout.root.getItemsById("Search Report").length == 0) {
+        myLayout.root.contentItems[0].contentItems[0].addChild( newItemConfig ,1);
+        $("#SmartSearchReportContainer").css("display", "block");
+        topcontainer.setSize(100, 300);
+    }
+            
+    let report = new hcSmartSearch.SmartSearchReport(mySmartSearchManager,   hcSmartSearch.SmartSearchEditorUI.getFoundItems());
+    hcSmartSearch.SmartSearchReportsUI.generateReport(report);
+}
+
 async function msready() {
 
 
@@ -15,6 +39,7 @@ async function msready() {
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);
     hcSmartSearch.SmartSearchReportsUI.initialize("SmartSearchReportContainer",mySmartSearchManager);
+    hcSmartSearch.SmartSearchResultsUI.setPopulateReportCallback(generateReportCallback);
 
     // hwv.selectionManager.setSelectionFilter(function (nodeid) {
     //     return nodeid;
@@ -41,20 +66,16 @@ function createUILayout() {
                 content: [
                     {
                         type: 'column',
+                        isClosable: false,
                         content: [{
                             type: 'component',
                             componentName: 'Viewer',
                             isClosable: false,
                             width: 80,
+                            height:75,
                             componentState: { label: 'A' }
-                        },
-                        {
-                            type: 'component',
-                            componentName: 'Search Report',
-                            isClosable: false,
-                            height: 25,
-                            componentState: { label: 'A' }
-                        }],
+                        }
+                        ],
                     },                 
                     {
                         type: 'column',
@@ -109,6 +130,10 @@ function createUILayout() {
     });
 
     myLayout.registerComponent('Search Report', function (container, componentState) {
+        topcontainer = container;
+        topcontainer.on('destroy', function (a,b,c,d) {
+            $("body").append($("#SmartSearchReportContainer"));
+        });
         $(container.getElement()).append($("#SmartSearchReportContainer"));
     });
 
@@ -118,9 +143,8 @@ function createUILayout() {
             hwv.resizeCanvas();
         }
     });
+   
     myLayout.init();
-
-
 }
 
 

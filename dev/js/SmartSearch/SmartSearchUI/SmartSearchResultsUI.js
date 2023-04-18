@@ -15,6 +15,11 @@ export class SmartSearchResultsUI {
 
     }
 
+    static setPopulateReportCallback(callback) {
+        SmartSearchResultsUI._populateReportCallback = callback;
+    }
+
+
     static async display() {
         let html = "";
         html += '<div id = "SmartSearchResultsUIFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
@@ -49,8 +54,15 @@ export class SmartSearchResultsUI {
     }
 
     static _populateReport() {
-        let report = new hcSmartSearch.SmartSearchReport(this._manager, SmartSearchEditorUI._founditems);
-        SmartSearchReportsUI.generateReport(report);
+
+
+        if (SmartSearchResultsUI._populateReportCallback != null) {
+            SmartSearchResultsUI._populateReportCallback();
+        }
+        else {
+            let report = new hcSmartSearch.SmartSearchReport(this._manager, SmartSearchEditorUI._founditems);
+            SmartSearchReportsUI.generateReport(report);
+        }      
     }
    
    
