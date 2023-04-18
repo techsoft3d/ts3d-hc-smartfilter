@@ -1023,7 +1023,7 @@ export class SmartSearch {
                 }
                 let condition = new SmartSearchCondition();
 
-                condition.propertyType = conditions[i].type;
+                condition.propertyType = conditions[i].propertyType;
                 condition.text = conditions[i].text;
                 condition.conditionType = conditions[i].conditionType;
 
