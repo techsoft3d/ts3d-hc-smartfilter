@@ -398,15 +398,21 @@ export class SmartSearchReportsUI {
             SmartSearchReportsUI._selectionFromTable = false;
         });
 
-
         SmartSearchReportsUI._table.on("cellEdited", function (cell) {
             if (cell.getField() == "color") {
                 let data = cell.getRow().getData();
+                let color;
                 if (data.color != "empty") {
+                    color = SmartSearchReportsUI._report.convertColor(data.color);
                     SmartSearchReportsUI._report.getCategoryHash()[data.id].color = SmartSearchReportsUI._report.convertColor(data.color);
                 }
                 else {
-                    SmartSearchReportsUI._report.getCategoryHash()[data.id].color = null;
+                    color = null;
+                }
+                SmartSearchReportsUI._report.getCategoryHash()[data.id].color = color;
+                let rows = SmartSearchReportsUI._table.getSelectedData();
+                for (let i=0;i<rows.length;i++) {
+                    SmartSearchReportsUI._report.getCategoryHash()[rows[i].id].color = color;
                 }
                 SmartSearchReportsUI._updateColorsInTable();
             }

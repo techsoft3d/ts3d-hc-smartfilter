@@ -67,13 +67,13 @@ export class SmartSearchResultsUI {
    
    
 
-    static generateSearchResults(founditems_in) {
+    static async generateSearchResults(founditems_in) {
         SmartSearchResultsUI._results = founditems_in;
         $("#SmartSearchResultsUIFirstRow").css("display", "block");
-        $("#" + SmartSearchResultsUI._maindiv + "_searchitems").empty();
         $("#" + SmartSearchResultsUI._maindiv + "_searchitems").css("overflow", "auto");
         $("#" + SmartSearchResultsUI._maindiv + "_found").empty();
         if (founditems_in == undefined) {
+            $("#" + SmartSearchResultsUI._maindiv + "_searchitems").empty();
             return;
         }
 
@@ -98,6 +98,9 @@ export class SmartSearchResultsUI {
         }
 
         for (let i = 0; i < lend; i++) {
+            if (i % 500 == 0) {
+                await new Promise(r => setTimeout(r, 1));      
+            }
             toggle = !toggle;
             if (SmartSearchResultsUI._viewer.selectionManager.isSelected(Communicator.Selection.SelectionItem.create(founditems[i].id))) {
                 let parent = SmartSearchResultsUI._viewer.model.getNodeParent(founditems[i].id);
@@ -135,7 +138,9 @@ export class SmartSearchResultsUI {
         if (more) {
             html += '<div style="left:3px;" >More...</div>';
         }
+        $("#" + SmartSearchResultsUI._maindiv + "_searchitems").empty();
 
+        
         $("#" + SmartSearchResultsUI._maindiv + "_searchitems").append(html);
         SmartSearchResultsUI.adjust();
     }

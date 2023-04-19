@@ -165,6 +165,9 @@ export class SmartSearchReport {
         let lastValue = undefined;
        
         let sum = 0;
+        if (!this.isNumberProp(propname)) {
+            isNumber = false;
+        }
         for (let i=0;i<ids.length;i++) {
             let value = this._findPropValue2(propname, ids[i]);
             if (value != undefined) {
