@@ -334,7 +334,7 @@ export class SmartSearchReportsUI {
         let tabulatorColumnes = [];
         
         let orgColumn = { title: SmartSearchReportsUI._report.getOrgString(), field: "org", sorter: "string", headerMenu: columnMenu2 };
-        if (SmartSearchReportsUI._report.isNumberProp(orgColumn.title)) {
+        if (SmartSearchReportsUI._report._orgProperties.length == 1 && SmartSearchReportsUI._report.isNumberProp(orgColumn.title)) {
             orgColumn.sorter = "number";
         }
         tabulatorColumnes.push(orgColumn);
