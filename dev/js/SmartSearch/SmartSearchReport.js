@@ -1,7 +1,8 @@
 import { SmartSearchPropertyType } from './SmartSearchCondition.js';
+import { SmartSearchConditionType } from './SmartSearchCondition.js';
 
 export class SmartSearchReport {
-    
+
     constructor(manager, result) {
         this._manager = manager;
         this._viewer = this._manager._viewer;
@@ -9,6 +10,20 @@ export class SmartSearchReport {
         this._orgProperties = [];
         this._tableParams = [];
         this._tableParamsExpanded = [];
+        for (let i = 0; i < this._result.getQuery().getNumConditions(); i++) {
+            let condition = this._result.getQuery().getCondition(i);
+            if (condition.propertyName.indexOf("Node Chain") == -1) {
+                if (condition.conditionType == SmartSearchConditionType.exists) {
+                    this._orgProperties.push(condition.propertyName);
+                }
+                else {
+                    this._tableParams.push({prop:condition.propertyName});
+                }
+            }
+        }
+        if (this._orgProperties.length == 0) {
+            this._orgProperties.push("Node Name");
+        }
     }
 
     getTableParams() {
@@ -60,12 +75,20 @@ export class SmartSearchReport {
     }
 
 
-    _findPropValue(propname, searchResult) {
+    async _findPropValue(propname, searchResult) {
         if (propname == "Node Name") {
             return searchResult.name;
         }
         else if (propname == "Nodeid") {
             return searchResult.id;
+        }
+        else if (propname.indexOf("Bounding-Z") != -1) {
+            try {
+                return (await this._viewer.model.getNodesBounding([searchResult.id])).center().z;
+                }
+                catch (e) {
+                    return "EMPTY";
+                }
         }
         else if (propname == "Node Name (No :Ext)") {
             let name;
@@ -101,9 +124,17 @@ export class SmartSearchReport {
         }
     }
 
-    _findPropValue2(propname, nodeid) {
+    async _findPropValue2(propname, nodeid) {
         if (propname.indexOf("Node Name") != -1) {
             return this._viewer.model.getNodeName(nodeid);
+        }
+        else if (propname.indexOf("Bounding-Z") != -1) {
+            try {
+            return (await this._viewer.model.getNodesBounding([nodeid])).center().z;
+            }
+            catch (e) {
+                return "EMPTY";
+            }
         }
         else if (propname == "Nodeid") {
             return nodeid;
@@ -124,7 +155,7 @@ export class SmartSearchReport {
     
     
 
-    generateTableHash() {
+    async generateTableHash() {
 
         let searchresults = this._result.getItems();
 
@@ -135,7 +166,7 @@ export class SmartSearchReport {
             let propvalues = "";
             for (let j = 0; j < this._orgProperties.length; j++) {
                 let propname = this._orgProperties[j];
-                let propvalue = this._findPropValue(propname, searchresults[i]);
+                let propvalue = await this._findPropValue(propname, searchresults[i]);
                 if (this._orgProperties.length == 1) {
                     propvalue != undefined ? propvalues = propvalue : propvalues = "";
                 }
@@ -157,7 +188,7 @@ export class SmartSearchReport {
 
     
 
-    _getTableParamData(prop, ids) {
+    async _getTableParamData(prop, ids) {
         let propname = prop.prop;
         let isSame = true;
         let isNumber = true;
@@ -169,7 +200,7 @@ export class SmartSearchReport {
             isNumber = false;
         }
         for (let i=0;i<ids.length;i++) {
-            let value = this._findPropValue2(propname, ids[i]);
+            let value = await this._findPropValue2(propname, ids[i]);
             if (value != undefined) {
                 let fValue = parseFloat(value);
                 if (!isNaN(fValue)) {
@@ -214,12 +245,12 @@ export class SmartSearchReport {
         return {isSame:isSame,isNumber:hasNumber && isNumber,result:res};
     }
 
-    determineColumnTypes() {
+    async determineColumnTypes() {
         let tdata = [];
         for (let j = 0; j < this._tableParams.length; j++) {
             let isNumber = false;
             for (let i in this._categoryHash) {
-                let res = this._getTableParamData(this._tableParams[j], this._categoryHash[i].ids);
+                let res = await this._getTableParamData(this._tableParams[j], this._categoryHash[i].ids);
                 if (res.isNumber) {
                     isNumber = true;
                     break;
@@ -240,12 +271,12 @@ export class SmartSearchReport {
         return tdata;
     }
 
-    getExpandedTableData() {
+    async getExpandedTableData() {
         let tdata = [];
         for (let i=0;i<this.expandedIds.length;i++) {
             let data = { id:this.expandedIds[i]};
             for (let j=0;j<this._tableParamsExpanded.length;j++) {
-                let res = this._getTableParamData(this._tableParamsExpanded[j],[this.expandedIds[i]]);
+                let res = await this._getTableParamData(this._tableParamsExpanded[j],[this.expandedIds[i]]);
                 data["tableParams" + j] = res.result;
             }
             tdata.push(data);
@@ -254,13 +285,13 @@ export class SmartSearchReport {
     }
 
 
-    getTableData() {
+    async getTableData() {
         let tdata = [];
         for (let i in this._categoryHash) {
 
             let data = { org: i, num: this._categoryHash[i].ids.length, color:"",id:i};
             for (let j=0;j<this._tableParams.length;j++) {
-                let res = this._getTableParamData(this._tableParams[j],this._categoryHash[i].ids);
+                let res = await this._getTableParamData(this._tableParams[j],this._categoryHash[i].ids);
                 data["tableParams" + j] = res.result;
             }
             tdata.push(data);
@@ -532,6 +563,9 @@ export class SmartSearchReport {
         if (ltext.indexOf("version") != -1 || ltext.indexOf("globalid") != -1 || ltext.indexOf("nodeid") != -1 || ltext.indexOf("name") != -1 || ltext.indexOf("date") != -1 || ltext.indexOf("persistentid") != -1) {
             return false;
         }
+        else if (ltext.indexOf("bounding-z") != -1) {
+            return true;
+        }
 
         let prop = this._manager._allPropertiesHash[ltextin];
         if (prop != undefined) {
@@ -570,6 +604,7 @@ export class SmartSearchReport {
         }
 
         propnames2.sort();
+        propnames2.unshift("Bounding-Z");
         propnames2.unshift("Nodeid");
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
@@ -616,6 +651,7 @@ export class SmartSearchReport {
         }
 
         propnames2.sort();
+        propnames2.unshift("Bounding-Z");
         propnames2.unshift("Nodeid");
         propnames2.unshift("Node Parent");
         propnames2.unshift("Node Type");
@@ -718,9 +754,9 @@ export class SmartSearchReport {
     // }
 
 
-    calculateGradientData(column) {
+    async calculateGradientData(column) {
 
-        let rows = this.getTableData();
+        let rows = await this.getTableData();
         
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
@@ -757,10 +793,10 @@ export class SmartSearchReport {
         }      
     }
 
-    caculateExpandedColorsGradient(column,nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
+    async caculateExpandedColorsGradient(column,nodeids,tablePropertyExpanded0,tablePropertyExpanded1) {
         let pname = column;
     
-        let rows = this.getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1)
+        let rows = await this.getExpandedTableData(nodeids,tablePropertyExpanded0,tablePropertyExpanded1)
         let min = Number.MAX_VALUE;
         let max = -Number.MAX_VALUE;
         for (let i = 0; i < rows.length; i++) {

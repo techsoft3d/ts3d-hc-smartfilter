@@ -158,7 +158,7 @@ export class SmartSearchReportsUI {
         }
     }
 
-    static _assignColorsGradient(column) {
+    static async _assignColorsGradient(column) {
      
         let pname = column;
         if (column == "org") {
@@ -167,7 +167,7 @@ export class SmartSearchReportsUI {
                 return;
             }
         }
-        SmartSearchReportsUI._report.calculateGradientData(pname);      
+        await SmartSearchReportsUI._report.calculateGradientData(pname);      
         SmartSearchReportsUI._updateColorsInTable();
     }
 
@@ -243,9 +243,9 @@ export class SmartSearchReportsUI {
     }
 
 
-    static _generateTable(regenerateTable = true) {
+    static async _generateTable(regenerateTable = true) {
         if (regenerateTable) {
-            SmartSearchReportsUI._report.generateTableHash();
+            await SmartSearchReportsUI._report.generateTableHash();
         }
         let columnMenu = [ 
             {
@@ -340,13 +340,15 @@ export class SmartSearchReportsUI {
         tabulatorColumnes.push(orgColumn);
         tabulatorColumnes.push({title: "#", field: "num", width: 65,bottomCalc:"sum",headerMenu:columnMenu2});        
 
-        let columnTypes = SmartSearchReportsUI._report.determineColumnTypes();
+        let columnTypes = await SmartSearchReportsUI._report.determineColumnTypes();
         for (let i = 0;i< SmartSearchReportsUI._report._tableParams.length;i++) {
             let title =  SmartSearchReportsUI._report._tableParams[i].prop;
             if (columnTypes[i].isNumber) {
-                title += "(" + columnTypes[i].unit + ")";
+                if (columnTypes[i].unit != undefined) {
+                    title += "(" + columnTypes[i].unit + ")";
+                }
                 if (!SmartSearchReportsUI._report._tableParams[i].aggtype || SmartSearchReportsUI._report._tableParams[i].aggtype == "sum") {
-                    title += 'Σ';
+                    title += ' Σ';
                 }
             }
 
@@ -378,8 +380,8 @@ export class SmartSearchReportsUI {
             rowContextMenu: rowMenu
         });
 
-        SmartSearchReportsUI._table.on("tableBuilt", function () {
-            let tdata = SmartSearchReportsUI._report.getTableData();
+        SmartSearchReportsUI._table.on("tableBuilt", async function () {
+            let tdata = await SmartSearchReportsUI._report.getTableData();
             SmartSearchReportsUI._table.setData(tdata);
         });
 
@@ -404,23 +406,24 @@ export class SmartSearchReportsUI {
                 let color;
                 if (data.color != "empty") {
                     color = SmartSearchReportsUI._report.convertColor(data.color);
-                    SmartSearchReportsUI._report.getCategoryHash()[data.id].color = SmartSearchReportsUI._report.convertColor(data.color);
                 }
                 else {
                     color = null;
                 }
                 SmartSearchReportsUI._report.getCategoryHash()[data.id].color = color;
                 let rows = SmartSearchReportsUI._table.getSelectedData();
-                for (let i=0;i<rows.length;i++) {
-                    SmartSearchReportsUI._report.getCategoryHash()[rows[i].id].color = color;
+                if (rows.length > 1) {
+                    for (let i = 0; i < rows.length; i++) {
+                        SmartSearchReportsUI._report.getCategoryHash()[rows[i].id].color = color;
+                    }
                 }
                 SmartSearchReportsUI._updateColorsInTable();
             }
         });      
     }
 
-    static _generateSettingsWindow() {
-        let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
+    static async _generateSettingsWindow() {
+        let sortedStrings = await SmartSearchReportsUI._report.getAllProperties();
         sortedStrings.unshift("Choose Property");
         $("#SmartSearchReportsUIOptions").empty();
 
@@ -454,7 +457,7 @@ export class SmartSearchReportsUI {
     }
 
 
-    static _generateExpandedTable() {
+    static async _generateExpandedTable() {
        
     
         $("#SmartSearchReportsUITabulator").empty();
@@ -492,8 +495,8 @@ export class SmartSearchReportsUI {
             columns: tabulatorColumnes,
         });
 
-        SmartSearchReportsUI._table.on("tableBuilt", function () {
-            let tdata = SmartSearchReportsUI._report.getExpandedTableData();
+        SmartSearchReportsUI._table.on("tableBuilt", async function () {
+            let tdata = await SmartSearchReportsUI._report.getExpandedTableData();
             SmartSearchReportsUI._table.setData(tdata);
         });
 
@@ -537,8 +540,8 @@ export class SmartSearchReportsUI {
     }
 
 
-    static _generateSettingsWindowExpanded(ids) {
-        let sortedStrings = SmartSearchReportsUI._report.getAllPropertiesExpanded();
+    static async _generateSettingsWindowExpanded(ids) {
+        let sortedStrings = await SmartSearchReportsUI._report.getAllPropertiesExpanded();
         sortedStrings.unshift("Choose Property");
         $("#SmartSearchReportsUIOptions").empty();
 
@@ -561,13 +564,13 @@ export class SmartSearchReportsUI {
         $("#SmartSearchReportsUIOptions").append(html);
     }
 
-    static _generatePropertyView(redrawOnly = false) {
+    static async _generatePropertyView(redrawOnly = false) {
 
         if (SmartSearchEditorUI._mainFilter.getAutoColorProperty()) {
             SmartSearchReportsUI._report.setTableProperty(SmartSearchEditorUI._mainFilter.getAutoColorProperty());
         }
 
-        let sortedStrings = SmartSearchReportsUI._report.getAllProperties();
+        let sortedStrings =  SmartSearchReportsUI._report.getAllProperties();
 
         if (!redrawOnly) {
             let found = false;
