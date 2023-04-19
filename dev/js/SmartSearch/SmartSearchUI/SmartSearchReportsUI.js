@@ -11,6 +11,18 @@ export class SmartSearchReportsUI {
         SmartSearchReportsUI._aggType = "sum";
         SmartSearchReportsUI._tablePropertyExpanded1 = "--EMPTY--";
         SmartSearchReportsUI._tablePropertyExpanded2 = "--EMPTY--";
+        SmartSearchReportsUI._table = null;
+        SmartSearchReportsUI._selectionFromTable = false;
+
+        SmartSearchReportsUI._viewer.setCallbacks({
+            selectionArray: function (selarray, removed) {
+                if (!SmartSearchReportsUI._selectionFromTable  &&  SmartSearchReportsUI._table) {
+                        SmartSearchReportsUI._table.deselectRow();                    
+                }
+            },
+        });
+
+
         SmartSearchReportsUI.display();
     }
 
@@ -359,7 +371,8 @@ export class SmartSearchReportsUI {
 
         SmartSearchReportsUI._table = new Tabulator("#SmartSearchReportsUITabulator", {
             rowHeight: 16,
-            selectable: 0,
+            selectable: true,
+            selectableRangeMode:"click",
             layout: "fitColumns",
             columns: tabulatorColumnes,
             rowContextMenu: rowMenu
@@ -370,23 +383,21 @@ export class SmartSearchReportsUI {
             SmartSearchReportsUI._table.setData(tdata);
         });
 
-        SmartSearchReportsUI._table.on("rowClick", async function (e, row) {
-            let data = row.getData();
-
-            let ids = SmartSearchReportsUI._report.getCategoryHash()[data.id].ids;
+        SmartSearchReportsUI._table.on("rowSelectionChanged", async function (e, row) {
+            SmartSearchReportsUI._selectionFromTable = true;
+            let rows = SmartSearchReportsUI._table.getSelectedData();
             SmartSearchReportsUI._viewer.selectionManager.clear();
-            if (ids.length == 1) {
-                SmartSearchReportsUI._viewer.selectionManager.selectNode(ids[0], Communicator.SelectionMode.Set);
-            }
-            else {
-                let selections = [];
-                for (let i = 0; i < ids.length; i++) {
-                    selections.push(new Communicator.Selection.SelectionItem(ids[i]));
+            let selections = [];
+            for (let i=0;i<rows.length;i++) {
+                let ids = SmartSearchReportsUI._report.getCategoryHash()[rows[i].id].ids;
+                for (let j = 0; j < ids.length; j++) {
+                    selections.push(new Communicator.Selection.SelectionItem(ids[j]));
                 }
-                SmartSearchReportsUI._viewer.selectionManager.add(selections);
             }
-
+            SmartSearchReportsUI._viewer.selectionManager.add(selections);
+            SmartSearchReportsUI._selectionFromTable = false;
         });
+
 
         SmartSearchReportsUI._table.on("cellEdited", function (cell) {
             if (cell.getField() == "color") {
@@ -468,8 +479,7 @@ export class SmartSearchReportsUI {
         tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
 
         SmartSearchReportsUI._table = new Tabulator("#SmartSearchReportsUITabulator", {
-            rowHeight: 16,
-            selectable: 0,
+            rowHeight: 16,         
             layout: "fitColumns",
             selectable: true,
             selectableRangeMode:"click",
@@ -500,7 +510,9 @@ export class SmartSearchReportsUI {
         });    
         
         SmartSearchReportsUI._table.on("rowSelectionChanged", async function (e, row) {
-            var rows = SmartSearchReportsUI._table.getSelectedData();
+            SmartSearchReportsUI._selectionFromTable = true;
+
+            let rows = SmartSearchReportsUI._table.getSelectedData();
 
             SmartSearchReportsUI._viewer.selectionManager.clear();
             let selections = [];
@@ -513,6 +525,7 @@ export class SmartSearchReportsUI {
                 }
                 SmartSearchReportsUI._viewer.selectionManager.add(selections);
             }
+            SmartSearchReportsUI._selectionFromTable = false;
                     
         });
     }
