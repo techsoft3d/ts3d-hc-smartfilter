@@ -10,6 +10,7 @@ export class SmartSearchReport {
         this._orgProperties = [];
         this._tableParams = [];
         this._tableParamsExpanded = [];
+        this.expandedColorsHash = [];
         for (let i = 0; i < this._result.getQuery().getNumConditions(); i++) {
             let condition = this._result.getQuery().getCondition(i);
             if (condition.propertyName.indexOf("Node Chain") == -1) {
@@ -24,6 +25,14 @@ export class SmartSearchReport {
         if (this._orgProperties.length == 0) {
             this._orgProperties.push("Node Name");
         }
+    }
+
+    getExpandedColorsHash() {
+        return this.expandedColorsHash;
+    }
+
+    clearExpandedColorsHash() {
+        this.expandedColorsHash = [];
     }
 
     getTableParams() {
@@ -752,6 +761,36 @@ export class SmartSearchReport {
     //     }
     //     return tdata;
     // }
+
+
+
+    async calculateGradientDataExpanded(column) {
+
+        let rows = await this.getExpandedTableData();
+        
+        let min = Number.MAX_VALUE;
+        let max = -Number.MAX_VALUE;
+        for (let i = 0; i < rows.length; i++) {
+            let num = parseFloat(rows[i][column]);
+
+            if (!isNaN(num)) {
+                if (num < min) min = num;
+
+                if (num > max) max = num;
+            }
+            
+        }
+        let tdist = (max - min);
+
+        this.expandedColorsHash = [];
+        for (let i = 0; i < rows.length; i++) {
+            let num = parseFloat(rows[i][column]);
+            if (!isNaN(num)) {
+                let m = (num - min) / tdist * 255;
+                this.expandedColorsHash[rows[i].id] = new Communicator.Color(m, m, m);
+            }
+        }      
+    }
 
 
     async calculateGradientData(column) {

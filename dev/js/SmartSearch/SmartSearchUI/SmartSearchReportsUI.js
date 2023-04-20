@@ -127,6 +127,23 @@ export class SmartSearchReportsUI {
         SmartSearchReportsUI._updateColorsInTable();
     }
 
+
+    static _updateColorsInTableExpanded() {
+        let tdata = [];
+        for (let i in SmartSearchReportsUI._report.getExpandedColorsHash()) {
+            let color = SmartSearchReportsUI._report.getExpandedColorsHash()[i];
+            let data;
+            if (color) {
+                data = { color: 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',1)',id: i };
+            }
+            else {
+                data = { color:null,id: i };
+            }
+            tdata.push(data);
+        }
+        SmartSearchReportsUI._table.updateData(tdata);
+    }
+
     static _updateColorsInTable() {
         let tdata = [];
         for (let i in SmartSearchReportsUI._report.getCategoryHash()) {
@@ -153,10 +170,19 @@ export class SmartSearchReportsUI {
     static applyExpandedColors() {
         let rows = SmartSearchReportsUI._table.getRows();
         for (let i = 0; i < rows.length; i++) {
-            let m = rows[i].getData().colorsav;
-            SmartSearchEditorUI._viewer.model.setNodesFaceColor([rows[i].getData().id], new Communicator.Color(m, m, m));
+            let id = rows[i].getData().id;
+            SmartSearchEditorUI._viewer.model.setNodesFaceColor([parseInt(id)],SmartSearchReportsUI._report.getExpandedColorsHash()[id]);
         }
     }
+
+
+    static async _assignColorsGradientExpanded(column) {
+     
+      
+        await SmartSearchReportsUI._report.calculateGradientDataExpanded(column);      
+        SmartSearchReportsUI._updateColorsInTableExpanded();
+    }
+
 
     static async _assignColorsGradient(column) {
      
@@ -190,6 +216,18 @@ export class SmartSearchReportsUI {
             tdata.push(data);
         }
         SmartSearchReportsUI._table.updateData(tdata);
+    }
+
+    static _clearColorsExpanded() {
+       SmartSearchReportsUI._report.clearExpandedColorsHash();         
+       let rows = SmartSearchReportsUI._table.getRows();
+
+       let tdata = [];
+       for (let i=0;i<rows.length;i++) {
+            let data = { color: null,id: rows[i].getData().id };
+            tdata.push(data);
+        }
+       SmartSearchReportsUI._table.updateData(tdata);
     }
 
     static generateReport(report) {
@@ -459,7 +497,23 @@ export class SmartSearchReportsUI {
 
     static async _generateExpandedTable() {
        
-    
+        let columnMenu2 = [                    
+            {
+                label: "<i class='fas fa-user'></i> Assign Gradient",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._assignColorsGradientExpanded(column.getDefinition().field);
+                }
+            },
+            {
+                label: "<i class='fas fa-user'></i> Clear Colors",
+                action: async function (e, column) {
+                    SmartSearchReportsUI._clearColorsExpanded();
+                }
+            },
+            
+        ];
+
+
         $("#SmartSearchReportsUITabulator").empty();
         $("#SmartSearchReportsUITabulator").css("overflow", "inherit");
 
@@ -480,10 +534,13 @@ export class SmartSearchReportsUI {
             let column = { title: title, field: "tableParams" + i};
             if (SmartSearchReportsUI._report.isNumberProp( SmartSearchReportsUI._report.getTableParamsExpanded()[i].prop)) {
                 column.sorter = "number";
+                column.headerMenu = columnMenu2;
             }
 
             tabulatorColumnes.push(column);
         }      
+        tabulatorColumnes.push({title: "Color", field: "color", headerSort: false, field: "color", width: 45,formatter: "color" });
+
 
         tabulatorColumnes.push({title: "ID", field: "id", width: 20, visible: false});
 
@@ -558,7 +615,8 @@ export class SmartSearchReportsUI {
             html += SmartSearchReportsUI._generateExpandedButton(SmartSearchReportsUI._report.getTableParamsExpanded()[i].prop);
         }
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateExpandedTable()">Generate</button>';
-        html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateSettingsWindow();hcSmartSearch.SmartSearchReportsUI._generateTable()">Full Report</button>';
+        html += '<button class="SmartSearchSearchButton" type="button" style="right:70px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI.applyExpandedColors()">Apply Colors</button>';
+        html += '<button class="SmartSearchSearchButton" type="button" style="left:0px;bottom:3px;position:absolute;" onclick="hcSmartSearch.SmartSearchReportsUI._generateSettingsWindow();hcSmartSearch.SmartSearchReportsUI._generateTable()">Full Report</button>';
 
         html += '</div>';
         $("#SmartSearchReportsUIOptions").append(html);
