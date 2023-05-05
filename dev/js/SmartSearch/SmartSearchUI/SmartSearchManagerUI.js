@@ -68,7 +68,7 @@ export class SmartSearchManagerUI {
     }
     
     static async _executeAllFilters() {
-        SmartSearchManagerUI._manager.executeSQueries();
+        SmartSearchManagerUI._manager.executeSearchActions();
     }
 
     static async _addCurrentFilter() {
@@ -305,7 +305,7 @@ export class SmartSearchManagerUI {
                 };
             };
 
-            let actionValues = ["", "Isolate", "Show", "Hide", "Select", "Auto Color", "red", "green", "blue", "yellow", "grey", "Transparent", "Opaque", "Not Selectable", "Selectable"];
+            let actionValues = ["", "Isolate", "Show", "Hide", "Select", "Auto Color", "red", "green", "blue", "yellow", "grey", "Transparent", "Opaque", "Not Selectable", "Selectable", "Fit Nodes", "Fit World"];
            
 
             SmartSearchManagerUI._table = new Tabulator("#" + SmartSearchManagerUI._uidiv + "Tabulator", {
@@ -382,7 +382,7 @@ export class SmartSearchManagerUI {
                     let data = rows[i].getData();
                     neworder.push(SmartSearchManagerUI._manager.getSmartSearchByID(data.id));
                 }
-                SmartSearchManagerUI._manager.setSQueries(neworder);
+                SmartSearchManagerUI._manager.setSearches(neworder);
             });
         
 

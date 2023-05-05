@@ -99,9 +99,4 @@ export class SmartSearchResult {
         }
         return selections;
     }
-
-
-     
-
- 
 }

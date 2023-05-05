@@ -128,6 +128,13 @@ export class SmartSearch {
                 case "Selectable":
                     await this._viewer.model.setInstanceModifier(Communicator.InstanceModifier.DoNotSelect, nodeids, false);
                 break;
+                case "Fit Nodes":
+                    await this._viewer.view.fitNodes(nodeids,0);
+                break;
+                case "Fit World":
+                    await this._viewer.view.fitWorld(0);
+                break;
+
                 case "Select":
                     let selections = [];
                     for (let i = 0; i < nodeids.length; i++) {
