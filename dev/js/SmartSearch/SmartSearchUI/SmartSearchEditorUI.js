@@ -82,7 +82,7 @@ export class SmartSearchEditorUI {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SmartSearchSearchButton SmartSearchDropdow-button">...</button>';
         html += '<ul style="right:22px;top:10px;position:absolute;" class="SmartSearchDropdow-content">';
-        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
+        html +='<li id="' + SmartSearchEditorUI._maindiv + 'searchChildren"' + 'onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchVisible(this)\'>Search Visible</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setFilterBodies(this)\'>Filter Bodies</li>';              
         html +='<li>---</li>';              
@@ -167,7 +167,9 @@ export class SmartSearchEditorUI {
 
         SmartSearchEditorUI._generateSearchResults();
         SmartSearchEditorUI._addFilterFromUI(false,0);
-
+        if (SmartSearchEditorUI._showFirstRow) {
+            SmartSearchEditorUI._setDefaultSettingsUI();
+        }
     }
 
     static getFilter() {
@@ -390,6 +392,14 @@ export class SmartSearchEditorUI {
 
         SmartSearchEditorUI.refreshUI();
 
+    }
+
+    static _setDefaultSettingsUI() {
+        let text = "Search Children";
+        if (SmartSearchEditorUI._manager.getKeepSearchingChildren()) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $("#" + SmartSearchEditorUI._maindiv + "searchChildren").html(text);
     }
 
     static _setSearchChildren(el) {
