@@ -81,7 +81,7 @@ export class SmartSearchEditorUI {
     static _generateDropdown() {
         let html = "";
         html += '<button style="right:57px;top:3px;position:absolute;" class="SmartSearchSearchButton SmartSearchDropdow-button">...</button>';
-        html += '<ul style="right:22px;top:10px;position:absolute;" class="SmartSearchDropdow-content">';
+        html += '<ul style="position:absolute;z-index:10000" class="SmartSearchDropdow-content">';
         html +='<li id="' + SmartSearchEditorUI._maindiv + 'searchChildren"' + 'onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchVisible(this)\'>Search Visible</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setFilterBodies(this)\'>Filter Bodies</li>';              
@@ -152,7 +152,31 @@ export class SmartSearchEditorUI {
             const SmartSearchDropdowButton = document.querySelector('.SmartSearchDropdow-button');
             const SmartSearchDropdowContent = document.querySelector('.SmartSearchDropdow-content');
 
-            SmartSearchDropdowButton.addEventListener('click', function () {
+            SmartSearchDropdowButton.addEventListener('click', function () {              
+                if ($(SmartSearchDropdowContent).hasClass("SmartSearchDropdowShow")) {
+                    $(SmartSearchDropdowButton).append(SmartSearchDropdowContent);
+                    let os = $(SmartSearchDropdowContent).parent().offset();
+                }
+                else {
+                    $("body").append(SmartSearchDropdowContent);
+                    let os = $(SmartSearchDropdowButton).offset();
+                    let top = os.top;
+                    let left = os.left;
+                    let height = $(SmartSearchDropdowContent).height();
+                    let width = $(SmartSearchDropdowContent).width();
+                    if (top + height > $(window).height()) {
+                        top = $(window).height() - height - 10;
+                    }
+
+                    if (left + width > $(window).width()) {
+                        left = $(window).width() - width - 30;
+                    }
+
+                    $(SmartSearchDropdowContent).css("top", top + "px");
+                    $(SmartSearchDropdowContent).css("left", left + "px");
+
+                }
+
                 SmartSearchDropdowContent.classList.toggle('SmartSearchDropdowShow');
             });
 

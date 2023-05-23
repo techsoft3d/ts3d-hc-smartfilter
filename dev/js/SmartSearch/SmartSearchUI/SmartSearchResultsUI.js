@@ -39,7 +39,31 @@ export class SmartSearchResultsUI {
         const SmartSearchDropdowButton = document.querySelector('#SmartSearchResultsUIDropdown');
         const SmartSearchDropdowContent = document.querySelector('#SmartSearchResultsUIDropdownContent');
 
-        SmartSearchDropdowButton.addEventListener('click', function () {
+        SmartSearchDropdowButton.addEventListener('click', function () {              
+            if ($(SmartSearchDropdowContent).hasClass("SmartSearchDropdowShow")) {
+                $(SmartSearchDropdowButton).append(SmartSearchDropdowContent);
+                let os = $(SmartSearchDropdowContent).parent().offset();
+            }
+            else {
+                $("body").append(SmartSearchDropdowContent);
+                let os = $(SmartSearchDropdowButton).offset();
+                let top = os.top;
+                let left = os.left;
+                let height = $(SmartSearchDropdowContent).height();
+                let width = $(SmartSearchDropdowContent).width();
+                if (top + height > $(window).height()) {
+                    top = $(window).height() - height - 10;
+                }
+
+                if (left + width > $(window).width()) {
+                    left = $(window).width() - width - 30;
+                }
+
+                $(SmartSearchDropdowContent).css("top", top + "px");
+                $(SmartSearchDropdowContent).css("left", left + "px");
+
+            }
+
             SmartSearchDropdowContent.classList.toggle('SmartSearchDropdowShow');
         });
 
@@ -169,7 +193,7 @@ export class SmartSearchResultsUI {
     static _generateDropdown() {
         let html = "";
         html += '<button id="SmartSearchResultsUIDropdown" style="right:56px;top:3px;position:absolute;" class="SmartSearchSearchButton SmartSearchDropdow-button">...</button>';
-        html += '<ul  id="SmartSearchResultsUIDropdownContent" style="right:22px;top:10px;position:absolute;" class="SmartSearchDropdow-content">';
+        html += '<ul  id="SmartSearchResultsUIDropdownContent" style="position:absolute;z-index:10000" class="SmartSearchDropdow-content">';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.selectAll(this)\'>Select</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().isolateAll(this)\'>Isolate</li>';
         html += '<li onclick=\'hcSmartSearch.SmartSearchEditorUI.getFoundItems().makeVisible(true)\'>Show</li>';
