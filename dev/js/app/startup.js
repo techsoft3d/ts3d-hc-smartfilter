@@ -35,6 +35,7 @@ async function msready() {
     mySmartSearchManager = new hcSmartSearch.SmartSearchManager(hwv);
 
     hcSmartSearch.SmartSearchEditorUI.initialize("searchtools", mySmartSearchManager);
+    hcSmartSearch.SmartSearchResultsUI.setEnableReport(true);
     hcSmartSearch.SmartSearchEditorUI.display();
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);

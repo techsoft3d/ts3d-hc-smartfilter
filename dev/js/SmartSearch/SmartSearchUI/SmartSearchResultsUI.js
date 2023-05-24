@@ -6,6 +6,8 @@ export class SmartSearchResultsUI {
         SmartSearchResultsUI._maindiv = maindiv;
         SmartSearchResultsUI._manager = manager;
         SmartSearchResultsUI._viewer = manager._viewer;
+        SmartSearchResultsUI._enableReport = false;
+        
 
         SmartSearchResultsUI._viewer.setCallbacks({
             selectionArray: function (selarray, removed) {
@@ -19,6 +21,9 @@ export class SmartSearchResultsUI {
         SmartSearchResultsUI._populateReportCallback = callback;
     }
 
+    static setEnableReport(enable) {
+        SmartSearchResultsUI._enableReport = enable;
+    }
 
     static async display() {
         let html = "";
@@ -26,7 +31,9 @@ export class SmartSearchResultsUI {
         html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SmartSearchResultsUI._maindiv + '_found"></div>';
         html += SmartSearchResultsUI._generateDropdown();
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchEditorUI.selectAll(this)\'>Select</button>';
-        html += '<button id="SmartSearchToggleViewButton" class="SmartSearchSearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchResultsUI._populateReport()\'>Create Report</button>';
+        if (SmartSearchResultsUI._enableReport) {
+            html += '<button id="SmartSearchToggleViewButton" class="SmartSearchSearchButton" type="button" style="right:90px;top:3px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchResultsUI._populateReport()\'>Create Report</button>';
+        }
         html += '</div>';
 
         html += '<div id="' + SmartSearchResultsUI._maindiv + '_searchitems" class="SmartSearchSearchItems">';
