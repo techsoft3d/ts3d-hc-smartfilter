@@ -176,8 +176,11 @@ export class SmartSearchManager {
         return properties;
     }
 
-    _getModelTreeIdsRecursive(nodeid,proms, ids) {
+    async _getModelTreeIdsRecursive(nodeid,proms, ids) {
 
+        if (ids.length % 1000 == 0) {
+            await new Promise(r => setTimeout(r, 1));
+        }
         if (this._ignoreBodies && this._viewer.model.getNodeType(nodeid) == Communicator.NodeType.BodyInstance) {
             return;
         }
@@ -187,7 +190,7 @@ export class SmartSearchManager {
 
         let children = this._viewer.model.getNodeChildren(nodeid);
         for (let i = 0; i < children.length; i++) {
-            this._getModelTreeIdsRecursive(children[i],proms, ids);
+            await this._getModelTreeIdsRecursive(children[i],proms, ids);
         }
     }
 
@@ -420,7 +423,7 @@ export class SmartSearchManager {
             let proms = [];
             let ids = [];
 
-            this._getModelTreeIdsRecursive(this._viewer.model.getRootNode(), proms, ids);
+            await this._getModelTreeIdsRecursive(this._viewer.model.getRootNode(), proms, ids);
             let res = await Promise.all(proms);  
             this._updateHashes(ids, res, layernames);         
             this._consolidateBodies();
