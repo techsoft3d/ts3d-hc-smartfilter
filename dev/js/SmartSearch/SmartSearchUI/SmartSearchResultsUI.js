@@ -178,6 +178,9 @@ export class SmartSearchResultsUI {
 
     static adjust() {
 
+        if ($("#" + SmartSearchResultsUI._maindiv + "_searchitems").length == 0) {
+            return;
+        }
         let newheight = $("#" + SmartSearchEditorUI._maindiv).height() - ($("#" + SmartSearchResultsUI._maindiv + "_searchitems").offset().top - $("#" + SmartSearchEditorUI._maindiv).parent().offset().top);
         $("#" + SmartSearchResultsUI._maindiv + "_searchitems").css({ "height": newheight + "px" });
 
