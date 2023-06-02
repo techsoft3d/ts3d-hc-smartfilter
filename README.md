@@ -1,76 +1,10 @@
-# Advanced Search for HOOPS Communicator
+# Advanced Search for HOOPS Communicator - Version 2
 
-## Version Update (1.1.4)
-* regex support for searches
-
-## Version Update (1.1.4)
-* renamed to SmartSearch
-
-## Version Update (1.1.0)
-* UI included in main library
-* Many other improvements and fixes
-
-## Version Update (1.0.0)
-* Support for picking categories
-* Many other improvements and fixes
-
-## Version Update (0.9.9)
-* Support for secondary quantity in results
-
-## Version Update (0.9.8)
-* Support for property view in results
-* Auto Color option
-
-## Version Update (0.9.5)
-* Bounding search
-* Various UI improvements
-
-## Version Update (0.9.2)
-* Support for aggregate related property
-* ensure search does not stall viewer
-* indicator when search is running
-
-## Version Update (0.9.0)
-* More flexible related property search
-* Ability to search directly for IFC Globalid
-* Various other improvements and fixes
-
-## Version Update (0.8.6)
-* Ability to specify & execute Query Actions
-
-## Version Update (0.8.4)
-* Callback for search results
-
-## Version Update (0.8.3)
-* Ability to search by node children (count and name)
-* Display of property stats (nummber of options, number of occurences) in editor
-* Various other improvements and fixes
-
-## Version Update (0.7.7)
-* Ability to search Dates
-* Ability to search past found nodes
-* Better Ui Styling
-
-## Version Update (0.7.4)
-* Ability to pass property file during initialization
-* Server-Side generation of property file
-
-## Version Update (0.6.1)
-* Ability to save/restore optimized property JSON
-
-## Version Update (0.6.0)
-* Tabulator now included in UI library
-
-## Version Update (0.5.3)
-* Ability to choose an existing query as a filter condition
-
-## Version Update (0.5.0) 
-* Abiltity to hide top row UI buttons
-* Update to HOOPS Communicator 2023 U1
 
 ## Overview
 ![alt text](https://github.com/techsoft3d/ts3d-hc-smartsearch/blob/master/readme_images/image1.png?raw=true)  
-This library provides advanced search capabilities for HOOPS Communicator. It is split into the two main components, the core search and filter functionality as well as an UI component utilizing those classes.
+This library provides  search capabilities for HOOPS Communicator, allowing the user to easily specify advanced queries utilizing the properties and other data found in a AEC or CAD model. A search can be turned into a dynamic property, which makes it easy to classify entities at a glance. It also includes report generating capabilities, that aid in quantity take-off and other tasks around analyzing the content of a model.
+The library has two main components, the core search library with various classes for searching through Stream Cache models and visualizing the results in the model, defining properties and generating reports, as well as an (optional) UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 
