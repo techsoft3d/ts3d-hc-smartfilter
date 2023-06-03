@@ -28,7 +28,7 @@ export class SmartSearchEditorUI {
         });
     }
 
-    static initialize(maindiv, manager, startnode) {
+    static async initialize(maindiv, manager, startnode) {
         SmartSearchEditorUI.ctrlPressed = false;
 
      
@@ -52,6 +52,10 @@ export class SmartSearchEditorUI {
         if (!SmartSearchEditorUI._searchResultsCallback) {
             SmartSearchResultsUI.initialize(SmartSearchEditorUI._maindiv + '_resultscontainer', manager);
         }
+
+        await SmartSearchEditorUI._manager.initialize();
+
+        await SmartSearchEditorUI.display();
     }
 
     static setHideIFCProperties(onoff) {
@@ -110,8 +114,6 @@ export class SmartSearchEditorUI {
 
     static async display() {
         
-        await SmartSearchEditorUI._manager.initialize();
-
         let html = "";
         html += '<div class = "SmartSearchMain" id="' + SmartSearchEditorUI._maindiv + '_main">';
         if (SmartSearchEditorUI._showFirstRow) {

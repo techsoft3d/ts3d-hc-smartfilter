@@ -3,7 +3,7 @@
 
 ## Overview
 ![alt text](https://github.com/techsoft3d/ts3d-hc-smartsearch/blob/master/readme_images/image1.png?raw=true)  
-This library provides  search capabilities for HOOPS Communicator, allowing the user to easily specify advanced queries utilizing the properties and other data found in a AEC or CAD model. A search can be turned into a dynamic property, which makes it easy to classify entities at a glance. It also includes report generating capabilities, that aid in quantity take-off and other tasks around analyzing the content of a model.
+This library provides search capabilities for HOOPS Communicator, allowing the user to easily specify advanced queries utilizing the properties and other data found in a AEC or CAD model. A search can be turned into a dynamic property, which makes it easy to classify entities at a glance. It also includes report generating capabilities, that aid in quantity take-off and other tasks around analyzing the content of a model.
 The library has two main components, the core search library with various classes for searching through Stream Cache models and visualizing the results in the model, defining properties and generating reports, as well as an (optional) UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
@@ -39,20 +39,26 @@ Here is how to start the demo with the provided sample model locally when using 
 
 ```
 let manager = new hcSmartSearch.SmartSearchManager(hwv);
+```
+The SmartSearchManager object is the main entry point for the search functionality. It needs to be initialized with a webviewer object after the modelStructureReady event has been fired.
+
+```
+
 hcSmartSearch.SmartSearchEditorUI.initialize("searcheditor", manager);
-hcSmartSearch.SmartSearchEditorUI.display();
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
-Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models.
+Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models though it is possible to generate a JSON file with the properties beforehand and load it into the SmartSearchManager object. See futher below for details.
 
-The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest delving into the source code.
+```
+
+The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest writing your own UI.
 
 ## Usage
 
  The functionality of this class should be largely self-explanatory. The user can combine multiple conditions with either an “and” or “or” operator (but not mixed). However the user can also add a single level of subfilters with a separate set of conditions for more flexibility. 
  
- In addition the user can limit the scope of future searches by activating the “Limit to Selection:” checkbox which will limit all future searches to the currently selected nodes and their children.
+ In addition the user can limit the scope of future searches by activating “Limit to Selection” in the main drop-down menu which will limit all future searches to the currently selected nodes and their children.
 
 ### "contains" Comparison
 

@@ -36,9 +36,8 @@ async function msready() {
 
     hcSmartSearch.SmartSearchResultsUI.setEnableReport(true);
     hcSmartSearch.SmartSearchResultsUI.setPopulateReportCallback(generateReportCallback);
-    
+
     hcSmartSearch.SmartSearchEditorUI.initialize("searchtools", mySmartSearchManager);
-    hcSmartSearch.SmartSearchEditorUI.display();
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);
     hcSmartSearch.SmartSearchReportsUI.initialize("SmartSearchReportContainer",mySmartSearchManager);
