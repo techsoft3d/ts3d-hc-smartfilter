@@ -114,10 +114,6 @@ If this option is selected the search will be performed on the specified Query
 When displaying the search results you can optionally skip over the first "n" levels when displaying the parent hierachy of a node. This is useful if the application uses the loadSubtree functionality to load a model into a node other than the root node.
 
 
-```
- hcSmartSearch.SmartSearchEditorUI.setShowLimitOption(true);
-```
-Controls if the Limit checkbox should be visible in the UI.
 
 ## SmartSearchManager UI
 ### Initialization

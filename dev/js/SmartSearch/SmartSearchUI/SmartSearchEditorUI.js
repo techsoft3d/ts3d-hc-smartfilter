@@ -4,7 +4,6 @@ import { SmartSearchResultsUI } from './SmartSearchResultsUI.js';
 export class SmartSearchEditorUI {
     
     static _chainSkip = 0;
-    static _showLimitOption = true;
     static _showFirstRow = true;
     static _showPropertyStats = true;
     static _hideIFCProperties = false;
@@ -85,6 +84,8 @@ export class SmartSearchEditorUI {
         html +='<li id="' + SmartSearchEditorUI._maindiv + 'searchChildren"' + 'onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchChildren(this)\'><span style="left:-5px;position:absolute;">&#x2714</span>Search Children</li>';        
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setSearchVisible(this)\'>Search Visible</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._setFilterBodies(this)\'>Filter Bodies</li>';              
+        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._limitSelection(this)\'>Limit to Selection</li>';              
+        html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._limitSelectionShow(this)\'>Show Limit Nodes</li>';              
         html +='<li>---</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._toggleLighting()\'>Toggle Lighting</li>';              
         html +='<li onclick=\'hcSmartSearch.SmartSearchEditorUI._viewer.model.setNodesFaceColor([hcSmartSearch.SmartSearchEditorUI._viewer.model.getRootNode()],Communicator.Color.white())\'>Set Model to White</li>';              
@@ -114,16 +115,9 @@ export class SmartSearchEditorUI {
         let html = "";
         html += '<div class = "SmartSearchMain" id="' + SmartSearchEditorUI._maindiv + '_main">';
         if (SmartSearchEditorUI._showFirstRow) {
-            html+='<div id = "SmartSearchEditorUIFirstRow">';
-            if (SmartSearchEditorUI._showLimitOption) {
-                html += '<div id="' + SmartSearchEditorUI._maindiv + '_firstrow" style="position:relative;height:20px;">';
-                html += '<button title = "Select nodes current search is limited to" id="SmartSearchLimitSelectionButton" disabled style="position:relative;top:-1px"class="SmartSearchSearchButton" type="button" style="right:65px;top:2px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchEditorUI._limitSelectionShow()\'>Limit</button><input title = "Limit search to currently selected entities" onclick=\'hcSmartSearch.SmartSearchEditorUI._limitSelection()\' style="position:relative;left:-2px;top:2px;" type = "checkbox" id="' + SmartSearchEditorUI._maindiv + '_searchfromselection">'
-                html += '</div>';
-            }
-            else {
-                html += '<div style="position:relative;height:20px;"></div>';
-
-            }
+            html+='<div id = "SmartSearchEditorUIFirstRow">';           
+            html += '<div style="position:relative;height:20px;"></div>';
+            
 
             html += SmartSearchEditorUI._generateDropdown();
             html += '<button class="SmartSearchSearchButtonImportant" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchEditorUI.search()\'>Search</button>';
@@ -468,22 +462,26 @@ export class SmartSearchEditorUI {
     }
 
 
-    static _limitSelection() {
+    static _limitSelection(el) {
       
-        if ($("#" + SmartSearchEditorUI._maindiv + "_searchfromselection")[0].checked) {
+        if (SmartSearchEditorUI._mainFilter.getLimitSelectionList().length == 0) {
             let limitselectionlist = [];
             let r = SmartSearchEditorUI._viewer.selectionManager.getResults();
             for (let i = 0; i < r.length; i++) {
                 limitselectionlist.push(r[i].getNodeId());
             }
             SmartSearchEditorUI._mainFilter.limitToNodes(limitselectionlist);
-            $( "#SmartSearchLimitSelectionButton" ).prop( "disabled", false );
         }
         else
         {
             SmartSearchEditorUI._mainFilter.limitToNodes([]);
-            $( "#SmartSearchLimitSelectionButton" ).prop( "disabled", true );
         }
+
+        let text = "Limit Selection";
+        if (SmartSearchEditorUI._mainFilter.getLimitSelectionList().length != 0) {
+            text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
+        }
+        $(el).html(text);
     }
 
     static clearSearchResults() {
