@@ -34,13 +34,14 @@ async function msready() {
     // mySmartSearchManager.addModel("hospital",hwv.model.getRootNode(),json);
     mySmartSearchManager = new hcSmartSearch.SmartSearchManager(hwv);
 
-    hcSmartSearch.SmartSearchEditorUI.initialize("searchtools", mySmartSearchManager);
     hcSmartSearch.SmartSearchResultsUI.setEnableReport(true);
+    hcSmartSearch.SmartSearchResultsUI.setPopulateReportCallback(generateReportCallback);
+    
+    hcSmartSearch.SmartSearchEditorUI.initialize("searchtools", mySmartSearchManager);
     hcSmartSearch.SmartSearchEditorUI.display();
     hcSmartSearch.SmartSearchManagerUI.initialize("SmartSearchfilterscontainer",mySmartSearchManager, true);
     hcSmartSearch.SmartSearchPropertiesUI.initialize("SmartSearchpropertiescontainer",mySmartSearchManager);
     hcSmartSearch.SmartSearchReportsUI.initialize("SmartSearchReportContainer",mySmartSearchManager);
-    hcSmartSearch.SmartSearchResultsUI.setPopulateReportCallback(generateReportCallback);
 
     // hwv.selectionManager.setSelectionFilter(function (nodeid) {
     //     return nodeid;
@@ -146,13 +147,4 @@ function createUILayout() {
     });
    
     myLayout.init();
-}
-
-
-function initializeSearch(){
-    if(hwv.selectionManager.getLast())   
-        hcSmartSearch.SmartSearchEditorUI.initialize("searchtools",hwv,hwv.selectionManager.getLast().getNodeId());
-    else
-        hcSmartSearch.SmartSearchEditorUI.initialize("searchtools",hwv);
-    hcSmartSearch.SmartSearchEditorUI.display();
 }

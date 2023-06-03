@@ -2,13 +2,13 @@ import { SmartSearchEditorUI } from './SmartSearchEditorUI.js';
 import { SmartSearchReportsUI } from './SmartSearchReportsUI.js';
 export class SmartSearchResultsUI {
 
+    static _enableReport = false;
+
     static initialize(maindiv, manager) {
         SmartSearchResultsUI._maindiv = maindiv;
         SmartSearchResultsUI._manager = manager;
         SmartSearchResultsUI._viewer = manager._viewer;
-        SmartSearchResultsUI._enableReport = false;
-        
-
+    
         SmartSearchResultsUI._viewer.setCallbacks({
             selectionArray: function (selarray, removed) {
                     SmartSearchResultsUI.generateSearchResults(SmartSearchEditorUI._founditems);
@@ -27,7 +27,7 @@ export class SmartSearchResultsUI {
 
     static async display() {
         let html = "";
-        html += '<div id = "SmartSearchResultsUIFirstRow" style="position:relative;width:100%;height:15px;top:-8px">';
+        html += '<div id = id="' + SmartSearchResultsUI._maindiv + '_firstrow" style="position:relative;width:100%;height:15px;top:-8px">';
         html += '<div style="position:absolute; left:3px;top:5px; font-size:14px;background-color:white" id="' + SmartSearchResultsUI._maindiv + '_found"></div>';
         html += SmartSearchResultsUI._generateDropdown();
         html += '<button class="SmartSearchSearchButton" type="button" style="right:5px;top:3px;position:absolute;" onclick=\'hcSmartSearch.SmartSearchEditorUI.selectAll(this)\'>Select</button>';
@@ -100,7 +100,7 @@ export class SmartSearchResultsUI {
 
     static async generateSearchResults(founditems_in) {
         SmartSearchResultsUI._results = founditems_in;
-        $("#SmartSearchResultsUIFirstRow").css("display", "block");
+        $("#" + SmartSearchResultsUI._maindiv + "_firstrow").css("display", "block");
         $("#" + SmartSearchResultsUI._maindiv + "_searchitems").css("overflow", "auto");
         $("#" + SmartSearchResultsUI._maindiv + "_found").empty();
         if (founditems_in == undefined) {
