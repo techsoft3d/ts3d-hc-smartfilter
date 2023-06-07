@@ -1,0 +1,16 @@
+.valueinput {  
+  border-width:1px;
+  background:#e6e6ff;
+  flex:1 1 auto; 
+  font-size:11px;
+  width:350px;
+  height:20px;  
+}
+
+.uibuttons {       
+  border-radius: 2px;
+  padding: 2px;
+  top: 1px;
+  position: absolute;        
+  scale: 0.7;
+}

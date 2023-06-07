@@ -3,12 +3,13 @@
 
 ## Overview
 ![alt text](https://github.com/techsoft3d/ts3d-hc-smartsearch/blob/master/readme_images/image1.png?raw=true)  
-This library provides search capabilities for HOOPS Communicator, allowing the user to easily specify advanced queries utilizing the properties and other data found in a AEC or CAD model. A search can be turned into a dynamic property, which makes it easy to classify entities at a glance. It also includes report generating capabilities, that aid in quantity take-off and other tasks around analyzing the content of a model.
-The library has two main components, the core search library with various classes for searching through Stream Cache models and visualizing the results in the model, defining properties and generating reports, as well as an (optional) UI component utilizing those classes.
+This library provides search capabilities for HOOPS Communicator, allowing the user to easily specify advanced queries utilizing the properties and other data found in a AEC or CAD model. A search can be turned into a dynamic property, which makes it easy to classify entities at a glance. The library also includes report generating capabilities, that aid in quantity take-off and other tasks around analyzing the content of a model.
+The library has two main components, the core search library with various classes for searching through Stream Cache models and visualizing the results in the model, defining properties and generating reports, as well as an (optional) set of UI component utilizing those classes.
 
 For questions/feedback please send an email to guido@techsoft3d.com or post in our [forum](https://forum.techsoft3d.com/). For a 60 day trial of the HOOPS Web Platform go to [Web Platform](https://www.techsoft3d.com/products/hoops/web-platform).
 
 ## Future Plans
+* **Improved Documentation**
 * various performance improvements
 * server-side Search Evaluation
 * More UI Customization Options
@@ -43,7 +44,6 @@ let manager = new hcSmartSearch.SmartSearchManager(hwv);
 The SmartSearchManager object is the main entry point for the search functionality. It needs to be initialized with a webviewer object after the modelStructureReady event has been fired.
 
 ```
-
 hcSmartSearch.SmartSearchEditorUI.initialize("searcheditor", manager);
 ```
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
