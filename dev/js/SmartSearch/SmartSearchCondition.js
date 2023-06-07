@@ -269,6 +269,9 @@ export class SmartSearchCondition {
         return this.propertyType;
     }
 
+    setPropertyValue(propertyValue) {
+        this.text = propertyValue;
+    }
 
     setText(text) {
         this.text = text;

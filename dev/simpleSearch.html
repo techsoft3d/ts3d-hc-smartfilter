@@ -66,7 +66,6 @@
       let md = new MobileDetect(window.navigator.userAgent);
 
       window.onload = function () {
-        startup();
         Sample.createViewer().then(
           function (viewer) {
             window.hwv = viewer;
@@ -1207,8 +1206,19 @@
     </div>
   
     <div style="position:absolute;right:35px;top:3px;z-index:10000">
-      <input type="search" class="valueinput" />
-      <box-icon class="uibuttons" size="md" style="left:345px;top:-7px" name='search-alt-2' color='#ffffff' ></box-icon>
+      <input id="searchInput" type="search" class="searchInput"></input>
+      <box-icon class="uibuttons" onclick="doSearch()" size="md" style="right:-33px;top:-7px" name='search-alt-2' color='#ffffff' ></box-icon>
+      <select id="typeSelect" onChange = "typeChanged()" class="typeSelect" value="">        
+      </select>
+      <select id="modeSelect" class="modeSelect" value="">        
+        <option value="contains">contains</option>
+        <option value="exact">exact</option>
+        <option value="Starts With">Starts With</option>
+        <option value="Ends With">Ends With</option>
+      </select>
+
+      <div id="typeRow" class="typeRow"></div>
+
     </div>
 
   </body>

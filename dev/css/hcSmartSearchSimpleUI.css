@@ -1,11 +1,56 @@
-.valueinput {  
+.searchInput {  
   border-width:1px;
   background:#e6e6ff;
   flex:1 1 auto; 
   font-size:11px;
-  width:350px;
+  width:320px;
   height:20px;  
+  right:0px;
+  position:relative;
 }
+
+.typeSelect {  
+  border-width:1px;
+  background:#e6e6ff;
+  flex:1 1 auto; 
+  font-size:11px;
+  width:100px;
+  height:20px;  
+  top:25px;
+  right:302px;
+  position:absolute;
+  z-index:1;
+  transition: 0.7s;
+}
+
+
+.modeSelect {  
+  border-width:1px;
+  background:#e6e6ff;
+  flex:1 1 auto; 
+  font-size:11px;
+  width:80px;
+  height:20px;  
+  top:1px;
+  right:321px;
+  position:absolute;
+}
+
+
+
+.typeRow {  
+  border-width:1px;
+  background:none
+  flex:1 1 auto; 
+  font-size:11px;
+  width:500px;
+  height:20px;  
+  top:21px;
+  right:-100px;
+  position:absolute;
+}
+
+
 
 .uibuttons {       
   border-radius: 2px;
@@ -13,4 +58,37 @@
   top: 1px;
   position: absolute;        
   scale: 0.7;
+}
+
+
+.rectangular-button {
+  background-color: #000000;
+  color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  padding: 1px 20px 1px 3px;
+  font-size: 11px;
+  cursor: pointer;
+  outline: none;
+  transition: background-color 0.2s ease-in-out;
+  position: relative;
+  margin-right:3px;
+  margin-top:2px;
+}
+
+.rectangular-button:hover {
+  background-color: #2980b9;
+}
+
+.rectangular-button span {
+  display: inline-block;
+}
+
+.x {
+  position: absolute;
+  right: 5px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 15px;
+  font-weight: bold;
 }
