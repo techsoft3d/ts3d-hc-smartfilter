@@ -17,12 +17,26 @@
   width:100px;
   height:20px;  
   top:25px;
-  right:302px;
+  right:240px;
   position:absolute;
   z-index:1;
   transition: 0.7s;
 }
 
+
+.categorySelect {  
+  border-width:1px;
+  background:#e6e6ff;
+  flex:1 1 auto; 
+  font-size:11px;
+  width:60px;
+  height:20px;  
+  top:25px;
+  right:342px;
+  position:absolute;
+  z-index:1;
+  transition: 0.7s;
+}
 
 .modeSelect {  
   border-width:1px;

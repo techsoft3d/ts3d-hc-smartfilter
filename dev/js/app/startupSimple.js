@@ -1,6 +1,7 @@
 var myLayout;
 var mySmartSearchManager;
 let typeArray = [];
+let currentCategory = "TYPE"
 
 async function msready() {
     mySmartSearchManager = new hcSmartSearch.SmartSearchManager(hwv);
@@ -27,13 +28,14 @@ function generateTypeButton(text) {
 }
 
 function regenerateOptions() {       
-    let options = mySmartSearchManager.getAllOptionsForProperty("TYPE");
+    currentCategory = $("#categorySelect").val()
+    let options = mySmartSearchManager.getAllOptionsForProperty(currentCategory);
     let sortedStrings = [];
     for (let i in options) {
         sortedStrings.push(i);
     }
     sortedStrings.sort();
-    let html = '<option selected disabled>Choose Type</option>';
+    let html = '<option selected disabled>Choose ' + currentCategory + '</option>';
     for (let i = 0; i < sortedStrings.length; i++) {
             html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
     }
@@ -49,14 +51,21 @@ function regenerateOptions() {
 
     if (typeArray.length > 0) {
         $("#typeSelect").css("top", $("#typeRow").height() + 25 + "px");
+        $("#categorySelect").css("top", $("#typeRow").height() + 25 + "px");
     }
     else {
         $("#typeSelect").css("top", "25px");
+        $("#categorySelect").css("top", "25px");
     }
 }
 
 function typeChanged() {
     typeArray.push($("#typeSelect")[0].value);
+    regenerateOptions();
+}
+
+function categoryChanged() {
+    typeArray = [];
     regenerateOptions();
 }
 
@@ -66,7 +75,7 @@ async function doSearch() {
     if (typeArray.length > 0) {
         condition = new hcSmartSearch.SmartSearchCondition();
         condition.setPropertyType(hcSmartSearch.SmartSearchPropertyType.property);
-        condition.setPropertyName("TYPE");
+        condition.setPropertyName(currentCategory);
         let typetext = "";
         for (let i = 0; i < typeArray.length; i++) {
             typetext += '"' + typeArray[i] + '"';
