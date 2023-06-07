@@ -43,10 +43,9 @@
   background:none
   flex:1 1 auto; 
   font-size:11px;
-  width:500px;
-  height:20px;  
+  width:420px;
   top:21px;
-  right:-100px;
+  right:-20px;
   position:absolute;
 }
 

@@ -10,42 +10,29 @@ async function msready() {
 
 function deleteFromButton(c) {
     let propname = $(c).prev()[0].innerHTML;
-
     for (let i=0;i<typeArray.length;i++) {
         if (typeArray[i] == propname) {
             typeArray.splice(i,1);
             break;
         }
     }
-  
     regenerateOptions();
-
 }
 
 function generateTypeButton(text) {
-    let html = "";
-    html += '<button class="rectangular-button">';
+    let html = '<button class="rectangular-button">';
     html += '<span>' + text + '</span><span onclick = "deleteFromButton(this)" class="x">&times;</span>';
     html += '</button>';
     return html;
 }
 
-function regenerateOptions() {
-    
-    if (typeArray.length > 0) {
-        $("#typeSelect").css("top", "40px");
-    }
-    else {
-        $("#typeSelect").css("top", "25px");
-
-    }
+function regenerateOptions() {       
     let options = mySmartSearchManager.getAllOptionsForProperty("TYPE");
     let sortedStrings = [];
     for (let i in options) {
         sortedStrings.push(i);
     }
     sortedStrings.sort();
-//    sortedStrings.unshift("Choose Type");
     let html = '<option selected disabled>Choose Type</option>';
     for (let i = 0; i < sortedStrings.length; i++) {
             html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
@@ -53,13 +40,19 @@ function regenerateOptions() {
     $("#typeSelect").empty();
     $("#typeSelect").append(html);
 
-
     html = "";
     for (let i=0;i<typeArray.length;i++) {
         html += generateTypeButton(typeArray[i]);
     }
     $("#typeRow").empty();
     $("#typeRow").append(html);
+
+    if (typeArray.length > 0) {
+        $("#typeSelect").css("top", $("#typeRow").height() + 25 + "px");
+    }
+    else {
+        $("#typeSelect").css("top", "25px");
+    }
 }
 
 function typeChanged() {
@@ -77,15 +70,13 @@ async function doSearch() {
         let typetext = "";
         for (let i = 0; i < typeArray.length; i++) {
             typetext += '"' + typeArray[i] + '"';
-            //        typetext += typeArray[i];
             if (i < typeArray.length - 1) {
                 typetext += ",";
             }
         }
         condition.setPropertyValue(typetext);
         search.addCondition(condition);
-    }
-    
+    }    
     condition = new hcSmartSearch.SmartSearchCondition();
     condition.setPropertyType(hcSmartSearch.SmartSearchPropertyType.nodeName);
     if ($("#modeSelect")[0].value == "contains") {
@@ -103,7 +94,6 @@ async function doSearch() {
         condition.setConditionType(hcSmartSearch.SmartSearchConditionType.regex);
     }
     search.addCondition(condition);
-
     let results = await search.apply();
 
     let selections = [];
