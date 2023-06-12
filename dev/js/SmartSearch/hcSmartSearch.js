@@ -1,7 +1,7 @@
 export { SmartSearch } from './SmartSearch.js';
 export { SmartSearchCondition } from './SmartSearchCondition.js';
 export { SmartSearchManager } from './SmartSearchManager.js';
-export { SmartSearchConditionType } from './SmartSearchCondition.js';
+export { SmartSearchOperatorType } from './SmartSearchCondition.js';
 export { SmartSearchPropertyType } from './SmartSearchCondition.js';
 export { SmartSearchRelationshipType } from './SmartSearchCondition.js';
 export { SmartSearchResult } from './SmartSearchResult.js';

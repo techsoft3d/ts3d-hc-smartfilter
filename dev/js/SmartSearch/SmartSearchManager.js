@@ -12,6 +12,10 @@ export class SmartSearchManager {
         this._filterBodies = false;
     }
 
+    getVersion() {
+        return __VERSION__;
+      }
+
     setIgnoreBodies(ignoreBodies) {
         this._ignoreBodies = ignoreBodies;
     }

@@ -96,14 +96,14 @@ async function doSearch() {
     }
     else if ($("#modeSelect")[0].value == "Starts With") {
         condition.setPropertyValue('^' + $("#searchInput").val());
-        condition.setConditionType(hcSmartSearch.SmartSearchConditionType.regex);
+        condition.setOperator(hcSmartSearch.SmartSearchOperatorType.regex);
     }
     else if ($("#modeSelect")[0].value == "Ends With") {
         condition.setPropertyValue($("#searchInput").val() + '$');
-        condition.setConditionType(hcSmartSearch.SmartSearchConditionType.regex);
+        condition.setOperator(hcSmartSearch.SmartSearchOperatorType.regex);
     }
     search.addCondition(condition);
-    let results = await search.apply();
+    let results = await search.execute();
 
     let selections = [];
     for (let i = 0; i < results.length; i++) {

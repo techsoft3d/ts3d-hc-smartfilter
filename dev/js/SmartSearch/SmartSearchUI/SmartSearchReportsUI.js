@@ -78,7 +78,7 @@ export class SmartSearchReportsUI {
 
     static _propertySelected() {
         SmartSearchReportsUI._results.setTableProperty($("#SmartSearchPropSelect")[0].value);
-        SmartSearchEditorUI._mainFilter.setAutoColors(null, null);
+        SmartSearchEditorUI._currentSearch.setAutoColors(null, null);
         SmartSearchReportsUI._generatePropertyView();
 
     }
@@ -624,8 +624,8 @@ export class SmartSearchReportsUI {
 
     static async _generatePropertyView(redrawOnly = false) {
 
-        if (SmartSearchEditorUI._mainFilter.getAutoColorProperty()) {
-            SmartSearchReportsUI._report.setTableProperty(SmartSearchEditorUI._mainFilter.getAutoColorProperty());
+        if (SmartSearchEditorUI._currentSearch.getAutoColorProperty()) {
+            SmartSearchReportsUI._report.setTableProperty(SmartSearchEditorUI._currentSearch.getAutoColorProperty());
         }
 
         let sortedStrings =  SmartSearchReportsUI._report.getAllProperties();
@@ -828,10 +828,10 @@ export class SmartSearchReportsUI {
 
         SmartSearchReportsUI._table.on("cellEdited", function (cell) {
             if (cell.getField() == "color") {
-                let autoColors = SmartSearchEditorUI._mainFilter.getAutoColors();
+                let autoColors = SmartSearchEditorUI._currentSearch.getAutoColors();
                 if (!autoColors) {
                     autoColors = [];
-                    SmartSearchEditorUI._mainFilter.setAutoColors(autoColors, SmartSearchReportsUI._report.getTableProperty());
+                    SmartSearchEditorUI._currentSearch.setAutoColors(autoColors, SmartSearchReportsUI._report.getTableProperty());
                 }
                 let data = cell.getRow().getData();
                 autoColors[data.id] = SmartSearchReportsUI._report.convertColor(data.color);

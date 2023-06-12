@@ -1,4 +1,4 @@
-const SmartSearchConditionType = {
+const SmartSearchOperatorType = {
     contains:0,
     exists:1,
     notExists:2,
@@ -14,7 +14,7 @@ const SmartSearchConditionType = {
 
 };
 
-export {SmartSearchConditionType};
+export {SmartSearchOperatorType};
 
 const SmartSearchPropertyType = {
     nodeName:0,
@@ -53,29 +53,29 @@ export class SmartSearchCondition {
     static convertEnumConditionToString(c) {
     
         switch (c) {
-            case SmartSearchConditionType.contains:
+            case SmartSearchOperatorType.contains:
                 return "contains";
-            case SmartSearchConditionType.exists:
+            case SmartSearchOperatorType.exists:
                 return "exists";
-            case SmartSearchConditionType.notExists:
+            case SmartSearchOperatorType.notExists:
                 return "!exists";
-            case SmartSearchConditionType.greaterOrEqual:
+            case SmartSearchOperatorType.greaterOrEqual:
                 return ">=";
-            case SmartSearchConditionType.lessOrEqual:
+            case SmartSearchOperatorType.lessOrEqual:
                 return "<=";
-            case SmartSearchConditionType.greaterOrEqualDate:
+            case SmartSearchOperatorType.greaterOrEqualDate:
                 return ">=(Date)";
-            case SmartSearchConditionType.lessOrEqualDate:
+            case SmartSearchOperatorType.lessOrEqualDate:
                 return "<=(Date)";
-            case SmartSearchConditionType.equals:
+            case SmartSearchOperatorType.equals:
                 return "=";
-            case SmartSearchConditionType.evaluate:
+            case SmartSearchOperatorType.evaluate:
                 return "evaluate";                
-            case SmartSearchConditionType.unequal:
+            case SmartSearchOperatorType.unequal:
                 return "\u2260";
-            case SmartSearchConditionType.regex:
+            case SmartSearchOperatorType.regex:
                 return "regex";      
-            case SmartSearchConditionType.notregex:
+            case SmartSearchOperatorType.notregex:
                 return "!regex";                                  
         }
     }
@@ -84,29 +84,29 @@ export class SmartSearchCondition {
     
         switch (c) {
             case "contains":
-                return SmartSearchConditionType.contains;
+                return SmartSearchOperatorType.contains;
             case "exists":
-                return SmartSearchConditionType.exists;
+                return SmartSearchOperatorType.exists;
             case "!exists":
-                return SmartSearchConditionType.notExists;
+                return SmartSearchOperatorType.notExists;
             case ">=":
-                return SmartSearchConditionType.greaterOrEqual;
+                return SmartSearchOperatorType.greaterOrEqual;
             case "<=":
-                return SmartSearchConditionType.lessOrEqual;
+                return SmartSearchOperatorType.lessOrEqual;
             case "=":
-                return SmartSearchConditionType.equals;
+                return SmartSearchOperatorType.equals;
             case "\u2260":
-                return SmartSearchConditionType.unequal;
+                return SmartSearchOperatorType.unequal;
             case ">=(Date)":
-                return SmartSearchConditionType.greaterOrEqualDate;
+                return SmartSearchOperatorType.greaterOrEqualDate;
             case "<=(Date)":
-                return SmartSearchConditionType.lessOrEqualDate;
+                return SmartSearchOperatorType.lessOrEqualDate;
             case "evaluate":
-                return SmartSearchConditionType.evaluate;    
+                return SmartSearchOperatorType.evaluate;    
             case "regex":
-                 return SmartSearchConditionType.regex;      
+                 return SmartSearchOperatorType.regex;      
              case "!regex":
-                return SmartSearchConditionType.notregex;                                                                         
+                return SmartSearchOperatorType.notregex;                                                                         
         }
     }
 
@@ -183,7 +183,7 @@ export class SmartSearchCondition {
 
     constructor() {
         this.and = true;
-        this.conditionType = SmartSearchConditionType.contains;
+        this.conditionType = SmartSearchOperatorType.contains;
         this.propertyType = SmartSearchPropertyType.nodeName;
         this.propertyName = "";
         this.text =  "";
@@ -244,7 +244,7 @@ export class SmartSearchCondition {
         return this.and;
     }
 
-    setConditionType(conditionType) {
+    setOperator(conditionType) {
         this.conditionType = conditionType;
     }
 

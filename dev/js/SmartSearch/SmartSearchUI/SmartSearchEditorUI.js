@@ -41,8 +41,8 @@ export class SmartSearchEditorUI {
         SmartSearchEditorUI._maindiv = maindiv;
         SmartSearchEditorUI._manager = manager;
         SmartSearchEditorUI._viewer = manager._viewer;
-        SmartSearchEditorUI._mainFilter = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, startnode);
-        SmartSearchEditorUI._mainFilter.tempId = 0;
+        SmartSearchEditorUI._currentSearch = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, startnode);
+        SmartSearchEditorUI._currentSearch.tempId = 0;
 
         new ResizeObserver(function () {
             SmartSearchEditorUI.adjust()
@@ -193,7 +193,7 @@ export class SmartSearchEditorUI {
     }
 
     static getFilter() {
-        return SmartSearchEditorUI._mainFilter;
+        return SmartSearchEditorUI._currentSearch;
     }
 
     static adjust() 
@@ -221,19 +221,19 @@ export class SmartSearchEditorUI {
         if (!SmartSearchEditorUI._searchResultsCallback) {
             $("#" + SmartSearchResultsUI._maindiv + "_found").append("Searching...");
         }
-        let nodeids = await SmartSearchEditorUI._mainFilter.apply();
+        let nodeids = await SmartSearchEditorUI._currentSearch.execute();
         $("#SmartSearchEditorUIFirstRow").css("opacity", "");
         $("#SmartSearchEditorUIFirstRow").css("pointer-events", "");
 
 
 
-        let startnode = SmartSearchEditorUI._mainFilter.getStartNode();
-        SmartSearchEditorUI._founditems = new hcSmartSearch.SmartSearchResult(this._manager, SmartSearchEditorUI._mainFilter);
+        let startnode = SmartSearchEditorUI._currentSearch.getStartNode();
+        SmartSearchEditorUI._founditems = new hcSmartSearch.SmartSearchResult(this._manager, SmartSearchEditorUI._currentSearch);
         SmartSearchEditorUI._founditems.generateItems(nodeids, startnode, SmartSearchEditorUI._chainSkip);
 
         SmartSearchEditorUI._generateSearchResults();
         if (doAction) {
-            SmartSearchEditorUI._mainFilter.performAction(nodeids);
+            SmartSearchEditorUI._currentSearch.performAction(nodeids);
         }
     }
 
@@ -241,12 +241,12 @@ export class SmartSearchEditorUI {
     static _getSmartSearchFromTempId(id) {
 
         if (id == 0) {
-            return SmartSearchEditorUI._mainFilter;
+            return SmartSearchEditorUI._currentSearch;
         }
 
-        for (let i=0;i<SmartSearchEditorUI._mainFilter.getNumConditions();i++)
+        for (let i=0;i<SmartSearchEditorUI._currentSearch.getNumConditions();i++)
         {
-            let condition = SmartSearchEditorUI._mainFilter.getCondition(i);
+            let condition = SmartSearchEditorUI._currentSearch.getCondition(i);
             if (condition.childFilter && condition.childFilter.tempId == id)
             {
                 return condition.childFilter;
@@ -256,7 +256,7 @@ export class SmartSearchEditorUI {
     }
 
     static async _updateSearch() {
-        if (SmartSearchEditorUI._founditems || SmartSearchEditorUI._mainFilter.getNumConditions()) {
+        if (SmartSearchEditorUI._founditems || SmartSearchEditorUI._currentSearch.getNumConditions()) {
             await SmartSearchEditorUI.search();
         }
     }
@@ -284,7 +284,7 @@ export class SmartSearchEditorUI {
         let SmartSearch;
         if (!SmartSearchIn)
         {
-            SmartSearch = SmartSearchEditorUI._mainFilter;                 
+            SmartSearch = SmartSearchEditorUI._currentSearch;                 
         }
         else
         {
@@ -347,8 +347,8 @@ export class SmartSearchEditorUI {
 
 
     static async _convertToChildfilter() {
-        let SmartSearch = SmartSearchEditorUI._mainFilter; 
-        let newfilter = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, SmartSearchEditorUI._mainFilter.getStartNode());
+        let SmartSearch = SmartSearchEditorUI._currentSearch; 
+        let newfilter = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, SmartSearchEditorUI._currentSearch.getStartNode());
 
         for (let i = 0; i < SmartSearch.getNumConditions(); i++) {
 
@@ -379,7 +379,7 @@ export class SmartSearchEditorUI {
         SmartSearch = SmartSearchEditorUI._getSmartSearchFromTempId(id);
         let childFilter = null;
         if (createChildFilter) {
-            childFilter = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, SmartSearchEditorUI._mainFilter.getStartNode());
+            childFilter = new hcSmartSearch.SmartSearch(SmartSearchEditorUI._manager, SmartSearchEditorUI._currentSearch.getStartNode());
             childFilter.addCondition(new hcSmartSearch.SmartSearchCondition());
         }
             
@@ -456,8 +456,8 @@ export class SmartSearchEditorUI {
 
     static _limitSelectionShow() {
       
-        let nodeids = SmartSearchEditorUI._mainFilter.getLimitSelectionList();
-        SmartSearchEditorUI._founditems = new hcSmartSearch.SmartSearchResult(this._manager, SmartSearchEditorUI._mainFilter);
+        let nodeids = SmartSearchEditorUI._currentSearch.getLimitSelectionList();
+        SmartSearchEditorUI._founditems = new hcSmartSearch.SmartSearchResult(this._manager, SmartSearchEditorUI._currentSearch);
         SmartSearchEditorUI._founditems.generateItems(nodeids,SmartSearchEditorUI._viewer.model.getRootNode(),0);
 
         SmartSearchEditorUI.selectAll();        
@@ -466,21 +466,21 @@ export class SmartSearchEditorUI {
 
     static _limitSelection(el) {
       
-        if (SmartSearchEditorUI._mainFilter.getLimitSelectionList().length == 0) {
+        if (SmartSearchEditorUI._currentSearch.getLimitSelectionList().length == 0) {
             let limitselectionlist = [];
             let r = SmartSearchEditorUI._viewer.selectionManager.getResults();
             for (let i = 0; i < r.length; i++) {
                 limitselectionlist.push(r[i].getNodeId());
             }
-            SmartSearchEditorUI._mainFilter.limitToNodes(limitselectionlist);
+            SmartSearchEditorUI._currentSearch.limitToNodes(limitselectionlist);
         }
         else
         {
-            SmartSearchEditorUI._mainFilter.limitToNodes([]);
+            SmartSearchEditorUI._currentSearch.limitToNodes([]);
         }
 
         let text = "Limit Selection";
-        if (SmartSearchEditorUI._mainFilter.getLimitSelectionList().length != 0) {
+        if (SmartSearchEditorUI._currentSearch.getLimitSelectionList().length != 0) {
             text = '<span style="left:-5px;position:absolute;">&#x2714</span>' + text;
         }
         $(el).html(text);
@@ -721,7 +721,7 @@ export class SmartSearchEditorUI {
         if (!SmartSearchIn)
         {
             SmartSearchEditorUI.tempId = 0;
-            SmartSearch = SmartSearchEditorUI._mainFilter;                 
+            SmartSearch = SmartSearchEditorUI._currentSearch;                 
         }
         else
         {

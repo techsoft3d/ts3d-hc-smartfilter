@@ -1,5 +1,5 @@
 import { SmartSearchCondition } from './SmartSearchCondition.js';
-import { SmartSearchConditionType } from './SmartSearchCondition.js';
+import { SmartSearchOperatorType } from './SmartSearchCondition.js';
 import { SmartSearchRelationshipType } from './SmartSearchCondition.js';
 import { SmartSearchPropertyType } from './SmartSearchCondition.js';
 import { SmartSearchResult } from './SmartSearchResult.js';
@@ -69,7 +69,7 @@ export class SmartSearch {
             nodeidst = nodeids_in;
         }
         else {
-            nodeidst = await this.apply();
+            nodeidst = await this.execute();
         }
 
 
@@ -307,7 +307,7 @@ export class SmartSearch {
         }
     }
 
-    async apply() {
+    async execute() {
         this._selectionBounds = null;
         this._searchCounter = 0;
         let conditions = this._conditions;
@@ -460,7 +460,7 @@ export class SmartSearch {
             condition.relationship = savrel;
         }
         else {
-            if (condition.conditionType == SmartSearchConditionType.notExists) {
+            if (condition.conditionType == SmartSearchOperatorType.notExists) {
                 return true;
             }
         }
@@ -535,7 +535,7 @@ export class SmartSearch {
             condition.relationship = savrel;
         }
         else {
-            if (condition.conditionType == SmartSearchConditionType.notExists) {
+            if (condition.conditionType == SmartSearchOperatorType.notExists) {
                 return true;
             }
         }
@@ -573,7 +573,7 @@ export class SmartSearch {
             condition.relationship = savrel;
         }
         else {
-            if (condition.conditionType == SmartSearchConditionType.notExists) {
+            if (condition.conditionType == SmartSearchOperatorType.notExists) {
                 return true;
             }
         }
@@ -623,12 +623,12 @@ export class SmartSearch {
 
 
     async _checkCondition(id, condition, chaintext) {
-        if (condition.conditionType != SmartSearchConditionType.contains && condition.conditionType != SmartSearchConditionType.regex 
-            && condition.conditionType != SmartSearchConditionType.notregex) {          
-            if (condition.conditionType == SmartSearchConditionType.exists || condition.conditionType == SmartSearchConditionType.notExists) {
+        if (condition.conditionType != SmartSearchOperatorType.contains && condition.conditionType != SmartSearchOperatorType.regex 
+            && condition.conditionType != SmartSearchOperatorType.notregex) {          
+            if (condition.conditionType == SmartSearchOperatorType.exists || condition.conditionType == SmartSearchOperatorType.notExists) {
                 let res = false;
                 let invert = false;
-                if (condition.conditionType == SmartSearchConditionType.notExists) {
+                if (condition.conditionType == SmartSearchOperatorType.notExists) {
                     invert = true;
                 }
                 
@@ -664,7 +664,7 @@ export class SmartSearch {
             else if (condition.propertyType == SmartSearchPropertyType.numChildren) {
                 searchAgainstNumber = this._viewer.model.getNodeChildren(id).length;
             }
-            else if (condition.conditionType == SmartSearchConditionType.evaluate) {
+            else if (condition.conditionType == SmartSearchOperatorType.evaluate) {
                 let bounds;
                 if (condition.propertyName == "COG") {
                     let text = this._manager._propertyHash[id][condition.propertyName];
@@ -747,7 +747,7 @@ export class SmartSearch {
                     temp = this._manager._propertyHash[id][condition.propertyName];
                 }
                 if (temp == undefined) {
-                    if (condition.conditionType == SmartSearchConditionType.unequal)
+                    if (condition.conditionType == SmartSearchOperatorType.unequal)
                         return true;
                     else
                         return false;
@@ -755,7 +755,7 @@ export class SmartSearch {
                 searchAgainstNumber = parseFloat(temp);
             }
 
-            if (condition.conditionType == SmartSearchConditionType.greaterOrEqualDate || condition.conditionType == SmartSearchConditionType.lessOrEqualDate) {
+            if (condition.conditionType == SmartSearchOperatorType.greaterOrEqualDate || condition.conditionType == SmartSearchOperatorType.lessOrEqualDate) {
                 let temp;
                 if (this._manager._propertyHash[id]) {
                     temp = this._manager._propertyHash[id][condition.propertyName];
@@ -777,11 +777,11 @@ export class SmartSearch {
                     ctext = parseInt(ctext);
                 }
                 let searchDate = new Date(ctext);
-                if (condition.conditionType == SmartSearchConditionType.greaterOrEqualDate) {
+                if (condition.conditionType == SmartSearchOperatorType.greaterOrEqualDate) {
                     if (searchAgainstDate >= searchDate)
                         return true;
                 }
-                else if (condition.conditionType == SmartSearchConditionType.lessOrEqualDate) {
+                else if (condition.conditionType == SmartSearchOperatorType.lessOrEqualDate) {
                     if (searchAgainstDate <= searchDate)
                         return true;
                 }
@@ -793,15 +793,15 @@ export class SmartSearch {
                 if (isNaN(searchNumber) || isNaN(searchAgainstNumber))
                     return false;
 
-                if (condition.conditionType == SmartSearchConditionType.greaterOrEqual) {
+                if (condition.conditionType == SmartSearchOperatorType.greaterOrEqual) {
                     if (searchAgainstNumber >= searchNumber)
                         return true;
                 }
-                else if (condition.conditionType == SmartSearchConditionType.lessOrEqual) {
+                else if (condition.conditionType == SmartSearchOperatorType.lessOrEqual) {
                     if (searchAgainstNumber <= searchNumber)
                         return true;
                 }
-                else if (condition.conditionType == SmartSearchConditionType.unequal) {
+                else if (condition.conditionType == SmartSearchOperatorType.unequal) {
                     if (searchAgainstNumber != searchNumber)
                         return true;
                 }
@@ -814,7 +814,7 @@ export class SmartSearch {
         }
         else {
             let searchTerms;
-            if (condition.conditionType == SmartSearchConditionType.contains) {            
+            if (condition.conditionType == SmartSearchOperatorType.contains) {            
                     searchTerms = condition.text.split(",");
             }
             else {
@@ -879,7 +879,7 @@ export class SmartSearch {
             if (searchAgainst == undefined)
                 searchAgainst = "";
 
-            if (condition.conditionType != SmartSearchConditionType.contains) {
+            if (condition.conditionType != SmartSearchOperatorType.contains) {
                 let regex;
                 try {
                     regex = new RegExp(searchTerms, 'gi'); // Removed the 'i' flag for case-sensitive matching
@@ -892,7 +892,7 @@ export class SmartSearch {
                 let res;
                 matches ? res = true : res = false;
 
-                if (condition.conditionType == SmartSearchConditionType.regex) {
+                if (condition.conditionType == SmartSearchOperatorType.regex) {
                     return res;
                 }
                 else {
@@ -1014,7 +1014,7 @@ export class SmartSearch {
                     }
                 }
                 res = await this._testNodeAgainstConditions(id, conditions[i].SmartSearch._conditions, chaintext);
-                if (conditions[i].conditionType == SmartSearchConditionType.unequal) {
+                if (conditions[i].conditionType == SmartSearchOperatorType.unequal) {
                     res = !res;
                 }
             }
@@ -1039,14 +1039,14 @@ export class SmartSearch {
                     condition.propertyName = conditions[i].wildcardArray[j];
                     res = await this._checkCondition(id, condition, chaintext);
                     if (res == true) {
-                        if (condition.conditionType == SmartSearchConditionType.contains || condition.conditionType == SmartSearchConditionType.exists) {
+                        if (condition.conditionType == SmartSearchOperatorType.contains || condition.conditionType == SmartSearchOperatorType.exists) {
                             break;
                         }
                         numfound++;
                     }
                 }
 
-                if (condition.conditionType == SmartSearchConditionType.notExists) {
+                if (condition.conditionType == SmartSearchOperatorType.notExists) {
                     if (numfound == conditions[i].wildcardArray.length) {
                         res = true;
                     }

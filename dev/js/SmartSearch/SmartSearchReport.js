@@ -1,5 +1,5 @@
 import { SmartSearchPropertyType } from './SmartSearchCondition.js';
-import { SmartSearchConditionType } from './SmartSearchCondition.js';
+import { SmartSearchOperatorType } from './SmartSearchCondition.js';
 
 export class SmartSearchReport {
 
@@ -14,7 +14,7 @@ export class SmartSearchReport {
         for (let i = 0; i < this._result.getQuery().getNumConditions(); i++) {
             let condition = this._result.getQuery().getCondition(i);
             if (condition.propertyName.indexOf("Node Chain") == -1) {
-                if (condition.conditionType == SmartSearchConditionType.exists) {
+                if (condition.conditionType == SmartSearchOperatorType.exists) {
                     this._orgProperties.push(condition.propertyName);
                 }
                 else {
