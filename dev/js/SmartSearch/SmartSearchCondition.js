@@ -236,11 +236,11 @@ export class SmartSearchCondition {
         return this.SmartSearchID;
     }
 
-    setAndOr(andor) {
+    setAnd(andor) {
         this.and = andor;
     }
 
-    getAndOr() {
+    getAnd() {
         return this.and;
     }
 

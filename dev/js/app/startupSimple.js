@@ -1,7 +1,7 @@
 var myLayout;
 var mySmartSearchManager;
 let typeArray = [];
-let currentCategory = "TYPE"
+let currentProperty = "TYPE"
 
 async function msready() {
     mySmartSearchManager = new hcSmartSearch.SmartSearchManager(hwv);
@@ -28,14 +28,14 @@ function generateTypeButton(text) {
 }
 
 function regenerateOptions() {       
-    currentCategory = $("#categorySelect").val()
-    let options = mySmartSearchManager.getAllOptionsForProperty(currentCategory);
+    currentProperty = $("#categorySelect").val()
+    let options = mySmartSearchManager.getAllOptionsForProperty(currentProperty);
     let sortedStrings = [];
     for (let i in options) {
         sortedStrings.push(i);
     }
     sortedStrings.sort();
-    let html = '<option selected disabled>Choose ' + currentCategory + '</option>';
+    let html = '<option selected disabled>Choose ' + currentProperty + '</option>';
     for (let i = 0; i < sortedStrings.length; i++) {
             html += '<option value="' + sortedStrings[i] + '">' + sortedStrings[i] + '</option>\n';
     }
@@ -75,7 +75,7 @@ async function doSearch() {
     if (typeArray.length > 0) {
         condition = new hcSmartSearch.SmartSearchCondition();
         condition.setPropertyType(hcSmartSearch.SmartSearchPropertyType.property);
-        condition.setPropertyName(currentCategory);
+        condition.setPropertyName(currentProperty);
         let typetext = "";
         for (let i = 0; i < typeArray.length; i++) {
             typetext += '"' + typeArray[i] + '"';

@@ -35,13 +35,73 @@ Here is how to start the demo with the provided sample model locally when using 
 <http://127.0.0.1:5500/dev/viewer.html?scs=models/arboleda.scs>
 
 
-## Search Editor UI 
+
+## Basic Usage (without built-in UI)
+
+### Initialization
+
+```
+let searchManager = new hcSmartSearch.SmartSearchManager(hwv);
+await searchManager.initialize();
+```
+The SmartSearchManager object is the main entry point for the search functionality. It should be instanciated with a webviewer object only after the modelStructureReady event has been fired. The initialize function will extract all properties from the model and build an internal hash table. This can take a few seconds for large models. If you want to speed up the initialization you can generate a JSON file with the properties beforehand and load it into the SmartSearchManager object. See futher below for details.
+
+
+### Querying available properties
+
+```
+let propertiesArray = searchManager.getAllProperties();
+```
+This function will return an array containing all properties available in the model. This can be used to populate a drop-down menu for example in your UI so the user can quickly select a property to search for. 
+
+### Querying Options for a given property
+
+```
+let optionsArray = searchManager.getAllOptionsForProperty(property);
+```
+This function will return an array containing all options available for a given property. This can be used to populate a select box with the available choices for a given property in your UI.
+
+
+### Building the Search
+
+```
+let search = new hcSmartSearch.SmartSearch(searchManager, hwv.model.getRootNode());
+```
+The SmartSearch object is the main class for building a search. It needs to be initialized with a SmartSearchManager object and a startnode. The startnode is the node from which the search will be performed. In most cases this will be the root node of the model but it is also possible to start the search from a specific node in the model. This is useful if you want to limit the search to a specific part of the model.  
+
+After the search object has been instantiated, the next step is to add conditions to the search. A condition is a combination of a property, a comparison operator and a value:
+
+```
+let condition = new hcSmartSearch.SmartSearchCondition();
+condition.setPropertyType(hcSmartSearch.SmartSearchPropertyType.property);
+condition.setPropertyName("IFCDOORSTYLE/OperationType");
+condition.setPropertyValue("._SLIDING_TO_LEFT.,._SLIDING_TO_RIGHT.");
+condition.setOperator(hcSmartSearch.SmartSearchOperatorType.contains);
+condition.setAnd(true);
+```
+The code below creates a new condition object, sets the property type to be a regular property, defines the name of the property, the requested value as well as the operator to use for the comparison. In this case the condition will be true for all doors that have the property value set to either "_SLIDING_TO_LEFT." or "_SLIDING_TO_RIGHT.". Calling setAnd(true) will use an "and" operator to combine this condition with the next condition. It is important to note that mixing and/or operators is not allowed if more than two conditions are used. To support and/or combination use condition groups (see below).
+
+The next step is to add the condition to the search:
+
+```
+search.addCondition(condition);
+```
+The search object can contain multiple conditions. By default all conditions are combined with an "and" operator.  
+After all conditions have been specified and added to the search, you can execute the search:
+
+```
+let results = await search.execute();
+```
+This function will return an array of nodeids, of all nodes that match the search criteria. 
+
+
+## Using the built-in Search UI
 ## Initialization
 
 ```
 let manager = new hcSmartSearch.SmartSearchManager(hwv);
 ```
-The SmartSearchManager object is the main entry point for the search functionality. It needs to be initialized with a webviewer object after the modelStructureReady event has been fired.
+The SmartSearchManager object is the main entry point for the search functionality. It should be instanciated with a webviewer object only after the modelStructureReady event has been fired.
 
 ```
 hcSmartSearch.SmartSearchEditorUI.initialize("searcheditor", manager);
@@ -49,8 +109,6 @@ hcSmartSearch.SmartSearchEditorUI.initialize("searcheditor", manager);
 Initializes the Editor UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. A third (optional) parameter is the startnode. It is the node from which the search will be performed.
 
 Before the search window is initially displayed all model properties are extracted and put into an internal hash. That can take a few seconds for large models though it is possible to generate a JSON file with the properties beforehand and load it into the SmartSearchManager object. See futher below for details.
-
-```
 
 The editor is reactive and will adjust to various sizes though the parent div should be at least 300px wide and 400px high. Through the separate CSS file you can modify some aspect of its styling but if you need more customization I suggest writing your own UI.
 
@@ -125,7 +183,7 @@ When displaying the search results you can optionally skip over the first "n" le
 ### Initialization
 
 ```
-    hcSmartSearch.SmartSearchManagerUI.initialize("searchmanagercontainer",manager, true);
+hcSmartSearch.SmartSearchManagerUI.initialize("searchmanagercontainer",manager, true);
 ```
 
 Initializes the Manager UI and displays it. The first parameter is the id of the div that the UI should be created in. The second parameter is the webviewer object. If the third parameter is set to true the import/export buttons will be visible in the UI. 

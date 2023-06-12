@@ -396,7 +396,7 @@ export class SmartSearchEditorUI {
             let condition = new hcSmartSearch.SmartSearchCondition();
             condition.propertyName = "Node Name";
             condition.setChildFilter(childFilter);
-            condition.setAndOr(previousCondition.getAndOr());
+            condition.setAnd(previousCondition.getAnd());
             SmartSearch.addCondition(condition);
         }
 
